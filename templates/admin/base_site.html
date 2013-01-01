@@ -1,0 +1,165 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans 'RFID lock admin' %}{% endblock %}
+
+
+{% block extrastyle %}
+
+    <style>
+        #branding h1{ 
+            color: #000; 
+            font-weight:bold;
+            padding-bottom:10px;
+        }
+        #header{ 
+            border-bottom: solid 2px black;
+            background-color:#6A9A1F; 
+            -moz-border-top-left-radius: 7px;
+            -moz-border-top-right-radius: 7px;
+            border-top-left-radius: 7px;
+            border-top-right-radius: 7px;
+            padding-bottom:10px;
+        }
+        .login #container { 
+            border-color:black !important; 
+            -moz-border-radius: 9px !important;
+            border-radius: 9px !important;
+            border-width:2px !important;
+        }
+        .module caption { 
+            font-size:14px;
+            color:black;
+            background: transparent; 
+            background-color:#00ACE9; 
+            border-bottom:1px solid black; 
+            border-left:0px ; 
+            border-right:0px; 
+            -moz-border-top-left-radius: 7px;
+            border-top-left-radius: 7px;
+            -moz-border-top-right-radius: 7px;
+            border-top-right-radius: 7px;
+            }
+
+        .module2 {
+            margin:10px;
+            margin-left:10px;
+            margin-right:10px;
+            border:2px solid black;
+            /*-moz-border-radius: 9px;
+            border-radius: 9px;
+            */
+            width:200px;
+            height:75px;
+            background-color:#00ACE9;
+            padding-top:20px;
+            padding-bottom:0px;
+            padding-left:10px;
+            padding:right:10px;
+        }
+
+
+
+        .module {
+            margin:5px;
+            margin-left:10px;
+            margin-right:10px;
+            border:2px solid black;
+            -moz-border-radius: 9px;
+            border-radius: 9px;
+            padding-top:20px;
+            padding-bottom:0px;
+            padding-left:10px;
+            padding:right:10px;
+        }
+
+
+        #content-related .module h2 {
+            color:black;
+            font-size:14px;
+            background-image: none;
+            background-color: #ff9900; /* nice orange */
+/*            background-color: #97ce68; /*lighter green than the top bar */
+/*            background-color: #FF6766;  /* nice pinkish */
+            border-bottom:1px solid black; 
+            border-left:0px ; 
+            border-right:0px; 
+            -moz-border-top-left-radius: 7px;
+            border-top-left-radius: 7px;
+            -moz-border-top-right-radius: 7px;
+            border-top-right-radius: 7px;
+            }
+        a.section:link, a.section:visited { 
+            color: #003366; 
+        }
+        td, th {
+            border:0px; 
+        }
+        h1  {
+            color:black;
+        }
+
+        table th.sortable{ 
+            width:10px !important;  
+            }
+        table {
+            border:0px;
+            text-align:center;
+            margin:auto;
+            }
+
+        #header  {
+            border-bottom: solid 2px black;
+            -moz-border-top-left-radius: 0px;
+            -moz-border-top-right-radius: 0px;
+            border-top-left-radius: 0px;
+            border-top-right-radius: 0px;
+            margin-bottom:40px;
+
+        }
+
+        #header_link
+        {
+            color:black !important;
+        }
+
+        #site-name a:hover {
+            color:white !important;
+        }
+
+        .ml {margin:0 10px 10px;
+            display:block;
+            float:left;
+        }
+
+
+
+
+    </style>
+ {% endblock %}
+
+{% comment %}   No breadcrumbs pls, so put empty block here {% endcomment %}
+{% block breadcrumbs %}{% endblock %}
+
+{% block branding %}
+    <h1 id="site-name"><a href='/lock/' id='header_link'>{% trans 'RFID Lock Admin' %}</a></h1>
+{% endblock %}
+
+
+{% block nav-global %}
+<!--  {% if user.is_staff %} -->
+   <a href="/lockadmin/djock_app/lockuser/add/" class="ml">Assign new keycard</a>
+   <p class="ml">|</p>
+    {% comment %}
+    <a href="/lockadmin/djock_app/lockuser/?is_active__exact=0" class="ml">Inactive LockUsers</a>
+    <p class="ml">|</p>
+    Link above is a "deep link" to a filter model for not yet/no longer activated lock users.
+    (Note -- I'd like non-superuser staff to NOT have the ability to delete models -- 
+    but rather to DEACTIVATE.  So to-do: is_active flag for LockUser model. 
+    {% endcomment %}
+   <a href="/lockadmin/djock_app/accesstime/" class="ml">Room access log</a> <p class="ml">|</p>
+    <a href="/lockadmin/djock_app/lockuser/" class="ml">View/Manage lock users</a> <p class="ml">|</p>
+    <a href="/lockadmin/auth/user/add/" class="ml">Add STAFF users</a> <p class="ml">|</p>
+   <a href="/lockadmin/auth/user/" class="ml">Manage STAFF users</a> <p class="ml">
+ <!--           {% endif %} -->
+{% endblock %}
