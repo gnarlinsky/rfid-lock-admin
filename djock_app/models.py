@@ -22,7 +22,7 @@ class AccessTime(models.Model):
 
 
 
-
+        def wtf(self): pass
 
 
 class LockUser(models.Model):
