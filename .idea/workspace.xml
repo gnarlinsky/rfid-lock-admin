@@ -58,13 +58,12 @@
       <file leaf-file-name="models.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/djock_app/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="24" column="27" selection-start="818" selection-end="818" vertical-scroll-proportion="0.55130166">
+            <state line="24" column="0" selection-start="791" selection-end="791" vertical-scroll-proportion="0.55130166">
               <folding>
-                <element signature="e#301#818#0" expanded="true" />
-                <element signature="e#814#818#0" expanded="true" />
-                <element signature="e#855#1015#1" expanded="true" />
-                <element signature="e#2385#3240#0" expanded="true" />
-                <element signature="e#3307#3676#0" expanded="true" />
+                <element signature="e#301#695#0" expanded="true" />
+                <element signature="e#827#987#1" expanded="true" />
+                <element signature="e#2357#3212#0" expanded="true" />
+                <element signature="e#3279#3648#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -535,13 +534,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/djock_app/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="27" selection-start="818" selection-end="818" vertical-scroll-proportion="0.55130166">
+        <state line="24" column="0" selection-start="791" selection-end="791" vertical-scroll-proportion="0.55130166">
           <folding>
-            <element signature="e#301#818#0" expanded="true" />
-            <element signature="e#814#818#0" expanded="true" />
-            <element signature="e#855#1015#1" expanded="true" />
-            <element signature="e#2385#3240#0" expanded="true" />
-            <element signature="e#3307#3676#0" expanded="true" />
+            <element signature="e#301#695#0" expanded="true" />
+            <element signature="e#827#987#1" expanded="true" />
+            <element signature="e#2357#3212#0" expanded="true" />
+            <element signature="e#3279#3648#0" expanded="true" />
           </folding>
         </state>
       </provider>
