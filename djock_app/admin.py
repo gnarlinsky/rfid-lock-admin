@@ -27,7 +27,7 @@ class LockUserAdmin(admin.ModelAdmin):
 
     # fields (i.e. column headings)
     list_display = ('first_name','last_name','email','rfid','get_last_access_time','get_all_access_times','is_active')
-    list_filter = ('rfid','is_active')  # show filters by RFID and active/inactive on the right
+    #list_filter = ('rfid','is_active')  # show filters by RFID and active/inactive on the right
     #exclude = ("birthdate ", "middle_name")   # temp exclusion
 
     # Only the first name will appear as link to the individual LockUser page
