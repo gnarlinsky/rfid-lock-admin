@@ -12,7 +12,7 @@ urlpatterns = patterns('',
     url(r'^lockadmin/', include(admin.site.urls)),
 
     # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    #url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 )
 
 

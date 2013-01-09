@@ -15,13 +15,25 @@ class AccessTime(models.Model):
         else: # nobody found assigned this RFID
             return "No associated user found"
 
+# 2 more join tables
+#       class for rfid_door
+#       class user_rfid
+# modify AccessTime
+
+
 class LockUser(models.Model):
     """
     (Despite the misleading name, LockUsers are not subclassed Users, but subclassed Models.)
+
+    Former rfid's would be stored in a separate model
     """
     # The radio-frequency id, however it will be represented:
     # The first argument is what the label for this field should read/the verbose name (optional,
     # defaults to same as field's name, with spaces converted to underscores)
+    # (So if there's a separate table for past/all rfids, rfid here would be the active one from that table
+    #       join table - user and rfids, both foreign keys, also start and end times associated with rfid
+    #       so active rfid = falls within certain time period
+    #   AccessTime fields: foreign keys then
     rfid            = models.IntegerField("RF ID",max_length=30,null=True, help_text = "RF ID, however it's represented")
 
     # previous_rfid   = list of previous rfid's this user had?
