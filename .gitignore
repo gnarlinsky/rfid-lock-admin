@@ -2,7 +2,8 @@ ignore_me_for_readme
 NO
 admin_templates
 notes.txt
-.idea/* # PyCharm settings
+.idea
+#.idea/* # PyCharm settings
 
 # Compiled source #
 ###################
