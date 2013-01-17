@@ -1,12 +1,25 @@
 from django.contrib import admin
-from djock_app.models import LockUser, AccessTime
+from djock_app.models import LockUser, AccessTime, RFID
 
+# do I need this????
+#class OpenershipAdmin(admin.ModelAdmin):
+#    pass
 
+# https://docs.djangoproject.com/en/dev/ref/contrib/admin/#working-with-many-to-many-intermediary-models
+#class OpenershipInline(admin.TabularInline):
+    #model = Openership
+    #extra = 1
+
+class RFIDAdmin(admin.ModelAdmin):
+    #inlines = (OpenershipInline,)
+    pass
 
 class LockUserAdmin(admin.ModelAdmin):
     ####################################################
     # Page listing all LockUsers ("change list" page):
     ####################################################
+    #inlines = (OpenershipInline,)
+
     def make_active(self, request, queryset):
         """ Staff should not have the ability to delete LockUsers, only to DEACTIVATE them.  """
         queryset.update(is_active=True)
@@ -26,7 +39,12 @@ class LockUserAdmin(admin.ModelAdmin):
     actions = (make_active, make_inactive,email_selected)
 
     # fields (i.e. column headings)
-    list_display = ('first_name','last_name','email','rfid','get_last_access_time','get_all_access_times','is_active')
+    list_display = ('first_name','last_name','email','rfid','get_current_rfid','get_last_access_time','get_all_access_times','is_active')
+
+
+    # same as above, but taking out rfid just to see if it's the culprit right now.
+    #list_display = ('first_name','last_name','email','get_last_access_time','get_all_access_times','is_active')
+
     #list_filter = ('rfid','is_active')  # show filters by RFID and active/inactive on the right
     #exclude = ("birthdate ", "middle_name")   # temp exclusion
 
@@ -40,12 +58,13 @@ class LockUserAdmin(admin.ModelAdmin):
     # (parentheses group fields into a single line)
     fieldsets = (
             (None, {
-                'fields': ( ('first_name', 'last_name'), 'email','phone_number','address', 'rfid', 'get_last_access_time', 'get_all_access_times','is_active'),
+                'fields': ( ('first_name', 'last_name'), 'email','rfid','phone_number','address', 'get_current_rfid', 'get_last_access_time', 'get_all_access_times','is_active'),
                 'description': ('description.....  Create/modify new lock user and assign keycard')
             }),
-
         )
-    readonly_fields = ("get_last_access_time","get_all_access_times")   # Obviously access times should not be editable
+
+
+    readonly_fields = ("get_current_rfid","get_last_access_time","get_all_access_times")   # Obviously access times should not be editable
 
 class AccessTimeAdmin(admin.ModelAdmin):
     def __init__(self, *args, **kwargs):
@@ -71,7 +90,7 @@ class AccessTimeAdmin(admin.ModelAdmin):
     # Individual TimeAccess page
     # (Although there's no need link to an individual AccessTime object's page, it still exists.)
     ####################################################################################################
-    readonly_fields = ('access_time','rfid')   # because obviously these shouldn't be editable.
+   # readonly_fields = ('access_time','rfid')   # because obviously these shouldn't be editable.   (but commenting out if want to create some objects from admin just for fun)
 
     #Don't display save, etc. buttons on bottom (to do: the remaining "Save and continue editing" and "Save")
     def has_delete_permission(self, request, obj=None):
@@ -88,5 +107,6 @@ admin.site.disable_action('delete_selected')
 
 # Run admin.site.register() for each model we wish to register
 # (not defining a new AdminSite because the REAL Django admin just == all staff)
+admin.site.register(RFID, RFIDAdmin)
 admin.site.register(LockUser,LockUserAdmin)
 admin.site.register(AccessTime,AccessTimeAdmin)
