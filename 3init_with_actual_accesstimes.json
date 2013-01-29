@@ -1,0 +1,1351 @@
+[
+  {
+    "pk": 1, 
+    "model": "djock_app.door", 
+    "fields": {
+      "name": "oijojoij"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "djock_app.door", 
+    "fields": {
+      "name": "two"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "djock_app.door", 
+    "fields": {
+      "name": "ihojlkjlk"
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "djock_app.door", 
+    "fields": {
+      "name": "khkjkljkj"
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "djock_app.door", 
+    "fields": {
+      "name": "Makerspace"
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "djock_app.door", 
+    "fields": {
+      "name": "Bike Project"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "djock_app.rfidkeycard", 
+    "fields": {
+      "date_created": "2013-01-28T10:52:33.856Z", 
+      "the_rfid": 3453543, 
+      "date_revoked": "2013-01-28T11:26:58Z"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "djock_app.rfidkeycard", 
+    "fields": {
+      "date_created": "2013-01-28T10:52:39.505Z", 
+      "the_rfid": 4444, 
+      "date_revoked": null
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "djock_app.rfidkeycard", 
+    "fields": {
+      "date_created": "2013-01-28T10:52:47.946Z", 
+      "the_rfid": 33333333, 
+      "date_revoked": null
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "djock_app.rfidkeycard", 
+    "fields": {
+      "date_created": "2013-01-28T10:52:55.098Z", 
+      "the_rfid": 1111111, 
+      "date_revoked": null
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "djock_app.rfidkeycard", 
+    "fields": {
+      "date_created": "2013-01-28T10:53:03.656Z", 
+      "the_rfid": 2222222, 
+      "date_revoked": null
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "djock_app.rfidkeycard", 
+    "fields": {
+      "date_created": "2013-01-29T01:45:49.505Z", 
+      "the_rfid": 43854385, 
+      "date_revoked": "2013-01-29T02:45:08Z"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "djock_app.accesstime", 
+    "fields": {
+      "access_time": "2013-01-27T22:49:52Z", 
+      "the_rfid": 112312312
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "djock_app.accesstime", 
+    "fields": {
+      "access_time": "2013-01-27T22:50:06Z", 
+      "the_rfid": 1111111
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "djock_app.accesstime", 
+    "fields": {
+      "access_time": "2013-01-27T22:50:10Z", 
+      "the_rfid": 2222222
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "djock_app.accesstime", 
+    "fields": {
+      "access_time": "2013-01-27T22:50:16Z", 
+      "the_rfid": 333333333
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "djock_app.accesstime", 
+    "fields": {
+      "access_time": "2013-01-27T22:50:24Z", 
+      "the_rfid": 4444
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "djock_app.accesstime", 
+    "fields": {
+      "access_time": "2013-01-09T22:50:27Z", 
+      "the_rfid": 4444
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "djock_app.accesstime", 
+    "fields": {
+      "access_time": "2013-01-12T06:00:00Z", 
+      "the_rfid": 4444
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "djock_app.accesstime", 
+    "fields": {
+      "access_time": "2012-12-18T22:50:57Z", 
+      "the_rfid": 3453543
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "djock_app.accesstime", 
+    "fields": {
+      "access_time": "2012-12-10T12:00:00Z", 
+      "the_rfid": 3453543
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "djock_app.lockuser", 
+    "fields": {
+      "phone_number": 234324, 
+      "first_name": "asdfsd", 
+      "last_name": "sldkfj", 
+      "middle_name": "", 
+      "birthdate": null, 
+      "doors": [
+        4
+      ], 
+      "address": "", 
+      "rfids": [
+        3, 
+        5
+      ], 
+      "email": "lKDSJF@ALSDKJF.COM"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "djock_app.lockuser", 
+    "fields": {
+      "phone_number": 2342343242342342, 
+      "first_name": "hello", 
+      "last_name": "alsdkjfl", 
+      "middle_name": "", 
+      "birthdate": null, 
+      "doors": [
+        1
+      ], 
+      "address": "", 
+      "rfids": [
+        6
+      ], 
+      "email": "alsdkjf@alsdkjf.com"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "djock_app.lockuser", 
+    "fields": {
+      "phone_number": 55555555, 
+      "first_name": "maggie", 
+      "last_name": "simpson", 
+      "middle_name": "", 
+      "birthdate": null, 
+      "doors": [
+        5, 
+        6
+      ], 
+      "address": "", 
+      "rfids": [
+        1, 
+        4
+      ], 
+      "email": "maggie@simpfamily.com"
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "djock_app.lockuser", 
+    "fields": {
+      "phone_number": 234324, 
+      "first_name": "test", 
+      "last_name": "tesstttttt", 
+      "middle_name": "", 
+      "birthdate": null, 
+      "doors": [
+        3, 
+        6
+      ], 
+      "address": "", 
+      "rfids": [
+        2
+      ], 
+      "email": "alsdkjf@aldfj.com"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "accesstime", 
+      "name": "access time", 
+      "app_label": "djock_app"
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "contenttype", 
+      "name": "content type", 
+      "app_label": "contenttypes"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "door", 
+      "name": "door", 
+      "app_label": "djock_app"
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "group", 
+      "name": "group", 
+      "app_label": "auth"
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "lockuser", 
+      "name": "lock user", 
+      "app_label": "djock_app"
+    }
+  }, 
+  {
+    "pk": 11, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "logentry", 
+      "name": "log entry", 
+      "app_label": "admin"
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "permission", 
+      "name": "permission", 
+      "app_label": "auth"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "rfidkeycard", 
+      "name": "rfi dkeycard", 
+      "app_label": "djock_app"
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "session", 
+      "name": "session", 
+      "app_label": "sessions"
+    }
+  }, 
+  {
+    "pk": 10, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "site", 
+      "name": "site", 
+      "app_label": "sites"
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "user", 
+      "name": "user", 
+      "app_label": "auth"
+    }
+  }, 
+  {
+    "pk": "a8a2968991aa78e503882ccc97de0935", 
+    "model": "sessions.session", 
+    "fields": {
+      "expire_date": "2013-02-11T10:48:40.699Z", 
+      "session_data": "MGFkYmM2MDY5YTkyM2Q3NmRhYmZkZjdjMmNjMDI2YjlkMTc0NDViYzqAAn1xAShVEl9hdXRoX3Vz\nZXJfYmFja2VuZHECVSlkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZHED\nVQ1fYXV0aF91c2VyX2lkcQRLAXUu\n"
+    }
+  }, 
+  {
+    "pk": "26b93f9aef73cce3ae64ed83f021bd81", 
+    "model": "sessions.session", 
+    "fields": {
+      "expire_date": "2013-02-07T05:51:56.939Z", 
+      "session_data": "MGFkYmM2MDY5YTkyM2Q3NmRhYmZkZjdjMmNjMDI2YjlkMTc0NDViYzqAAn1xAShVEl9hdXRoX3Vz\nZXJfYmFja2VuZHECVSlkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZHED\nVQ1fYXV0aF91c2VyX2lkcQRLAXUu\n"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "sites.site", 
+    "fields": {
+      "domain": "example.com", 
+      "name": "example.com"
+    }
+  }, 
+  {
+    "pk": 31, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_logentry", 
+      "name": "Can add log entry", 
+      "content_type": 11
+    }
+  }, 
+  {
+    "pk": 32, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_logentry", 
+      "name": "Can change log entry", 
+      "content_type": 11
+    }
+  }, 
+  {
+    "pk": 33, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_logentry", 
+      "name": "Can delete log entry", 
+      "content_type": 11
+    }
+  }, 
+  {
+    "pk": 13, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_group", 
+      "name": "Can add group", 
+      "content_type": 6
+    }
+  }, 
+  {
+    "pk": 16, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_group", 
+      "name": "Can change group", 
+      "content_type": 6
+    }
+  }, 
+  {
+    "pk": 19, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_group", 
+      "name": "Can delete group", 
+      "content_type": 6
+    }
+  }, 
+  {
+    "pk": 14, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_permission", 
+      "name": "Can add permission", 
+      "content_type": 5
+    }
+  }, 
+  {
+    "pk": 17, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_permission", 
+      "name": "Can change permission", 
+      "content_type": 5
+    }
+  }, 
+  {
+    "pk": 20, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_permission", 
+      "name": "Can delete permission", 
+      "content_type": 5
+    }
+  }, 
+  {
+    "pk": 15, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_user", 
+      "name": "Can add user", 
+      "content_type": 7
+    }
+  }, 
+  {
+    "pk": 18, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_user", 
+      "name": "Can change user", 
+      "content_type": 7
+    }
+  }, 
+  {
+    "pk": 21, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_user", 
+      "name": "Can delete user", 
+      "content_type": 7
+    }
+  }, 
+  {
+    "pk": 22, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_contenttype", 
+      "name": "Can add content type", 
+      "content_type": 8
+    }
+  }, 
+  {
+    "pk": 23, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_contenttype", 
+      "name": "Can change content type", 
+      "content_type": 8
+    }
+  }, 
+  {
+    "pk": 24, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_contenttype", 
+      "name": "Can delete content type", 
+      "content_type": 8
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_accesstime", 
+      "name": "Can add access time", 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_accesstime", 
+      "name": "Can change access time", 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_accesstime", 
+      "name": "Can delete access time", 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_door", 
+      "name": "Can add door", 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_door", 
+      "name": "Can change door", 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 10, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_door", 
+      "name": "Can delete door", 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_lockuser", 
+      "name": "Can add lock user", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_lockuser", 
+      "name": "Can change lock user", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 11, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_lockuser", 
+      "name": "Can delete lock user", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_rfidkeycard", 
+      "name": "Can add rfi dkeycard", 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_rfidkeycard", 
+      "name": "Can change rfi dkeycard", 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 12, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_rfidkeycard", 
+      "name": "Can delete rfi dkeycard", 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 25, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_session", 
+      "name": "Can add session", 
+      "content_type": 9
+    }
+  }, 
+  {
+    "pk": 26, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_session", 
+      "name": "Can change session", 
+      "content_type": 9
+    }
+  }, 
+  {
+    "pk": 27, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_session", 
+      "name": "Can delete session", 
+      "content_type": 9
+    }
+  }, 
+  {
+    "pk": 28, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_site", 
+      "name": "Can add site", 
+      "content_type": 10
+    }
+  }, 
+  {
+    "pk": 29, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_site", 
+      "name": "Can change site", 
+      "content_type": 10
+    }
+  }, 
+  {
+    "pk": 30, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_site", 
+      "name": "Can delete site", 
+      "content_type": 10
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "gnadia", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": true, 
+      "is_staff": true, 
+      "last_login": "2013-01-24T05:51:56.936Z", 
+      "groups": [], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$0HDMTCTefsF1$3JhpedWFfu5xfd+Zrs0y1xzI1Cl+NiLiQR5FEGIQtYI=", 
+      "email": "alskdjf@alsdkjf.com", 
+      "date_joined": "2013-01-24T05:51:30.912Z"
+    }
+  }, 
+  {
+    "pk": 51, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-29T02:45:09.613Z", 
+      "object_repr": "43854385", 
+      "object_id": "6", 
+      "change_message": "Changed date_revoked.", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 50, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-29T02:44:33.578Z", 
+      "object_repr": "4444", 
+      "object_id": "2", 
+      "change_message": "Changed date_revoked.", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 49, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-29T01:46:11.009Z", 
+      "object_repr": "maggie simpson", 
+      "object_id": "3", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 48, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-29T01:45:56.442Z", 
+      "object_repr": "hello alsdkjfl", 
+      "object_id": "2", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 47, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-29T01:45:49.506Z", 
+      "object_repr": "43854385", 
+      "object_id": "6", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 46, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-29T01:45:35.901Z", 
+      "object_repr": "maggie simpson", 
+      "object_id": "3", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 45, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-29T01:45:26.159Z", 
+      "object_repr": "maggie simpson", 
+      "object_id": "3", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 44, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-29T01:45:11.036Z", 
+      "object_repr": "asdfsd sldkfj", 
+      "object_id": "1", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 43, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-29T01:44:56.376Z", 
+      "object_repr": "asdfsd sldkfj", 
+      "object_id": "1", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 42, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-29T01:44:43.815Z", 
+      "object_repr": "asdfsd sldkfj", 
+      "object_id": "1", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 41, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-29T01:44:33.811Z", 
+      "object_repr": "asdfsd sldkfj", 
+      "object_id": "1", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 40, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-29T01:44:24.654Z", 
+      "object_repr": "hello alsdkjfl", 
+      "object_id": "2", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 39, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-29T01:44:14.612Z", 
+      "object_repr": "maggie simpson", 
+      "object_id": "3", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 38, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-29T01:44:01.151Z", 
+      "object_repr": "test tesstttttt", 
+      "object_id": "4", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 37, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-28T11:27:39.085Z", 
+      "object_repr": "4444", 
+      "object_id": "2", 
+      "change_message": "Changed date_revoked.", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 36, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-28T11:27:00.339Z", 
+      "object_repr": "3453543", 
+      "object_id": "1", 
+      "change_message": "Changed date_revoked.", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 35, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-28T10:57:10.975Z", 
+      "object_repr": "asdfsd sldkfj", 
+      "object_id": "1", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 34, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-28T10:56:55.602Z", 
+      "object_repr": "hello alsdkjfl", 
+      "object_id": "2", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 33, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-28T10:56:46.721Z", 
+      "object_repr": "maggie simpson", 
+      "object_id": "3", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 32, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-28T10:56:31.972Z", 
+      "object_repr": "test tesstttttt", 
+      "object_id": "4", 
+      "change_message": "Changed rfids.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 31, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-28T10:53:03.656Z", 
+      "object_repr": "2222222", 
+      "object_id": "5", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 30, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-28T10:52:55.099Z", 
+      "object_repr": "1111111", 
+      "object_id": "4", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 29, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-28T10:52:47.947Z", 
+      "object_repr": "33333333", 
+      "object_id": "3", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 28, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-28T10:52:39.506Z", 
+      "object_repr": "4444", 
+      "object_id": "2", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 27, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-28T10:52:33.857Z", 
+      "object_repr": "3453543", 
+      "object_id": "1", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 26, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-27T22:51:27.563Z", 
+      "object_repr": "AccessTime object", 
+      "object_id": "9", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 25, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-27T22:50:58.462Z", 
+      "object_repr": "AccessTime object", 
+      "object_id": "8", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 24, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-27T22:50:43.113Z", 
+      "object_repr": "AccessTime object", 
+      "object_id": "7", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 23, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-27T22:50:33.216Z", 
+      "object_repr": "AccessTime object", 
+      "object_id": "6", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 22, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-27T22:50:24.792Z", 
+      "object_repr": "AccessTime object", 
+      "object_id": "5", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 21, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-27T22:50:17.261Z", 
+      "object_repr": "AccessTime object", 
+      "object_id": "4", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 20, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-27T22:50:12.321Z", 
+      "object_repr": "AccessTime object", 
+      "object_id": "3", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 19, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-27T22:50:07.871Z", 
+      "object_repr": "AccessTime object", 
+      "object_id": "2", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 18, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-27T22:49:54.146Z", 
+      "object_repr": "AccessTime object", 
+      "object_id": "1", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 17, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-27T22:39:53.559Z", 
+      "object_repr": "test tesstttttt", 
+      "object_id": "4", 
+      "change_message": "Changed doors.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 16, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-27T22:34:13.207Z", 
+      "object_repr": "maggie simpson", 
+      "object_id": "3", 
+      "change_message": "Changed last_name.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 15, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-27T21:49:40.629Z", 
+      "object_repr": "maggie simpsons", 
+      "object_id": "3", 
+      "change_message": "Changed doors.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 14, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-27T21:49:28.885Z", 
+      "object_repr": "Bike Project", 
+      "object_id": "6", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 13, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-27T21:49:16.344Z", 
+      "object_repr": "Makerspace", 
+      "object_id": "5", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 12, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-27T21:49:04.368Z", 
+      "object_repr": "maggie simpsons", 
+      "object_id": "3", 
+      "change_message": "Changed doors.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 11, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-27T21:48:47.695Z", 
+      "object_repr": "maggie simpsons", 
+      "object_id": "3", 
+      "change_message": "Changed first_name, last_name, email and phone_number.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 10, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-26T23:46:50.919Z", 
+      "object_repr": "test tesstttttt", 
+      "object_id": "4", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-25T18:39:43.914Z", 
+      "object_repr": "asdfsd sldkfj", 
+      "object_id": "1", 
+      "change_message": "Changed doors.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-01-25T18:39:34.399Z", 
+      "object_repr": "asdfsd sldkfj", 
+      "object_id": "1", 
+      "change_message": "Changed doors.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-25T18:39:04.686Z", 
+      "object_repr": "aosdfjsd asdfasdf", 
+      "object_id": "3", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-25T05:08:36.025Z", 
+      "object_repr": "khkjkljkj", 
+      "object_id": "4", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-25T05:04:52.059Z", 
+      "object_repr": "ihojlkjlk", 
+      "object_id": "3", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-25T05:04:30.110Z", 
+      "object_repr": "hello alsdkjfl", 
+      "object_id": "2", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-25T05:04:00.313Z", 
+      "object_repr": "asdfsd sldkfj", 
+      "object_id": "1", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-25T05:03:13.297Z", 
+      "object_repr": "two", 
+      "object_id": "2", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-01-25T05:03:06.159Z", 
+      "object_repr": "oijojoij", 
+      "object_id": "1", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 1
+    }
+  }
+]

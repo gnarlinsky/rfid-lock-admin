@@ -114,6 +114,8 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
     'djock_app',
+    'bootstrap_toolkit',
+    'debug_toolbar',
 # " if you are relying on your application's templates directory, make sure to list your app
 # before django.contrib.admin in the INSTALLED_APPS setting. Arguably TEMPLATE_DIRS is the
 # better place for global overrides. "

@@ -1,11 +1,11 @@
 {% extends "admin/base.html" %}
 {% load i18n %}
-
+{% load bootstrap_toolkit %}
 {% block title %}{{ title }} | {% trans 'RFID lock admin' %}{% endblock %}
 
 
 {% block extrastyle %}
-
+{% comment %}
     <style>
         #branding h1{ 
             color: #000; 
@@ -118,11 +118,6 @@
 
         }
 
-        #header_link
-        {
-            color:black !important;
-        }
-
         #site-name a:hover {
             color:white !important;
         }
@@ -136,20 +131,45 @@
 
 
     </style>
+{% endcomment %}
+<style>
+    #content-main { 
+        margin-top:20px; 
+    }
+    #header_link, .a:hover
+    {
+        color: #0044cc;
+        text-shadow:0 -1px 0 rgba(0,0,0,0.25) !important; 
+        font-size:50px; 
+        text-decoration: none; 
+    }
+</style>
+
  {% endblock %}
 
 {% comment %}   No breadcrumbs pls, so put empty block here {% endcomment %}
 {% block breadcrumbs %}{% endblock %}
-
 {% block branding %}
+
+    {% comment %}
     <h1 id="site-name"><a href='/lock/' id='header_link'>{% trans 'RFID Lock Admin' %}</a></h1>
+    {% endcomment %}
+    <div>
+        <h1><a href='/lock/' id='header_link'>{% trans 'RFID Lock Admin' %}</a></h1>
+    </div>
 {% endblock %}
 
 
 {% block nav-global %}
+    {% comment %}
 <!--  {% if user.is_staff %} -->
    <a href="/lockadmin/djock_app/lockuser/add/" class="ml">Assign new keycard</a>
    <p class="ml">|</p>
+   <a href="/lockadmin/djock_app/accesstime/" class="ml">Room access log</a> <p class="ml">|</p>
+    <a href="/lockadmin/djock_app/lockuser/" class="ml">View/Manage lock users</a> <p class="ml">|</p>
+    <a href="/lockadmin/auth/user/add/" class="ml">Add STAFF users</a> <p class="ml">|</p>
+   <a href="/lockadmin/auth/user/" class="ml">Manage STAFF users</a> <p class="ml">
+    {% endcomment %}
     {% comment %}
     <a href="/lockadmin/djock_app/lockuser/?is_active__exact=0" class="ml">Inactive LockUsers</a>
     <p class="ml">|</p>
@@ -157,9 +177,9 @@
     (Note -- I'd like non-superuser staff to NOT have the ability to delete models -- 
     but rather to DEACTIVATE.  So to-do: is_active flag for LockUser model. 
     {% endcomment %}
-   <a href="/lockadmin/djock_app/accesstime/" class="ml">Room access log</a> <p class="ml">|</p>
-    <a href="/lockadmin/djock_app/lockuser/" class="ml">View/Manage lock users</a> <p class="ml">|</p>
-    <a href="/lockadmin/auth/user/add/" class="ml">Add STAFF users</a> <p class="ml">|</p>
-   <a href="/lockadmin/auth/user/" class="ml">Manage STAFF users</a> <p class="ml">
+    {% comment %}
  <!--           {% endif %} -->
+    {% endcomment %}
 {% endblock %}
+
+

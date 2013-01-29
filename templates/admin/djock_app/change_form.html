@@ -1,0 +1,30 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+
+{% block object-tools %}
+{% if change %}{% if not is_popup %}
+<div style="text-align:center;">
+    <a href="../../fake/" class="btn btn-info btn-large" style="color:white; margin:10px auto ">Fake assign keycard<br>(== scanning a new keycard and getting the number)</a> 
+    <a href="" class="btn btn-info btn-large disabled" style="color:white; margin:10px auto ">
+    Deactivate keycard
+    </a> 
+</div>
+<ul class="object-tools">
+    {% block object-tools-items %} {{block.super}} {% endblock %}
+</ul>
+{% endif %}{% endif %}
+{% endblock %}
+
+
+
+{% comment %}
+The best thing would be to override the block with the save, etc. buttons at the bottom... But, that's harder than it sounds (solutions involve hacky stuff with javascript!).  Or that's what people on the internet think.  But here's what you can do, I think: submit_row is a template tag.  Look at the code for that, and create your own custom template tag that's similar but includes the extra behavior. 
+{% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+
+
+{% block submit_buttons_bottom %}
+Or move in here? 
+     {{block.super}}
+{% endblock %}
+{% endcomment %}
