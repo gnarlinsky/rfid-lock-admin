@@ -4,6 +4,7 @@ admin_templates
 notes.txt
 .idea
 #.idea/* # PyCharm settings
+*.swp
 
 # Compiled source #
 ###################
@@ -14,7 +15,6 @@ notes.txt
 *.o
 *.so
 *.pyc
-*.swp  
 
 # Packages #
 ############
