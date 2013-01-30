@@ -38,7 +38,7 @@ class RFIDkeycard(models.Model):
          a separate is_active field here... just ask: is_active() --> can just check if there's a revoked date,
          OR if today's date is between assigned/revoked...
     """
-    the_rfid    = models.IntegerField(max_length=24,null=True) # the radio-frequency id
+    the_rfid    = models.IntegerField(max_length=24,null=True,editable=True) # the radio-frequency id
     date_revoked = models.DateTimeField(null=True, blank=True) # note that blank=True is at form validation level, while null=True is at db level
     # actually, this should not be a field that staff users can fill in.  It should be created
     # automatically when the associated **LockUser** is deactivated!

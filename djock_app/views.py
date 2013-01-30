@@ -11,8 +11,7 @@ def fake_assign(request):
     return render_to_response('admin/djock_app/change_form.html', {'fake_rfid': fake_rfid} )
 
 
-    # hmm fuck that actually. maybe play a bit more with what to return, but try to create a custom template tag, like {{ fake_rfid }}. Good
-    # thing to learn anyways. 
+    # hmm fuck that actually. maybe play a bit more with what to return, but try to create a custom template tag, like {{ fake_rfid }}. Good # thing to learn anyways. 
 
 
 ###############  TO DO/ TO NOTE #####################################

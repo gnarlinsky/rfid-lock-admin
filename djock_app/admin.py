@@ -37,7 +37,25 @@ class DoorAdmin(admin.ModelAdmin):
 
 class RFIDkeycardAdmin(admin.ModelAdmin):
     #inlines = (OpenershipInline,)
-    list_display = ["the_rfid","date_created","date_revoked","get_this_lockuser"]
+    list_display = ["the_rfid","date_created","date_revoked","get_this_lockuser","id"]
+
+    ####################################################################################################
+    # Individual page (change form)
+    ####################################################################################################
+    #prepopulated_fields = { 'the_rfid': ('id',)} 
+    fields = ("the_rfid","date_revoked","date_created","id")
+    readonly_fields = ("date_revoked","date_created","id")
+   # fieldsets = ( (None, { 'fields': ("date_revoked" ),
+     #           'description': ('')
+      #     }), )
+      # WTF? It keeps saying field x doesn't exist, but "x" just picks up the first char of the field, like "field t doesn't
+      # exist" if I have "the_rfid" ????!!!
+
+
+    #readonly_fields = ("")
+
+
+
 
 class LockUserAdmin(admin.ModelAdmin):
     ####################################################
@@ -86,7 +104,7 @@ class LockUserAdmin(admin.ModelAdmin):
     list_display_links = ['first_name','last_name']
 
     ####################################################
-    # Individual LockUser page
+    # Individual LockUser page  (change form)
     ####################################################
     # Which fields to show, and in what order
     # (parentheses group fields into a single line)
@@ -133,6 +151,16 @@ class LockUserAdmin(admin.ModelAdmin):
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
         }
     #inlines = [ DoorInline, ] 
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        """ 'Like the formfield_for_foreignkey method, the formfield_for_manytomany method can be overridden to change the default formfield for a many to many field. '  - django docs """
+        if db_field.name == "rfids":
+            #kwargs["queryset"] = Car.objects.filter(owner=request.user)
+            #kwargs["queryset"] = RFIDkeycard.objects.filter(id=None)  # quick and gross way to just have nothing but the plus show up there!
+            # but actually that field is required, so limiting to rfid cards assigned to no one... Upon adding new one have to
+            # refresh but this is interim behavior anyways. :
+            kwargs["queryset"] = RFIDkeycard.objects.filter(lockuser=None)  
+        return super(LockUserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
     #Don't display save, etc. buttons on bottom (to do: the remaining "Save and continue editing" and "Save")
     def has_delete_permission(self, request, obj=None):
