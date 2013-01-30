@@ -61,7 +61,6 @@
         {% endif %}
 
 
-
           {% comment %}
          <h1><a href='/lock/' id='header_link' class="brand">{% trans 'RFID Lock Admin' %}</a></h1>
           {% endcomment %}
@@ -70,19 +69,11 @@
           {% endcomment %}
          <h1><a href='/lock/' class="brand" style="padding:0px;margin:0px;
          font-size:30px;float:center;font-size:40px;font-weight:bold; color:rgba(0, 0, 0, 0.7)  ">{% trans 'RFID Lock Admin' %}</a></h1>
-                  {% comment%} 
-                  <ul class="nav">
-                  UGH.  links here don't work, urlconf complains and the urls it don't
-                  contain all the admin ones!  wtf? 
-                        <li class="active"><a href="/lockuser/add/">Add new lock user</a></li>
-                              <li><a href="/lockuser/">lock users</a></li>
-                                    <li><a href="#">blah blah</a></li>
-                                        </ul>
-                    {% endcomment %}
-        
-        
-       
-
+        <a href='/lock/'>main</a> |
+        <a href='/lockadmin/djock_app/lockuser/'>lock users</a> |
+        <a href='/lockadmin/djock_app/door/'>door locks</a> |
+        <a href='/lockadmin/djock_app/accesstime/'>access logs</a> |
+        <a href='/lockadmin/auth/user/'>staff users</a> |
 
                                           </div>
                                           </div>

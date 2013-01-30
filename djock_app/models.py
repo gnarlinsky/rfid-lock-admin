@@ -1,5 +1,10 @@
 from django.db import models
 
+
+############### TO DO ##########################
+# make sure various stuff are set unique
+################################################
+
 class Door(models.Model):
     """ Doors with RFID locks installed. """
     name    = models.CharField(max_length=50)  # e.g. "Makerspace," "Bike Project," etc.
@@ -21,10 +26,6 @@ class Door(models.Model):
         """ Get the LockUsers with access to this Door """
         return ", ".join([str(lu) for lu in self.lockuser_set.all()])
 
-   # def get_active_allowed_lockusers(self):
-   #     """ So a more specific case of get_allowed_lockusers()."""
-   #  but wait......    with the current setup, are inactive lockusers still associated with
-   #  doors?
 
 class RFIDkeycard(models.Model):
     """ Let's try this: door access represented by a (reusable) RFID *keycard*
@@ -63,53 +64,18 @@ class RFIDkeycard(models.Model):
     def get_this_lockuser(self):
         return ", ".join([str(lu) for lu in self.lockuser_set.all()])
 
-
-    # not even using anywhere... ??
     def get_allowed_doors(self):
         """ Get the Doors this user is allowed access to. """
         lu = get_this_lockuser()
         return lu.doors
     
 
-
-    # def get_access_times(self):
-    #   """ Get the access times associated with this keycard """
-    
-    # def is_active(self):
-    # """ Hmm...  ???   based on - is today's date between date assigned and date revoked.  ???  
-    #  Or actually based on the is_active FIELD in LockUser...?
-
 class AccessTime(models.Model):
-    ########### FK?????????????????????????????????????? ###############
-    # Hmm, going with no.  The accessTime is associated with a certain key, period. 
-    #rfid           = models.ForeignKey('RFIDkeycard')
     the_rfid           = models.IntegerField(max_length=24,null=True) # the radio-frequency id, however represented....
     access_time    = models.DateTimeField(null=True)    # the time the rfid was used
 
-    #def __unicode__(self):
-       # """ The default looks like 'Dec. 10, 2012, 6 a.m.', but going for more detail with ctime"""
-       # """Well, that was the plan, but this is not having an affect """
-        #return self.access_time.isoformat()
-
     def get_this_lockuser(self):
         """ Return the user's name associated with the RFID for this access time """
-        ################################################################################
-        #Or should there be only one get_this_user method in another class, and any other get_this_lockuser
-        # would call that one? 
-        #  So.......   this would take the rfid as an argument and then call the rfid keycard user? but
-        #  wouldn't that one be limited to active keycard users?   Blech, just think about this later. It's
-        #  probly just a matter of slightly changing the filter parameters.
-        ################################################################################
-        # Get QuerySet of all LockUser objects whose RFIDkeycard rfid number  matches the RFID associated with this AccessTime
-        #_at_query_set = LockUser.objects.filter(rfid_num__exact=self.rfid)
-
-        # to do: look through past RFID's?
-        #if _at_query_set:
-        #    return _at_query_set[0]   # There SHOULD only be one. Check for that. 
-        #else: # nobody is assigned this RFID
-        #    return "No associated user found"
-        #return ", ".join([str(lu) for lu in self.lockuser_set.all()])
-        #LockUser.objects.all().rfids????????
         # Get RFIDkeycard (there should only be one!) with the rfid associated with this access time; 
         # get the lock user names associated with those RFIDkeycards
         _rfid_keycard = RFIDkeycard.objects.all().filter(the_rfid__exact=self.the_rfid)
@@ -121,19 +87,7 @@ class AccessTime(models.Model):
 
 class LockUser(models.Model):
     """ (Despite the misleading name, LockUsers are not subclassed Users, but subclassed Models.) """
-    # The radio-frequency id, however it will be represented:
-    # The first argument is what the label for this field should read/the verbose name (optional,
-    # defaults to same as field's name, with spaces converted to underscores)
-    #the_rfid            = models.IntegerField("RF ID",max_length=24,null=True, help_text = "some blackboxing is about to happen...   button to fake-assign, etc.")
-    #rfid           = models.ManyToManyField(RFID,through='Openership')     # defaults to the current active rfid for
-    # this user?
-    #rfid           = models.ForeignKey(RFID,related_name='lockusers')
-    # nope, something's wrong here. At the very least, if you're going to have a field FK'd to another model, don't call it
-    # *num*. Just call it rfid, and actually call RFIDkeycard's rfid field "rfid_num."  
-    #rfid           = models.ForeignKey('RFIDkeycard',null=True)
-    
-    # So there may be multiples, perhaps even all inactive. There should be a method to get the
-    # *current* one. 
+
     rfids            = models.ManyToManyField("RFIDkeycard", help_text = "some blackboxing is about to happen...   button to fake-assign, etc.")
 
     # doors should be limited to the Doors, and should show up as checkable items for a specific LockUser. 
@@ -142,7 +96,6 @@ class LockUser(models.Model):
     # superuser, etc.] for the person doing the assigning. E.g. someone only involved with the Bike Project
     # shouldn't be able to assign keycard access to the Makerspace door. 
     doors = models.ManyToManyField(Door)
-
 
     ####  contact infoz ######
     first_name      = models.CharField(max_length=50)
@@ -164,7 +117,6 @@ class LockUser(models.Model):
         else:
             return False
 
-
     def get_all_rfids(self):
         """ Get all RFID's associated with this Lock User (i.e. not just the current one, which is just the rfid field) """
         return self.rfids.all()
@@ -180,7 +132,8 @@ class LockUser(models.Model):
         """
         #_rfid_keycards = self.rfids.all()   # or call get_all_rfids for consistency
         _rfid_keycards = self.get_all_rfids()
-        curr_rfid = _rfid_keycards.filter(date_revoked=None)  # there should only be one or 0 but obviously i'm not doing any kind of checking or exception handling or anything....         
+        curr_rfid = _rfid_keycards.filter(date_revoked=None)  # there should only be one or 0 but obviously
+                    #    i'm not doing any kind of checking or exception handling or anything....         
         return curr_rfid
        
     def prettify_get_current_rfid(self):
@@ -203,8 +156,6 @@ class LockUser(models.Model):
         _door_names_list = [d.name for d in _doors] 
         return ", ".join(_door_names_list)
         
-    ######################################## hmmmmmm.........  hold up.  
-   # Should access times be a manytomany here???
     def get_all_access_times(self, curr_rfid_only=True):
         """ Returns list of all access times for this user, which means that the search should include any other
         RFID's this LockUser ever had. In other words, the search is by *person*, not by RFID.
@@ -213,7 +164,8 @@ class LockUser(models.Model):
 
         if curr_rfid_only:
             #curr_rfid = self.get_current_rfid()  
-            # until fix the only-1-curr-rfid thing, the above actually may refer to multiple instances...  So just for now, for the purposes of getting on with this, just taking the first item if it exists
+            # until fix the only-1-curr-rfid thing, the above actually may refer to multiple instances...  
+            # So just for now, for the purposes of getting on with this, just taking the first item if it exists
             if self.get_current_rfid():
                 curr_rfid_keycard = self.get_current_rfid()[0]
 
@@ -228,16 +180,8 @@ class LockUser(models.Model):
             #_rfid_keycards = self.get_all_rfids()
 
         if all_access_times_list:
-            print "**********************************"
             a = all_access_times_list[0]
-            print dir(a)
-            print "================================"
-            print a.isoformat()
-            print a.isocalendar()
-            print a.ctime()
-            print "***************************************"
         return all_access_times_list
-        #return at_query_set
 
     ######Note, stuff is not consistent among these get_blah's because sometimes I'm returning the OBJECT, sometimes actual fields of it
 
@@ -272,24 +216,6 @@ class LockUser(models.Model):
         else:
             return None
 
-
-
-#    def get_the_rfid(self):
-#        """ for admin.py....
-#        'ManyToManyField fields aren't supported, because that would entail executing a separate SQL statement for each row in the table. If you want to do this nonetheless, give your model a custom method, and add that method's name to list_display.'
-#        """
-#        return self.rfid
-
     def __unicode__(self):
         """ In the list of AcessTimes, for example, LockUsers will be represented with their first and last names """
         return u'%s %s' % (self.first_name, self.last_name)
-
-
-"""
-class Openership(models.Model):
-    lockUser = models.ForeignKey('LockUser')
-    rfid     = models.ForeignKey('RFID')
-    date_rfid_assigned = models.DateField(null=True) # to this lockUser
-    date_rfid_revoked = models.DateField(null=True)  # from this lockUser
-"""
-

@@ -3,26 +3,15 @@ from django.forms import CheckboxSelectMultiple
 from django.db import models
 from djock_app.models import LockUser, AccessTime, RFIDkeycard, Door
 
-# do I need this????
-#class OpenershipAdmin(admin.ModelAdmin):
-#    pass
 
-# https://docs.djangoproject.com/en/dev/ref/contrib/admin/#working-with-many-to-many-intermediary-models
-#class OpenershipInline(admin.TabularInline):
-    #model = Openership
-    #extra = 1
-
-
-
-#########################  TO DO ########################################
-# Get rid of "delete" action for all except superuser, 
-# including not showing the button on change_list
-########################################################################
-
+#########################  TO DO ########################################################################
+#  - Get rid of "delete" action for all except superuser, including not showing the button on change_list
+# - (maybe?): When a user is modified or added (in terms of being active at all or more/fewer doors access), e-mail all the staff. 
+# - search bar for lockusers/accesstimes/doors change lists
+####################################################################################################
 
 
 class DoorAdmin(admin.ModelAdmin):
-
     ####################################################################################################
     # Page listing all Doors:
     ####################################################################################################
@@ -33,7 +22,8 @@ class DoorAdmin(admin.ModelAdmin):
     ####################################################################################################
     # Individual Door page
     ####################################################################################################
-    readonly_fields = ('get_allowed_lockusers',)   # because obviously these shouldn't be editable.   (but commenting out if want to create some objects from admin just for fun)
+    readonly_fields = ('get_allowed_lockusers',)   # because obviously these shouldn't be editable.  
+    #(but commenting out if want to create some objects from admin vs shell just for fun)
 
 class RFIDkeycardAdmin(admin.ModelAdmin):
     #inlines = (OpenershipInline,)
@@ -52,21 +42,14 @@ class RFIDkeycardAdmin(admin.ModelAdmin):
       # exist" if I have "the_rfid" ????!!!
 
 
-    #readonly_fields = ("")
-
-
-
-
 class LockUserAdmin(admin.ModelAdmin):
     ####################################################
     # Page listing all LockUsers ("change list" page):
     ####################################################
     #inlines = (OpenershipInline,)
 
-    ####  no!  creating views to activate/deactivate that are more complex now, so these should reference those
-    # instead of just independent updates
-    #       Update: Well.... maybe not.  I'm distinguishing (de)activating LockUsers from (de)activating RFIDkeycards now, so
-    #       come back to this.......
+    ####  no!  creating views to activate/deactivate that are more complex now, so these may
+    # reference those instead of just independent updates
     def make_active(self, request, queryset):
         """ Staff should not have the ability to delete LockUsers, only to DEACTIVATE them.  """
  #       queryset.update(is_active=True)
@@ -84,18 +67,15 @@ class LockUserAdmin(admin.ModelAdmin):
         pass
     email_selected.short_description =  "Email selected lock users"
 
-    def activate_keycard(self,request,queryset): pass
-    activate_keycard.short_description = "Activate keycard"
-    def deactivate_keycard(self,request,queryset): pass
-    deactivate_keycard.short_description = "Deactivate keycard"
-    def reactivate_keycard(self,request,queryset): pass
-    reactivate_keycard.short_description = "Reactivate keycard"
-
     # Only the following actions will be shown in the dropdown
-    actions = (activate_keycard, deactivate_keycard, reactivate_keycard, make_active, make_inactive,email_selected)
+    #actions = (activate_keycard, deactivate_keycard, reactivate_keycard, make_active, make_inactive,email_selected)
+    actions = (make_active, make_inactive,email_selected)
 
     # fields (i.e. column headings)
-    list_display = ('first_name','last_name','email','prettify_get_current_rfid','prettify_get_all_rfids','prettify_get_allowed_doors','prettify_get_last_access_time','prettify_get_all_access_times','is_active')
+    list_display = ('first_name','last_name','email',\
+                    'prettify_get_current_rfid','prettify_get_all_rfids','prettify_get_allowed_doors', \
+                    'prettify_get_last_access_time','prettify_get_all_access_times',\
+                    'is_active')
 
     #list_filter = ('rfid','is_active')  # show filters by RFID and active/inactive on the right
     #exclude = ("birthdate ", "middle_name")   # temp exclusion
@@ -115,25 +95,9 @@ class LockUserAdmin(admin.ModelAdmin):
                             'phone_number','address', \
                             # will error if the below are not set as read_only...  which makes sense; these are methods and
                             # things I can't edit from the form.. right?
-                            # !!!!!!!!!!!!!  What you want is to set allowed doors from here, right. So now you have to go into
-                            # this territory:  how do i make these into like checkboxes or whatever.  form shit. like this:
-                            # http://stackoverflow.com/questions/1760421/how-can-i-render-a-manytomanyfield-as-checkboxes
-                            # update to that:  nope.   DO INLINE SHIT HERE... RIGHT? 
-                            # https://docs.djangoproject.com/en/dev/ref/contrib/admin/#inlinemodeladmin-objects
-                            #  goddamnit something is not fucking working, wtf.
-                            #  https://docs.djangoproject.com/en/dev/ref/contrib/admin/#working-with-many-to-many-models leads me
-                            #  to believe there should not be this fucking trouble with just fucking displaying fucking a
-                            #  manytomany or fk field without any inline shenanigans. so wtf. 
-
-                            # wait, you know what.......     the reason doors wasn't happening was because it's a fucking
-                            # rfidkeycard field, not lockuser field.  So now that I think about it....   door access should be
-                            # defined by the person, not by the keycard.  that is, it should be just a fucking manytomany in
-                            # lockusers.   and then rfidkeycard can look at the fucking lockuser for its shit. 
                             'prettify_get_current_rfid','prettify_get_all_rfids',\
                             'prettify_get_last_access_time', 'prettify_get_all_access_times', \
                             'is_active',\
-                            #'get_allowed_doors', \
-                            # but this won't work either! even if you read-only it. 
                             'doors',
                             'rfids',
                             ),
@@ -155,9 +119,8 @@ class LockUserAdmin(admin.ModelAdmin):
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         """ 'Like the formfield_for_foreignkey method, the formfield_for_manytomany method can be overridden to change the default formfield for a many to many field. '  - django docs """
         if db_field.name == "rfids":
-            #kwargs["queryset"] = Car.objects.filter(owner=request.user)
             #kwargs["queryset"] = RFIDkeycard.objects.filter(id=None)  # quick and gross way to just have nothing but the plus show up there!
-            # but actually that field is required, so limiting to rfid cards assigned to no one... Upon adding new one have to
+            # but actually that field is required (although I guess it should not be), so limiting to rfid cards assigned to no one... Upon adding new one have to
             # refresh but this is interim behavior anyways. :
             kwargs["queryset"] = RFIDkeycard.objects.filter(lockuser=None)  
         return super(LockUserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)

@@ -36,7 +36,7 @@ urlpatterns = patterns('',
 
     # testing stuff/temp
     url(r'^t/$', direct_to_template, {'template': 'test/index.html' }    ),
-    url(r'fake/$', 'djock_app.views.fake_assign' ), 
+    #url(r'fake/$', 'djock_app.views.fake_assign' ), 
 
 )
 

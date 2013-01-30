@@ -4,14 +4,30 @@ from django.shortcuts import render_to_response
 from djock_app.models import Door, LockUser, RFIDkeycard, AccessTime
 import random
 
+
+
+
+
+# pseudocoding how to  handle the incoming request to verify rfid
+"""
+def is_allowed(request, rfid, door):
+    alloweds = door.get_allowed_rfids()
+
+    if rfid in alloweds:
+        return HttpResponse with 1
+    else:
+        0
+"""
+    
+
+#generate a random number to simulate an actual keycard being scanned in and the num retrieved """
+"""
 def fake_assign(request):
-    """ just generate a random number to simulate an actual keycard being scanned in and the num retrieved """
     fake_rfid = random.randint(1000000000,9999999999)
     # template is change_form.html?  really?
     return render_to_response('admin/djock_app/change_form.html', {'fake_rfid': fake_rfid} )
-
-
-    # hmm fuck that actually. maybe play a bit more with what to return, but try to create a custom template tag, like {{ fake_rfid }}. Good # thing to learn anyways. 
+"""
+# How about creating a custom template tag, like {{ fake_rfid }} ?
 
 
 ###############  TO DO/ TO NOTE #####################################
@@ -36,20 +52,9 @@ ON ASSIGNING NEW KEYCARD:
 
 If there is already a keycard assigned, but deactivated, show a REactivate button. 
         just set the is_active to True. 
-    Door perms won't be saved though. Fuck it. Just make a note by the button about that or something.  
-    or in the code for the activate method 
-
-If there is already a keycard assigned, and it's active, show a Deactivate button:
-    keycard objects should have deactivate() method that will set is_active of keycard to false and set doors to null. 
 
 
-wait........   Can I do this:   you know the dropdown actions... Can't I have those appear on the individual object's page as well????  Because those would be really easy to define in admin.
-    Update:  answer -- yeah, I guess you can do this.  http://stackoverflow.com/questions/2805701/is-there-a-way-to-get-custom-django-admin-actions-to-appear-on-the-change-view
-    Whatever.  OK, yes, it's going to be gross to see 'activate user' as well as 'activate keycard' but... whatever.   you can restrict those later. 
-
-IF SOMETHING IS NOT ASSOCIATED WITH A SPECIFIC TEMPLATE/DIFFERENT PAGE, I REALLY DON'T WANT TO MAKE A VIEW FOR IT!   IT SHOULD CALL SOME METHOD I DEFINE IN ADMIN.PY!!!!!  Which honestly should just call a model method. like blah.activate().  
-
-
+So this was in admin.py.........
     def make_active(self, request, queryset):
         # check if REactivating
         queryset = blah blah
@@ -64,28 +69,6 @@ ON CHECKING IF AN RFID/KEY IN THE URL IS APPROVED FOR THE SPECIFIED DOOR(S):
 - Get the door object for the (slugified?) door name in the url
 - Get the QuerySet of associated RFIDkeycards
 - Filter those for RFIDkeycard's rfid_num = rfid num in url
-
-        Well, what happens when adding a new rfid num for a door? OK, change_list will just show each Door. With a checkmark.  If you check a certain Door, it's list of ok rfid nums would get updated. But how to do this list? 
-
-        Does this make sense OOPily, though? Should that be a keycard field? It makes sense to ask Doors who can access them. But...........
-        But.... aren't we dealing with keycards? so maybe it's the keycard that shold have manytomany to doors. 
-
-        then: we can access rfidkeycard.doors and door.rfidkeycard_set
-        then can do add/remove like https://docs.djangoproject.com/en/dev/ref/models/relations/#django.db.models.fields.related.RelatedManager. 
-        blah  = RFIDKeycard.objects.get  some specific card
-        d = Door.objects.blah blah however you get a specific door
-        d.rfidkeycard_set.add(blah)
-        or .remove(blah) ........
-            - **so remember this for active/inactive shit.   don't have to check that because deactivation should
-              remove(), and activation should add()
-
-
-UPDATE !!!!!!!!!!!!!!!!!    doors should be a lockuser field, not rfidkeycard field 
-and, as a consequence of that and other shit.........
-FUCK HAVING SEPARATE RFIDKEYCARD OBJECTS. IT REALLY DOES ADD EXTRA COMPLEXITY.   IT'S NOT LIKE THERE ARE GOING TO BE more than one keycard per person.  SHIT HAS BEEN CHANGED SINCE I TALKED TO ERICH ABOUT THIS.  THE WHOLE REASON FOR THE KEYCARD SHIT WAS... I DON'T REMEMBER.  BUT FUCK IT. And what about the shit with the revoked time?  Well, i don't even remember the point of that anymore...  but a deactivated keycard ==  deactivated lockuser!
-
-
-
 
 
 LATER........

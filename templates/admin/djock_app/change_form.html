@@ -2,6 +2,8 @@
 {% load i18n admin_urls %}
 
 
+{% comment %}
+;
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
 <div style="text-align:center;">
@@ -16,9 +18,13 @@
 {% endif %}{% endif %}
 {% endblock %}
 
+{% endcomment %}
+
 
 
 {% comment %}
+MORE OR LESS DEPRECATED BRAINVOMIT:
+
 The best thing would be to override the block with the save, etc. buttons at the bottom... But, that's harder than it sounds (solutions involve hacky stuff with javascript!).  Or that's what people on the internet think.  But here's what you can do, I think: submit_row is a template tag.  Look at the code for that, and create your own custom template tag that's similar but includes the extra behavior. 
 {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
 

@@ -14,6 +14,7 @@ notes.txt
 *.o
 *.so
 *.pyc
+*.swp  
 
 # Packages #
 ############
@@ -31,8 +32,9 @@ notes.txt
 # Logs and databases #
 ######################
 *.log
-#*.sql  # using the Django hook that looks for sql/<modelname>.sql files to to populate db with initial data
+*.sql  # using the Django hook that looks for sql/<modelname>.sql files to to populate db with initial data
 *.sqlite
+*.db 
 
 # OS generated files #
 ######################
