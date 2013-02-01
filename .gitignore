@@ -5,6 +5,7 @@ notes.txt
 .idea
 #.idea/* # PyCharm settings
 *.swp
+activate # shortcut to activate virtual env
 
 # Compiled source #
 ###################

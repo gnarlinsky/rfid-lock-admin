@@ -9,6 +9,9 @@ import random
 
 
 # pseudocoding how to  handle the incoming request to verify rfid
+# I think we discussed two ways of verifying: id 
+#   - primary: /door/<door_id>/check/<rfid_id>
+#   - secondary (if stuff is down): cached version on arduino????
 """
 def is_allowed(request, rfid, door):
     alloweds = door.get_allowed_rfids()
