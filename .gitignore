@@ -4,9 +4,8 @@ NO
 admin_templates
 notes.txt
 .idea
+activate
 #.idea/* # PyCharm settings
-*.swp
-activate # shortcut to activate virtual env
 
 # Compiled source #
 ###################
