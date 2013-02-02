@@ -46,3 +46,5 @@ activate
 Icon?
 ehthumbs.db
 Thumbs.db
+
+*.db
