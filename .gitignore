@@ -1,4 +1,3 @@
-djock.db  # ugh! have to explicitly include this because including *.db below has no effect.  Actually doing this has no effect here. So, fun. 
 ignore_me_for_readme
 NO
 admin_templates
@@ -47,3 +46,5 @@ activate
 Icon?
 ehthumbs.db
 Thumbs.db
+
+*.db
