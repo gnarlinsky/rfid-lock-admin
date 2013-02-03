@@ -5,6 +5,8 @@ notes.txt
 .idea
 activate
 #.idea/* # PyCharm settings
+*.swp       # ignore vim swap files
+*.swo
 
 # Compiled source #
 ###################
