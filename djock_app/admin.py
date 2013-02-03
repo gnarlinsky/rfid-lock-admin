@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.forms import CheckboxSelectMultiple, IntegerField, ModelForm
 from django.db import models
 from djock_app.models import LockUser, AccessTime, RFIDkeycard, Door
-
+import random
 
 #########################  TO DO ########################################################################
 #  - Get rid of "delete" action for all except superuser, including not showing the button on change_list
@@ -28,7 +28,14 @@ class DoorAdmin(admin.ModelAdmin):
 
 # playing with prepopulating stuff 
 class RFIDkeycardForm(ModelForm):
-    the_rfid = IntegerField(help_text="help text")
+    #the_rfid = IntegerField(help_text="help text")
+
+    # override __init__ to prepopulate the_rfid field with a random number, just to 
+    #   simulate assigning a new card
+    def __init__(self, *args, **kwargs):
+        super(RFIDkeycardForm, self).__init__(*args, **kwargs)
+        self.fields['the_rfid'] = IntegerField(help_text = "(this is a random number to simulate getting a new keycard number after it's scanned in)")
+        self.fields['the_rfid'].initial = random.randint(100000,999999)
 
     class Meta:
         model = RFIDkeycard
