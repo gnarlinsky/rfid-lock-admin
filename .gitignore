@@ -1,11 +1,18 @@
+#########################################################
+# Remember, the pattern is the entire line -- 
+# So no trailing white space or comments on the same line.
+#########################################################
+
+
 ignore_me_for_readme
 NO
 admin_templates
 notes.txt
 .idea
 activate
-#.idea/* # PyCharm settings
-*.swp       # ignore vim swap files
+# PyCharm settings
+#.idea/* 
+*.swp
 *.swo
 
 # Compiled source #
@@ -34,9 +41,10 @@ activate
 # Logs and databases #
 ######################
 *.log
-*.sql  # using the Django hook that looks for sql/<modelname>.sql files to to populate db with initial data
+# using the Django hook that looks for sql/<modelname>.sql files to to populate db with initial data
+*.sql  
 *.sqlite
-*.db 
+*.db
 
 # OS generated files #
 ######################
@@ -48,5 +56,3 @@ activate
 Icon?
 ehthumbs.db
 Thumbs.db
-
-*.db
