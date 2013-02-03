@@ -42,7 +42,7 @@ class RFIDkeycard(models.Model):
     the_rfid    = models.IntegerField(max_length=24,null=True,editable=True) # the radio-frequency id
     date_revoked = models.DateTimeField(null=True, blank=True) # note that blank=True is at form validation level, while null=True is at db level
     # actually, this should not be a field that staff users can fill in.  It should be created
-    # automatically when the associated **LockUser** is deactivated!
+    # automatically when the associated **LockUser** is deactivateh
 
     date_created = models.DateTimeField(auto_now_add=True) 
 
@@ -219,3 +219,49 @@ class LockUser(models.Model):
     def __unicode__(self):
         """ In the list of AcessTimes, for example, LockUsers will be represented with their first and last names """
         return u'%s %s' % (self.first_name, self.last_name)
+
+
+from django.conf import settings
+from django.contrib.auth import models as auth_models
+from django.contrib.auth.management import create_superuser
+from django.db.models import signals
+
+# From http://stackoverflow.com/questions/1466827/ --
+#
+# Prevent interactive question about wanting a superuser created.  (This code
+# has to go in this otherwise empty "models" module so that it gets processed by
+# the "syncdb" command during database creation.)
+signals.post_syncdb.disconnect(
+    create_superuser,
+    sender=auth_models,
+    dispatch_uid='django.contrib.auth.management.create_superuser')
+
+
+# Create our own test user automatically.
+
+def create_testuser(app, created_models, verbosity, **kwargs):
+  if not settings.DEBUG:
+    return
+  try:
+    auth_models.User.objects.get(username='test')
+  except auth_models.User.DoesNotExist:
+    print '*' * 80
+    print 'Creating test user -- login: test, password: test'
+    print '*' * 80
+    assert auth_models.User.objects.create_superuser('test', 'x@x.com', 'test')
+  else:
+    print 'Test user already exists.'
+
+signals.post_syncdb.connect(create_testuser,
+    sender=auth_models, dispatch_uid='common.models.create_testuser')
+
+
+# Note - no need to do explicit memoization, I think. From the docs: 
+# "In a newly created QuerySet, the cache is empty. The first
+#  time a QuerySet is evaluated -- and, hence, a database query happens -- Django 
+#  saves the query results in the QuerySet's cache and returns the results that have
+#  been explicitly requested (e.g., the next element, if the QuerySet is being
+#  iterated over). Subsequent evaluations of the QuerySet reuse the cached results."
+
+
+
