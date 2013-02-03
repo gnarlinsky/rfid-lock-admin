@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.forms import CheckboxSelectMultiple
+from django.forms import CheckboxSelectMultiple, IntegerField, ModelForm
 from django.db import models
 from djock_app.models import LockUser, AccessTime, RFIDkeycard, Door
 
@@ -25,7 +25,20 @@ class DoorAdmin(admin.ModelAdmin):
     readonly_fields = ('get_allowed_lockusers',)   # because obviously these shouldn't be editable.  
     #(but commenting out if want to create some objects from admin vs shell just for fun)
 
+
+# playing with prepopulating stuff 
+class RFIDkeycardForm(ModelForm):
+    the_rfid = IntegerField(help_text="help text")
+
+    class Meta:
+        model = RFIDkeycard
+
+
 class RFIDkeycardAdmin(admin.ModelAdmin):
+
+    # playing with prepopulating stuff 
+    form = RFIDkeycardForm
+
     #inlines = (OpenershipInline,)
     list_display = ["the_rfid","date_created","date_revoked","get_this_lockuser","id"]
 
@@ -40,6 +53,7 @@ class RFIDkeycardAdmin(admin.ModelAdmin):
       #     }), )
       # WTF? It keeps saying field x doesn't exist, but "x" just picks up the first char of the field, like "field t doesn't
       # exist" if I have "the_rfid" ????!!!
+
 
 
 class LockUserAdmin(admin.ModelAdmin):
