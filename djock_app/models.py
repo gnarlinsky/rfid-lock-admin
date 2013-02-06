@@ -1,8 +1,10 @@
 from django.db import models
+from django.forms import ModelForm, IntegerField
 
 
 ############### TO DO ##########################
 # make sure various stuff are set unique
+# consistency with _var vs var
 ################################################
 
 class Door(models.Model):
@@ -33,7 +35,7 @@ class RFIDkeycard(models.Model):
     this RFID has access to; can get times when it was used (i.e. AccessTimes),
     and ........
 
-    Note for nk when  get to LockUser: when a lockuser is "deactivated," their card is deactivated as well -
+    Note for nk when  get to LockUser: when a lockuser is "deactivated," their card is deactivated as well  (but not the other way around, by the way!) -
         and the date_revoked will be automatically populated (so in addition to manually revoking a card).
          This means that if there's no revoked date, the card is still active, and don't need
          a separate is_active field here... just ask: is_active() --> can just check if there's a revoked date,
@@ -62,13 +64,46 @@ class RFIDkeycard(models.Model):
         pass
     
     def get_this_lockuser(self):
-        return ", ".join([str(lu) for lu in self.lockuser_set.all()])
+        #return self.lockuser_set.all() 
+        return self.lockuser_set.all()[0]  # There should only be one lockuser associated with this RFIDkeycard (not RFID num)
+
+    #  don't need this since there should only be one lockuser, and LockUser's __unicode__() returns first
+    #  name, last name string
+   # def prettify_get_this_lockuser(self):
+        # There should only be one lockuser associated with this RFIDkeycard (not RFID num)
+               # i.e. don't do this: 
+                   # _associated_lockusers_set =  self.get_this_lockuser() 
+                   # return ", ".join([str(lu) for lu in _associated_lockusers_set])
+
+       # _associated_lockuser =  self.get_this_lockuser()  
+       # return _associated_lockuser   # but now try str()'ing it
 
     def get_allowed_doors(self):
-        """ Get the Doors this user is allowed access to. """
-        lu = get_this_lockuser()
-        return lu.doors
-    
+        """ Get the Doors this user is allowed access to.
+            But wait, stop, collaborate and listen... a lockuser may have more than one RFID associated with them, and each card may have more different door access.  So then this would return doors that are not actually associated with this RFID, but all doors associated with that lockuser. But the idea of a user having more than one card just brings up a host of problems, including wasting cards; this issue here; more complicated queries that may take more time... So do we assume one keycard per lockuser, then, set in stone? """
+        lu = self.get_this_lockuser()
+        return lu.get_allowed_doors()
+
+    def prettify_get_allowed_doors(self):
+        lu = self.get_this_lockuser()
+        return lu.prettify_get_allowed_doors()
+
+    def is_active(self):
+        # lu = self.get_this_lockuser()
+        # return lu.is_active()
+        # The above is not going to work, because
+        #   The way the code is right now, a LockUser is active if there's an RFIDkeycard currently associated with them. If you determine an RFIDkeycard's being active by appealing to its lockusers is_active, that is not going to be correct, because then it would be true if the associated lockuser has ANY RFIDkeycard currently, not the one we're inquiring about.  So getting the lockuser_set gets any past lockusers of this keycard! ... right?  
+        #   So you either have to do something like check if the returned lockuser's current rfid num matches this one... Or do a separate check that only looks at whether this RFIDkeycard has a revoked date.
+        #   So doing the latter:
+        print "*"*100; print self.date_revoked; print type(self.date_revoked)
+        if self.date_revoked: # additional checks? 
+            return False
+        else: 
+            return True
+
+
+
+        
 
 class AccessTime(models.Model):
     the_rfid           = models.IntegerField(max_length=24,null=True) # the radio-frequency id, however represented....
@@ -132,9 +167,8 @@ class LockUser(models.Model):
         """
         #_rfid_keycards = self.rfids.all()   # or call get_all_rfids for consistency
         _rfid_keycards = self.get_all_rfids()
-        curr_rfid = _rfid_keycards.filter(date_revoked=None)  # there should only be one or 0 but obviously
-                    #    i'm not doing any kind of checking or exception handling or anything....         
-        return curr_rfid
+        _curr_rfid = _rfid_keycards.filter(date_revoked=None)  # note there can be more than one
+        return _curr_rfid
        
     def prettify_get_current_rfid(self):
         """ Returns results of get_current_rfid(), but as a nice pretty string.
@@ -155,17 +189,27 @@ class LockUser(models.Model):
         _doors = self.get_allowed_doors()
         _door_names_list = [d.name for d in _doors] 
         return ", ".join(_door_names_list)
-        
+       
+
+    # TO DO here...  Hmm, something feels weird with the curr_rfid_only argument. Biggest issue is
+    # how to pass arguments to list_display and fieldsets in admin. It's technically possible but
+    # it's annoying
+    # (http://stackoverflow.com/questions/14033182/list-display-with-a-function-how-to-pass-arguments). 
+    # Wouldn't it more consistent/comprehensible/Pythonic to create *separate methods* for (1)
+    # getting all access times for all rfid's a lockuser has ever had and (2) only the current
+    # active one. 
     def get_all_access_times(self, curr_rfid_only=True):
         """ Returns list of all access times for this user, which means that the search should include any other
         RFID's this LockUser ever had. In other words, the search is by *person*, not by RFID.
-        However, multiple RFID's are not implemented yet, so this defaults to using the current RFID only.
+        Although we're in the process of deciding whether there should only be one keycard/RFID per person. see the comment for RFIDkeycard.get_allowed_doors().
         """
 
         if curr_rfid_only:
             #curr_rfid = self.get_current_rfid()  
             # until fix the only-1-curr-rfid thing, the above actually may refer to multiple instances...  
-            # So just for now, for the purposes of getting on with this, just taking the first item if it exists
+            # So just for now, for the purposes of getting on with this, just taking the first item
+            # if it exists. Although we're in the process of deciding whether there should only be
+            # one keycard/RFID per person. see the comment for RFIDkeycard.get_allowed_doors()
             if self.get_current_rfid():
                 curr_rfid_keycard = self.get_current_rfid()[0]
 

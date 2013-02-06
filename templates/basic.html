@@ -1,6 +1,137 @@
 <html>
 <body>
-<p>Door: {{params.doorid}}</p>
-<p>RFID: {{params.rfid}}</p>
+<h1>Are we sending the right response? (what we have to check)</h1>
+
+<p> These are the arguments in the URL:<p>
+<ul>
+    <li>Door id from URL: {{params.doorid}} </li>
+    <li>RFID id from URL: {{params.rfid}}</li>
+</ul>
+<hr>
+
+<div style="color: red; ">
+<p> So do we have a match? </p>
+    {% for rfidkeycard in object_list %}
+        {% for  d in rfidkeycard.get_allowed_doors%}
+            {% if rfidkeycard.is_active %} 
+                    {% ifequal rfidkeycard.the_rfid params.rfid|add:0 %} 
+                        <ul>   
+                        {% ifequal d.id params.doorid|add:0 %} 
+                            <li> active  </li>
+                            <li> rfid's equal: {{rfidkeycard.the_rfid }}; {{ params.rfid}}  </li>
+                            <li> door id's equal: {{d.id }}; {{ params.doorid}}  </li>
+                        {% endifequal %}
+                    {% endifequal %}
+            {% endif %}
+                        </ul>
+
+        {% endfor %}
+    {% endfor %}
+</div>
+<hr>
+
+<p> Same as above, but all checks explicit: </p>
+<p> Here are all the RFIDkeycard objects, and results of their get_allowed_doors(); those doors' id's; and is_active:<p> 
+<ul>
+    {% for rfidkeycard in object_list %}
+        <li> {{ rfidkeycard }} </li>
+        <ul>
+        {% for  d in rfidkeycard.get_allowed_doors%}
+            <li> {{ d.id }} </li>
+                <ul> 
+                    {% ifequal rfidkeycard.the_rfid params.rfid|add:0 %} 
+                        <li> rfid's equal: {{rfidkeycard.the_rfid }}; {{ params.rfid}}  </li>
+                    {% else %}
+                        <li> rfid's not equal </li>
+                    {% endifequal %}
+                    {% ifequal d.id params.doorid|add:0 %} 
+                        <li> door id's equal: {{d.id }}; {{ params.doorid}}  </li>
+                    {% else %}
+                        <li> door id's not equal </li>
+                    {% endifequal %}
+                    {% if rfidkeycard.is_active %} 
+                        <li> active  </li>
+                    {% else %}
+                        <li> not active </li>
+                    {% endif %}
+                </ul>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+</ul>
+<hr>
+
+
+
+
+{% comment %}
+
+<p> Here are all the RFIDkeycard objects, and their get_allowed_doors() :<p> 
+<ul>
+    {% for rfidkeycard in object_list %}
+        <li> {{ rfidkeycard }} </li>
+    {% endfor %}
+</ul>
+<hr>
+
+
+(<p> Where those are in the REQUEST, btw: <p> 
+<ul>
+    <li>....</li>
+    <li>....</li>
+</ul>
+)
+<hr>
+
+<p> RFIDkeycards (object_list) :<p> 
+{{ object_list }}
+<hr>
+
+
+<p> Same as above, but list their id's/pk's<p>
+<ul>
+    {% for rfidkeycard in object_list %}
+        <li> {{ rfidkeycard.id }} </li>
+    {% endfor %}
+</ul>
+<hr>
+
+<p> Same as above, but list their rfid num's<p>
+<ul>
+    {% for rfidkeycard in object_list %}
+        <li> {{ rfidkeycard.the_rfid }} </li>
+    {% endfor %}
+</ul>
+<hr>
+
+
+
+
+<p> Is there an rfidkeycard with the rfid in the URL?<p>
+<ul>
+    {% for rfidkeycard in object_list %}
+        {% ifequal rfidkeycard.the_rfid params.rfid|add:0 %} 
+            <li> YES: {{ rfidkeycard.the_rfid }}  equal to {{ params.rfid }} </li>
+        {% else %}
+            <li> NO:  {{ rfidkeycard.the_rfid }} not equal to {{ params.rfid }} </li>
+        {% endifequal %}
+    {% endfor %}
+</ul>
+<hr>
+
+
+<p> Here are all the RFIDkeycard objects, and results of their is_active(): <p> 
+<ul>
+    {% for rfidkeycard in object_list %}
+        <li> {{ rfidkeycard.is_active}} </li>
+    {% endfor %}
+</ul>
+<hr>
+
+
+
+{% endcomment %}
+
+
 </body>
 </html>

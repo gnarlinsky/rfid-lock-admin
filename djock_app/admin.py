@@ -47,7 +47,7 @@ class RFIDkeycardAdmin(admin.ModelAdmin):
     form = RFIDkeycardForm
 
     #inlines = (OpenershipInline,)
-    list_display = ["the_rfid","date_created","date_revoked","get_this_lockuser","id"]
+    list_display = ["the_rfid","id", "date_created","date_revoked","is_active", "get_this_lockuser", "prettify_get_allowed_doors"]
 
     ####################################################################################################
     # Individual page (change form)

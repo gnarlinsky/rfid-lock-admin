@@ -1,11 +1,52 @@
+from django.views.generic import list_detail
 from django.views.generic.simple import redirect_to, direct_to_template
 from django.conf.urls import patterns, include, url
+from djock_app.models import RFIDkeycard, Door
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
+
+
+# This is a view, but putting it in here to test stuff
+def blah(request, doorid, rfid):
+
+    return list_detail.object_list(
+        request,
+        queryset = RFIDkeycard.objects.all(), 
+        template_name = "basic.html",
+        #template_object_name = "rfidkeycard_list",  # So in template,  {% for rfidkeycard in rfidkeycard_list %} instead of   {% for rfidkeycard in object_list %} .....  although something isn't working.....
+        extra_context = {"params" :{'doorid': doorid, 'rfid':rfid}, \
+                        "doors_list": Door.objects.all(), 
+                         }
+    )
+
+
+
+#rfidkeycard_info = {
+ #       "queryset" : RFIDkeycard.objects.all(), 
+        #"template_object_name" : "rfidkeycard",  # So in template,  {% for rfidkeycard in rfidkeycard_list %} instead of   {% for rfidkeycard in object_list %} .....  although something isn't working.....
+#}
+
 urlpatterns = patterns('',
+    # if don't provide template name to object_list view, inferred template will be "djock_app/rfidkeycard_list.html"
+    url(r'checkdoor/(?P<doorid>\d+)/checkrfid/(?P<rfid>\d+)/$',\
+                        blah, \
+                        #list_detail.object_list, \
+                        #rfidkeycard_info
+                        #direct_to_template, {'template': 'basic.html' }, \
+
+    ),
+
+
+
+
+
+
+
+
+
     # Uncomment the next line to enable the admin:
     url(r'^lockadmin/', include(admin.site.urls)),
 
@@ -19,8 +60,10 @@ urlpatterns = patterns('',
     # [ But since all I have to send back is a 1 or 0, maybe I don't have to write a template at all?])
     # direct_to_template passes the dictionary 'params' to the template, so to
     #   access 'doorid,' for example, you have to do {{ params.doorid }} )
-    url(r'door/(?P<doorid>\d+)/checkrfid/(?P<rfid>.{2})/$', direct_to_template, {'template': 'basic.html' }  ),
-    #(just going with a 2 digit "rfid" right now to make my lazy life easier)
+    url(r'door/(?P<doorid>\d+)/checkrfid/(?P<rfid>\d+)/$',\
+                        direct_to_template, {'template': 'basic.html' }, \
+
+    ),
 
     # get list of rfid's allowed to open this door
     # direct_to_template right now, just a quick demo of displaying arguments in the url,
@@ -28,8 +71,8 @@ urlpatterns = patterns('',
     # (later, in view, something like -
     #   return HttpResponse(data, mimetype='application/json')
     #url(r'^door/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'we_are_ok.html' }    ),
-    url(r'^door/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'admin/we_are_ok.html' }    ),
-    url(r'door/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'admin/we_are_ok.html' }    ),
+    url(r'^checkdoor/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'admin/we_are_ok.html' }    ),
+    url(r'checkdoor/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'admin/we_are_ok.html' }    ),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     #url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

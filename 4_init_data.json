@@ -246,5 +246,25 @@
       ], 
       "email": "alsdkjf@aldfj.com"
     }
-  } 
+  },
+
+ {
+    "pk": 5,  
+    "model": "djock_app.lockuser", 
+    "fields": {
+      "phone_number": 123123, 
+      "first_name": "Homer", 
+      "last_name": "Simpson", 
+      "middle_name": "", 
+      "birthdate": null, 
+      "doors": [
+        6   
+      ],  
+      "address": "", 
+      "rfids": [
+        7   
+      ],  
+      "email": "ChunkyLover53@aol.com"
+    }   
+  }  
 ]
