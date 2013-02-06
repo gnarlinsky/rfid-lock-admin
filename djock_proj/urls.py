@@ -2,6 +2,7 @@ from django.views.generic import list_detail
 from django.views.generic.simple import redirect_to, direct_to_template
 from django.conf.urls import patterns, include, url
 from djock_app.models import RFIDkeycard, Door
+from djock_app import views
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -30,6 +31,15 @@ def blah(request, doorid, rfid):
 #}
 
 urlpatterns = patterns('',
+    url(r'checkdoor/(?P<doorid>\d+)/checkrfid/(?P<rfid>\d+)/$',\
+                        views.check, \
+                        #list_detail.object_list, \
+                        #rfidkeycard_info
+                        #direct_to_template, {'template': 'basic.html' }, \
+
+    ),
+
+
     # if don't provide template name to object_list view, inferred template will be "djock_app/rfidkeycard_list.html"
     url(r'checkdoor/(?P<doorid>\d+)/checkrfid/(?P<rfid>\d+)/$',\
                         blah, \

@@ -5,9 +5,6 @@ from djock_app.models import Door, LockUser, RFIDkeycard, AccessTime
 import random
 
 
-
-
-
 # pseudocoding how to  handle the incoming request to verify rfid
 # I think we discussed two ways of verifying: id 
 #   - primary: /door/<door_id>/check/<rfid_id>
@@ -21,6 +18,40 @@ def is_allowed(request, rfid, door):
     else:
         0
 """
+
+
+
+
+def check(request,doorid, rfid): 
+    response = 0
+    rfidkeycard_list =  RFIDkeycard.objects.all()
+    
+    for rfidkeycard in rfidkeycard_list:
+        for door in rfidkeycard.get_allowed_doors():
+            if rfidkeycard.is_active():
+                if int(rfidkeycard.the_rfid) == int(rfid):
+                    if int(door.id) == int(doorid):
+                        response = 1
+        
+    return HttpResponse(response)
+
+"""def check(request, doorid, rfid):
+
+    return list_detail.object_list(
+        request,
+        queryset = RFIDkeycard.objects.all(), 
+        template_name = "basic.html",
+        #template_object_name = "rfidkeycard_list",  # So in template,  {% for rfidkeycard in rfidkeycard_list %} instead of   {% for rfidkeycard in object_list %} .....  although something isn't working.....
+        extra_context = {"params" :{'doorid': doorid, 'rfid':rfid}, \
+        "doors_list": Door.objects.all(), 
+                     }   
+                     )   
+
+"""
+
+
+
+    
     
 
 #generate a random number to simulate an actual keycard being scanned in and the num retrieved """
