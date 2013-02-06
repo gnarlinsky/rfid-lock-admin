@@ -25,13 +25,15 @@ def is_allowed(request, rfid, door):
 def check(request,doorid, rfid): 
     response = 0
     rfidkeycard_list =  RFIDkeycard.objects.all()
-    
+
     for rfidkeycard in rfidkeycard_list:
-        for door in rfidkeycard.get_allowed_doors():
-            if rfidkeycard.is_active():
-                if int(rfidkeycard.the_rfid) == int(rfid):
-                    if int(door.id) == int(doorid):
-                        response = 1
+        allowed_doors = rfidkeycard.get_allowed_doors()
+        if allowed_doors:
+            for door in rfidkeycard.get_allowed_doors():
+                if rfidkeycard.is_active():
+                    if int(rfidkeycard.the_rfid) == int(rfid):
+                        if int(door.id) == int(doorid):
+                            response = 1
         
     return HttpResponse(response)
 

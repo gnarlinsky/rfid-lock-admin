@@ -16,7 +16,7 @@ class DoorAdmin(admin.ModelAdmin):
     # Page listing all Doors:
     ####################################################################################################
     # # field names to display, as columns
-    list_display = ('name','get_allowed_lockusers','prettify_get_allowed_rfids')
+    list_display = ('name','id', 'get_allowed_lockusers','prettify_get_allowed_rfids')
     actions=None  # don't provide the actions dropdown
     
     ####################################################################################################

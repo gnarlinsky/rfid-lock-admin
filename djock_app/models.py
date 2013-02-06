@@ -65,7 +65,10 @@ class RFIDkeycard(models.Model):
     
     def get_this_lockuser(self):
         #return self.lockuser_set.all() 
-        return self.lockuser_set.all()[0]  # There should only be one lockuser associated with this RFIDkeycard (not RFID num)
+        if self.lockuser_set.all():
+            return self.lockuser_set.all()[0]  # There should only be one lockuser associated with this RFIDkeycard (not RFID num)
+        else:
+            return None
 
     #  don't need this since there should only be one lockuser, and LockUser's __unicode__() returns first
     #  name, last name string
@@ -82,7 +85,10 @@ class RFIDkeycard(models.Model):
         """ Get the Doors this user is allowed access to.
             But wait, stop, collaborate and listen... a lockuser may have more than one RFID associated with them, and each card may have more different door access.  So then this would return doors that are not actually associated with this RFID, but all doors associated with that lockuser. But the idea of a user having more than one card just brings up a host of problems, including wasting cards; this issue here; more complicated queries that may take more time... So do we assume one keycard per lockuser, then, set in stone? """
         lu = self.get_this_lockuser()
-        return lu.get_allowed_doors()
+        if lu:
+            return lu.get_allowed_doors()
+        else:
+            return None
 
     def prettify_get_allowed_doors(self):
         lu = self.get_this_lockuser()
@@ -95,7 +101,6 @@ class RFIDkeycard(models.Model):
         #   The way the code is right now, a LockUser is active if there's an RFIDkeycard currently associated with them. If you determine an RFIDkeycard's being active by appealing to its lockusers is_active, that is not going to be correct, because then it would be true if the associated lockuser has ANY RFIDkeycard currently, not the one we're inquiring about.  So getting the lockuser_set gets any past lockusers of this keycard! ... right?  
         #   So you either have to do something like check if the returned lockuser's current rfid num matches this one... Or do a separate check that only looks at whether this RFIDkeycard has a revoked date.
         #   So doing the latter:
-        print "*"*100; print self.date_revoked; print type(self.date_revoked)
         if self.date_revoked: # additional checks? 
             return False
         else: 
