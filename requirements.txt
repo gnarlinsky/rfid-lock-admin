@@ -1,4 +1,5 @@
 Django==1.4.1
 django-bootstrap-toolkit==2.5.10
+selenium==2.29.0
 termcolor==1.1.0
 wsgiref==0.1.2
