@@ -1,0 +1,25 @@
+[
+  {
+    "pk": 2, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "staff-only_test_user", 
+      "first_name": "Staff-only-Jane", 
+      "last_name": "Doe", 
+      "is_active": true, 
+      "is_superuser": false, 
+      "is_staff": true, 
+      "last_login": "2013-02-09T22:57:41Z", 
+      "groups": [], 
+      "user_permissions": [
+        3, 
+        7, 
+        4, 
+        8
+      ], 
+      "password": "pbkdf2_sha256$10000$1TmTXn6svca8$h4Uj4YwPzsenDWdjM9n+4xBZZhC7e+4RZNH1lgZvV60=", 
+      "email": "jane@blah.com", 
+      "date_joined": "2013-02-09T22:57:41Z"
+    }
+  }
+]
