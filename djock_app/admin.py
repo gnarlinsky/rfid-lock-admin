@@ -35,7 +35,7 @@ class RFIDkeycardForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(RFIDkeycardForm, self).__init__(*args, **kwargs)
         self.fields['the_rfid'] = IntegerField(help_text = "(this is a random number to simulate getting a new keycard number after it's scanned in)")
-        self.fields['the_rfid'].initial = random.randint(100000,999999)
+        self.fields['the_rfid'].initial = str(random.randint(0000000000,9999999999)) # rfid's should be 10 char long... just str'ing ints, because I don't want to mess with random crap anymore.
 
     class Meta:
         model = RFIDkeycard
@@ -185,13 +185,84 @@ class AccessTimeAdmin(admin.ModelAdmin):
         """Don't display Save And Add button """
         return False
 
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
+
+"""
+UserAdmin.list_display = ('email', 'first_name', 'last_name', 'is_active', 'is_staff')
+UserAdmin.fields = ('additional_attribute',)
+
+"""
+
+"""
+class StaffUserAdmin(UserAdmin):
+    list_display = ('email', 'first_name', 'last_name', 'is_active', 'is_staff')
+    #fields = ('additional_attribute',)
+    #fields += ('email','first_name',)
+    fieldsets = (
+            (None, {
+                'fields': ( \
+                            ('first_name', 'last_name'), 'email', 'additional_attribute',\
+                            ),
+
+            }),
+        )
+    #add_fieldsets = (
+    #fieldsets = (
+    #        (None, {
+                #'classes': ('wide',),
+                #'fields': ('additional_attribute') }
+   #             'fields': ('username', 'first_name','additional_attribute') 
+   #             } ),
+   #     )
+
+    #readonly_fields = ('additional_attributes',)   
+    #fields = ('username', )
+
+"""
+
+#    list_display += ('additional_attribute')
+#    UserAdmin.fieldsets += ('additional_attribute',)
+
+
+
+
+#  should this stuff go in __init__.py? 
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+
+content_type = ContentType.objects.get(app_label='djock_app', model='lockuser')
+
+# or just get(...  ??  vs get_or_create ??
+"""
+permission = Permission.objects.get_or_create(codename='can_manage_door_1',  \
+               name='Can Manage Door 1',\
+              #content_type=content_type)
+              content_type=content_type)
+"""
+
+# Making door permissions based on how many door there are right now, not hardcoding it in
+door_objects = Door.objects.all()
+for door in door_objects:
+    Permission.objects.get_or_create(\
+                    codename='can_manage_door_%d' % door.pk, \
+
+                    # TO DO: make sure door names are unique!
+                    name = 'Can manage door to %s' % door.name,\
+
+                    content_type = content_type)   
+                                                
 
 # Run admin.site.register() for each model we wish to register
-# (not defining a new AdminSite because the REAL Django admin just == all staff)
 admin.site.register(RFIDkeycard, RFIDkeycardAdmin)
 admin.site.register(LockUser,LockUserAdmin)
 admin.site.register(AccessTime,AccessTimeAdmin)
 admin.site.register(Door, DoorAdmin)
+
+#admin.site.register(User)
+#admin.site.unregister(User)
+#admin.site.register(User, StaffUserAdmin)
+#admin.site.register(User, UserAdmin)
 
 # Globally disable deletion of selected objects (i.e this will not be an available action in the Actions dropdown of
 # all ModelAdmins/change_list pages.
