@@ -1,7 +1,7 @@
 {% extends "admin/base.html" %}
 {% load i18n %}
 {% load bootstrap_toolkit %}
-{% block title %}{{ title }} | {% trans 'RFID lock admin' %}{% endblock %}
+{% block title %}{{ title }} | {% trans 'RFID Lock Administration' %}{% endblock %}
 
 
 {% block extrastyle %}
@@ -143,6 +143,21 @@
         font-size:50px; 
         text-decoration: none; 
     }
+
+/* The select box is way too small (can't see the full text of the permission in User change_form), so overriding this in widgets.css */
+.selector select#id_user_permissions_to.filtered, #id_user_permissions_from.filtered 
+{
+    width: 450px ;  /* changing from 270 px */
+}
+.selector-available, .selector-chosen 
+{
+    width: 450px !important;  /* changing from 270 px */
+}
+.selector 
+{
+    width: 940px !important;  /* changing from 580 px */
+}
+
 </style>
 
  {% endblock %}
@@ -152,10 +167,10 @@
 {% block branding %}
 
     {% comment %}
-    <h1 id="site-name"><a href='/lock/' id='header_link'>{% trans 'RFID Lock Admin' %}</a></h1>
+    <h1 id="site-name"><a href='/lock/' id='header_link'>{% trans 'RFID Lock Administration' %}</a></h1>
     {% endcomment %}
     <div>
-        <h1><a href='/lock/' id='header_link'>{% trans 'RFID Lock Admin' %}</a></h1>
+        <h1><a href='/lock/' id='header_link'>{% trans 'RFID Lock Administration' %}</a></h1>
     </div>
 {% endblock %}
 
