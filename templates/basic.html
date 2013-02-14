@@ -14,9 +14,9 @@
     {% for rfidkeycard in object_list %}
         {% for  d in rfidkeycard.get_allowed_doors%}
             {% if rfidkeycard.is_active %} 
-                    {% ifequal rfidkeycard.the_rfid params.rfid|add:0 %} 
+                    {% ifequal rfidkeycard.the_rfid params.rfid %} 
                         <ul>   
-                        {% ifequal d.id params.doorid|add:0 %} 
+                        {% ifequal d.id params.doorid %} 
                             <li> active  </li>
                             <li> rfid's equal: {{rfidkeycard.the_rfid }}; {{ params.rfid}}  </li>
                             <li> door id's equal: {{d.id }}; {{ params.doorid}}  </li>
@@ -39,12 +39,12 @@
         {% for  d in rfidkeycard.get_allowed_doors%}
             <li> {{ d.id }} </li>
                 <ul> 
-                    {% ifequal rfidkeycard.the_rfid params.rfid|add:0 %} 
+                    {% ifequal rfidkeycard.the_rfid params.rfid %} 
                         <li> rfid's equal: {{rfidkeycard.the_rfid }}; {{ params.rfid}}  </li>
                     {% else %}
                         <li> rfid's not equal </li>
                     {% endifequal %}
-                    {% ifequal d.id params.doorid|add:0 %} 
+                    {% ifequal d.id params.doorid %} 
                         <li> door id's equal: {{d.id }}; {{ params.doorid}}  </li>
                     {% else %}
                         <li> door id's not equal </li>
@@ -110,7 +110,7 @@
 <p> Is there an rfidkeycard with the rfid in the URL?<p>
 <ul>
     {% for rfidkeycard in object_list %}
-        {% ifequal rfidkeycard.the_rfid params.rfid|add:0 %} 
+        {% ifequal rfidkeycard.the_rfid params.rfid %} 
             <li> YES: {{ rfidkeycard.the_rfid }}  equal to {{ params.rfid }} </li>
         {% else %}
             <li> NO:  {{ rfidkeycard.the_rfid }} not equal to {{ params.rfid }} </li>
