@@ -2,6 +2,66 @@
 {% load i18n admin_urls %}
 
 
+{% comment %} 
+    If this is an RFIDkeycard inline/popup (http://localhost:8080/lockadmin/djock_app/rfidkeycard/add/?_popup=1), insert some extra temporary text 
+{% endcomment %} 
+{% block object-tools %}
+
+    {% comment %} {% if request.path == "/lockadmin/djock_app/rfidkeycard/add/" and request.META.QUERY_STRING == "_popup=1"  %} {% endcomment %} 
+    {% if request.path == "/lockadmin/djock_app/rfidkeycard/add/" and is_popup  %}
+            <center style="background-color:#fdd;">
+
+            <p style="font-size:10px; color:#666;width:700px;">
+            (This popup should go away; then the change_form should refresh so that superusers see the number there and non-superusers don't see the number but see the other signs that mean that a keycard is assigned and is active, like the place by "Manage keycard" that says whether or not lock user has an active keycard, and which options of "assign new keycard" and "deactivate current keycard" are functional. 
+            <p>
+            <p style="font-size:10px; color:#777;width:700px; ">
+            Note that the "Save" is really "Save and Assign" - the association with this LockUser already happens by the time back at the form.  
+            Also, since manage keycards stuff will actually be below everything else and the save bar -- i.e. saving everything else about the
+            lockuser is a separate thing.... so that refreshing when come back out of the popup doesn't screw things up/lose things.  The manage
+            keycards bar will now reflect that that user now has active keycard. The superuser should see the fields listing current and all
+            rfid's have changed.)
+            <p>
+            </center>
+            <hr>
+            
+            {{ request }}<hr>
+            {{ context }}
+            <hr>
+            <center>
+            <h2>Go scan in a new card........</h2>
+            <h5>..................... waiting .....................</h3>
+            <h5>(Be the Arduino and go to</h5>
+            <p>http://192.168.x.x:8080/checkdoor/doorid/checkrfid/rfid/ (if ran ./manage.py runserver 192.168.x.x:8080)</p>
+            <h5> OK, got it. Click "Save" to finish creating new keycard.</h5>
+            </center>
+
+
+    {% endif %}
+
+    {% if change %}{% if not is_popup %}
+        <ul class="object-tools">
+            {% block object-tools-items %} {{block.super}} {% endblock %}
+        </ul>
+    {% endif %}{% endif %}
+{% endblock %}
+
+
+
+
+{% comment %} overriding this block in order to show the controls for assigning new keycards/deactivating existing ones in the form row {% endcomment %} 
+
+{% comment %}
+    {% block field_sets %}
+        {% for fieldset in adminform %}
+            overriding this block.. unless i can actually get fieldset into the right dir....
+            {% include "admin/includes/fieldset.html" %}
+        {% endfor %}
+    {% endblock %}
+{% endcomment %}
+
+
+
+
 {% comment %}
 ;
 {% block object-tools %}
