@@ -176,6 +176,7 @@
       "last_name": "Mann", 
       "middle_name": "", 
       "birthdate": null, 
+      "is_active":true,
       "doors": [
         2
       ], 
@@ -196,12 +197,12 @@
       "last_name": "Wiggum", 
       "middle_name": "", 
       "birthdate": null, 
+      "is_active":true,
       "doors": [
         1
       ], 
       "address": "Springfield", 
       "rfids": [
-        6
       ], 
       "email": "alsdkjf@alsdkjf.com"
     }
@@ -215,6 +216,7 @@
       "last_name": "Simpson", 
       "middle_name": "", 
       "birthdate": null, 
+      "is_active":true,
       "doors": [
         5, 
         6
@@ -236,13 +238,13 @@
       "last_name": "Simpson", 
       "middle_name": "", 
       "birthdate": null, 
+      "is_active":false,
       "doors": [
         3, 
         6
       ], 
       "address": "742 Evergreen Terrace", 
       "rfids": [
-        2
       ], 
       "email": "alsdkjf@aldfj.com"
     }
@@ -257,6 +259,7 @@
       "last_name": "Simpson", 
       "middle_name": "", 
       "birthdate": null, 
+      "is_active":true,
       "doors": [
         6   
       ],  
