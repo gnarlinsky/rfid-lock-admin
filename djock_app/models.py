@@ -1,11 +1,24 @@
 from django.db import models
 from django.forms import ModelForm, IntegerField
+from django.contrib.auth.models import User
+from django.dispatch import dispatcher
+from django.db.models.signals import post_save
+from django.conf import settings
+from django.contrib.auth import models as auth_models
+from django.contrib.auth.management import create_superuser
+from django.db.models import signals
 
 
 ############### TO DO ##########################
 # make sure various stuff are set unique
 # consistency with _var vs var
 ################################################
+
+
+
+# the field labeled "rfids" should not be required. 
+
+
 
 class Door(models.Model):
     """ Doors with RFID locks installed. """
@@ -41,7 +54,7 @@ class RFIDkeycard(models.Model):
          a separate is_active field here... just ask: is_active() --> can just check if there's a revoked date,
          OR if today's date is between assigned/revoked...
     """
-    the_rfid    = models.IntegerField(max_length=24,null=True,editable=True) # the radio-frequency id
+    the_rfid    = models.CharField(max_length=10,null=True,editable=True) # the radio-frequency id
     date_revoked = models.DateTimeField(null=True, blank=True) # note that blank=True is at form validation level, while null=True is at db level
     # actually, this should not be a field that staff users can fill in.  It should be created
     # automatically when the associated **LockUser** is deactivateh
@@ -57,7 +70,7 @@ class RFIDkeycard(models.Model):
     def __unicode__(self):
         # Represent keycard object with the rfid number (which may not be unique, blah blah
         #   blah, but it's a useful for showing on the page for a particular LockUser, for ex.
-        return u'%d' % (self.the_rfid)
+        return u'%s' % (self.the_rfid)
 
     def get_date_assigned(self): 
         # get from __init__
@@ -111,7 +124,7 @@ class RFIDkeycard(models.Model):
         
 
 class AccessTime(models.Model):
-    the_rfid           = models.IntegerField(max_length=24,null=True) # the radio-frequency id, however represented....
+    the_rfid           = models.CharField(max_length=10,null=True) # the radio-frequency id, however represented....
     access_time    = models.DateTimeField(null=True)    # the time the rfid was used
 
     def get_this_lockuser(self):
@@ -128,7 +141,7 @@ class AccessTime(models.Model):
 class LockUser(models.Model):
     """ (Despite the misleading name, LockUsers are not subclassed Users, but subclassed Models.) """
 
-    rfids            = models.ManyToManyField("RFIDkeycard", help_text = "some blackboxing is about to happen...   button to fake-assign, etc.")
+    rfids            = models.ManyToManyField("RFIDkeycard", help_text = "(Fake-assign new keycard)", blank=True)  # the field labeled "rfids" should not be required -- it's ok to have an active LockUser that is not currently assigned a keycard.  
 
     # doors should be limited to the Doors, and should show up as checkable items for a specific LockUser. 
     ################################################################################
@@ -146,16 +159,22 @@ class LockUser(models.Model):
     phone_number    = models.IntegerField(max_length=30,null=True)
     birthdate       = models.DateField(null=True)
 
-    # Is this person allowed access? (Non-superuser staff should not have the ability to delete models -- 
-    # but rather to DEACTIVATE.)  Note:  a deactivated keycard == deactivated user
-    #is_active       =   models.BooleanField(default=False)
 
-    def is_active(self):
-        """ Determine whether this lock user is active, based on whether they have a current active rfid """
-        if self.get_current_rfid():
-            return True
-        else:
-            return False
+    # but a lock user could be still be active without having a current rfid... We could define active as having a current rfid, but
+    # that doesn't seem intuitive.... So just doing a field instead of this: 
+    #def is_active(self):
+    #    """ Determine whether this lock user is active, based on whether they have a current active rfid """
+    #    if self.get_current_rfid():
+    #        return True
+    #    else:
+    #        return False
+
+    # Is this person allowed access? (Non-superuser staff should not have the ability to delete models -- 
+    # but rather to DEACTIVATE.) 
+    is_active       =   models.BooleanField(default=False)
+
+
+
 
     def get_all_rfids(self):
         """ Get all RFID's associated with this Lock User (i.e. not just the current one, which is just the rfid field) """
@@ -270,10 +289,7 @@ class LockUser(models.Model):
         return u'%s %s' % (self.first_name, self.last_name)
 
 
-from django.conf import settings
-from django.contrib.auth import models as auth_models
-from django.contrib.auth.management import create_superuser
-from django.db.models import signals
+
 
 # From http://stackoverflow.com/questions/1466827/ --
 #
@@ -305,6 +321,7 @@ signals.post_syncdb.connect(create_testuser,
     sender=auth_models, dispatch_uid='common.models.create_testuser')
 
 
+
 # Note - no need to do explicit memoization, I think. From the docs: 
 # "In a newly created QuerySet, the cache is empty. The first
 #  time a QuerySet is evaluated -- and, hence, a database query happens -- Django 
@@ -312,5 +329,16 @@ signals.post_syncdb.connect(create_testuser,
 #  been explicitly requested (e.g., the next element, if the QuerySet is being
 #  iterated over). Subsequent evaluations of the QuerySet reuse the cached results."
 
+
+
+"""
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+
+content_type = ContentType.objects.get(app_label='djock_app', model='LockUser')
+permission = Permission.objects.get_or_create(codename='can_manage_door',\   # or just get(...  ??
+                                       name='Can Manage Door 1',\
+                                       content_type=content_type)
+"""
 
 
