@@ -1,0 +1,74 @@
+{% load custom_filters %}
+
+<fieldset class="module aligned {{ fieldset.classes }}">
+    {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
+    {% if fieldset.description %}
+        <div class="description">{{ fieldset.description|safe }}</div>
+    {% endif %}
+
+    {% for line in fieldset %}
+        <div class="form-row{% if line.fields|length_is:'1' and line.errors %} errors{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% endfor %}">
+            {% if line.fields|length_is:'1' %}{{ line.errors }}{% endif %}
+            {% for field in line %}
+                <div{% if not line.fields|length_is:'1' %} class="field-box{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% if not field.is_readonly and field.errors %} errors{% endif %}"{% endif %}>
+                {% comment %} If this is the rfid form row, this is the place for the "assign new keycard"/"deactivate current keycard" controls {% endcomment %}
+                {% if field.field.name == "rfids" %}
+                    <h2>Manage keycards ({% if object_id|does_lockuser_have_active_keycard %}user currently has active keycard{% else %}user does not have a keycard{%endif%})</h2>
+
+
+                {% comment %} 
+                note, turned on the template_context_processors per http://stackoverflow.com/questions/2882490/get-the-current-url-within-a-django-template
+                Can I avoid filters, then? ...
+                so look at {{ context }} 
+                {% endcomment %} 
+
+
+                {% comment %} using STATIC_URL for *my* static/ files; otherwise it's Django admin's originals {% endcomment %}
+                 {% if  not object_id|is_lockuser_active %} 
+                    <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids" onclick="return showAddAnotherPopup(this);">
+                    <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign keycard and activate user </a>
+                    <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif " width="10" height="10" readonly>Deactivate current keycard
+
+                 {% elif  object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %}
+                    <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids" onclick="return showAddAnotherPopup(this);">
+                    <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign new keycard </a>
+                    <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif" width="10" height="10">Deactivate current keycard
+
+                 {% elif  object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
+                    <img src="{{ STATIC_URL }}/admin/img/disabled_icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign new keycard
+                    <a href="/" class="add-another" id="add_id_rfids" onclick="return showAddAnotherPopup(this);"> 
+                        <img src="/static/admin/img/icon_deletelink.gif " width="10" height="10"> Deactivate current keycard </a>
+                 {% endif %}
+
+                 {{ field.field }} {% comment %} show RFIDs for debuggage {% endcomment %}
+                 
+
+                    </div>
+                {% else %}
+
+
+
+                        {% if not line.fields|length_is:'1' and not field.is_readonly %}{{ field.errors }}{% endif %}
+                        {% if field.is_checkbox %}
+                            {{ field.field }}{{ field.label_tag }}
+                        {% else %}
+                            {{ field.label_tag }}
+                            {% if field.is_readonly %}
+                                <p>{{ field.contents }}</p>
+                            {% else %}
+                                {{ field.field }}
+                            {% endif %}
+                        {% endif %}
+                        {% if field.field.help_text %}
+                            <p class="help">{{ field.field.help_text|safe }}</p>
+                        {% endif %}
+                {% endif %} <!-- end nk if -->
+
+
+
+                </div>
+                {% endfor %}
+        </div>  <!-- end form-row -->
+
+    {% endfor %}
+</fieldset>
