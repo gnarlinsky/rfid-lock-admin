@@ -4,10 +4,14 @@ from django.db import models
 from djock_app.models import LockUser, AccessTime, RFIDkeycard, Door
 import random
 
+
+
+
 #########################  TO DO ########################################################################
 #  - Get rid of "delete" action for all except superuser, including not showing the button on change_list
 # - (maybe?): When a user is modified or added (in terms of being active at all or more/fewer doors access), e-mail all the staff. 
 # - search bar for lockusers/accesstimes/doors change lists
+# -  # the field labeled "rfids" should not be required.  
 ####################################################################################################
 
 
@@ -26,6 +30,43 @@ class DoorAdmin(admin.ModelAdmin):
     #(but commenting out if want to create some objects from admin vs shell just for fun)
 
 
+    # Staff users should only be able to manage doors that they have permissions for
+
+
+    # This works when the user is looking at the list of Doors (the change list page), 
+    # but not when they're displayed on the lock user's change_form, and the user is 
+    # able to add/remove any of those. I can restrict stuff template-level here,
+    # but that still seems wrong.... ???
+    def queryset(self, request):
+        if request.user.is_superuser:
+            return Door.objects.all()
+        # but else if not superuser, is staff, is active: 
+        
+        doors_to_return = Door.objects.none()  # creates an EmptyQuerySet
+        for door in Door.objects.all():
+            perm = "djock_app.can_manage_door_%d" % door.pk   # put in proper format for has_perm
+            if request.user.has_perm(perm):
+                doors_to_return = doors_to_return | Door.objects.filter(pk=door.pk)  # concatenating QuerySets
+                # Doing door instead of the filter results in Error: 'Door' object has no attribute '_clone'
+                #doors_to_return = doors_to_return | door   # concatenating QuerySets
+                
+        return doors_to_return
+
+
+
+
+
+
+        """ has_perm(perm, obj=None) / has_perms(perm_list, obj=None)
+        Returns True if the user has the specified permission, where perm is in the format "<app label>.<permission codename>". (see documentation on permissions). If the user is inactive, this method will always return False.
+
+        If obj is passed in, this method won't check for a permission for the model, but for this specific object.
+        """
+
+
+            # permission codenames are named can_manage_door_x, where x is the pk num
+        # else... return nothing and/or exception? 
+
 # playing with prepopulating stuff 
 class RFIDkeycardForm(ModelForm):
     #the_rfid = IntegerField(help_text="help text")
@@ -34,11 +75,27 @@ class RFIDkeycardForm(ModelForm):
     #   simulate assigning a new card
     def __init__(self, *args, **kwargs):
         super(RFIDkeycardForm, self).__init__(*args, **kwargs)
-        self.fields['the_rfid'] = IntegerField(help_text = "(this is a random number to simulate getting a new keycard number after it's scanned in)")
+        self.fields['the_rfid'] = IntegerField(help_text = "(This is a random number to simulate getting a new keycard number after it's scanned in.<br>Only superuser can actually see the number.)")
         self.fields['the_rfid'].initial = str(random.randint(0000000000,9999999999)) # rfid's should be 10 char long... just str'ing ints, because I don't want to mess with random crap anymore.
 
     class Meta:
         model = RFIDkeycard
+
+    # playing with# trying to override save
+#    def save(self, commit=True, force_insert=False, force_update=False, *args, **kwargs):
+        # If anything overrides your form, or wants to modify what it's saving,
+        # it will do save(commit=False), modify the output, and then save it itself.
+#        rfcard = super(RFIDkeycardForm, self).save(commit=False, *args, **kwargs)
+        #################################################
+        # do my custom stuff - 
+        # (rfidkeycard actually will be saved same as always.  But before it does so, I want to actually change the associated lockuser -- just to
+        # associate it with this keycard, so that after a page refresh of the original change_form, we
+        # should be able to see this change. /save
+
+#        if commit: 
+#            rfcard.save()
+#        return rfcard
+
 
 
 class RFIDkeycardAdmin(admin.ModelAdmin):
@@ -53,8 +110,12 @@ class RFIDkeycardAdmin(admin.ModelAdmin):
     # Individual page (change form)
     ####################################################################################################
     #prepopulated_fields = { 'the_rfid': ('id',)} 
-    fields = ("the_rfid","date_revoked","date_created","id")
-    readonly_fields = ("date_revoked","date_created","id")
+    #fields = ("the_rfid","date_revoked","date_created","id")
+    fields = ("the_rfid",)
+    #readonly_fields = ("the_rfid",)   # I only see None when readonly. Maybe need to save first in RFIDkeycardForm's __init__?
+                                        # But since regular staff users shouldn't see it at all... forget it. 
+
+
    # fieldsets = ( (None, { 'fields': ("date_revoked" ),
      #           'description': ('')
       #     }), )
@@ -128,7 +189,7 @@ class LockUserAdmin(admin.ModelAdmin):
         )
 
 
-    readonly_fields = ("is_active","prettify_get_current_rfid", "prettify_get_all_rfids","prettify_get_last_access_time","prettify_get_all_access_times")   # Obviously access times should not be editable
+    readonly_fields = ("prettify_get_current_rfid", "prettify_get_all_rfids","prettify_get_last_access_time","prettify_get_all_access_times")   # Obviously access times should not be editable
 
 
     # display options as checkboxes, not default as selection list
@@ -137,19 +198,56 @@ class LockUserAdmin(admin.ModelAdmin):
         }
     #inlines = [ DoorInline, ] 
 
+
+     
     def formfield_for_manytomany(self, db_field, request, **kwargs):
-        """ 'Like the formfield_for_foreignkey method, the formfield_for_manytomany method can be overridden to change the default formfield for a many to many field. '  - django docs """
+        """ 'Like the formfield_for_foreignkey method, the formfield_for_manytomany method can be overridden to change the default formfield for a many to many field. '  - django docs;
+        Here, need specific behavior for rfid keycards and Doors"""
+
+        ################
+        #  rfids
+        ################
+        # if the field name is rfids, don't show any -- only the "+" should be there,
+        #   i.e. "assign new keycard"
         if db_field.name == "rfids":
-            #kwargs["queryset"] = RFIDkeycard.objects.filter(id=None)  # quick and gross way to just have nothing but the plus show up there!
-            # but actually that field is required (although I guess it should not be), so limiting to rfid cards assigned to no one... Upon adding new one have to
-            # refresh but this is interim behavior anyways. :
-            kwargs["queryset"] = RFIDkeycard.objects.filter(lockuser=None)  
+            # No existing rfid keycard/number should be shown on the LockUser's change form, 
+            # at least not to non-superusers
+            #kwargs["queryset"] = RFIDkeycard.objects.none()  # creates an EmptyQueryset  
+            # temporarily show some keycards there, for debugging
+            kwargs["queryset"] = RFIDkeycard.objects.all()  
+        
+
+        ################
+        #  doors
+        ################
+        # The queryset() method in DoorAdmin restricts a staff user's ability to 
+        #   view/change Doors that they do not have permission for (individual objects and change list).
+        # But on the listdisplay and changeform for LockUsers, staff users can still see Doors 
+        #   -- and assign them -- that they don't have permission for.  So here, we need to limit the 
+        #   ManyToMany Door field output for the LockUser.  
+        #
+        # TO DO: maybe it makes more sense for non-permitted doors to be viewable 
+        # (Door changelist, LockUser displaylist, LockUser changeform), but be grayed out/readonly
+        if db_field.name == "doors":
+            doors_to_show = Door.objects.none()  # creates an EmptyQuerySet
+            for door in Door.objects.all():
+                perm = "djock_app.can_manage_door_%d" % door.pk   # put in proper format for has_perm
+                #if request.user.has_perm(perm):
+                # if staff user has permission for a certain door, or if user is superuser,  put door on the list
+                if request.user.is_superuser or request.user.has_perm(perm):
+                    doors_to_show = doors_to_show | Door.objects.filter(pk=door.pk)  # concatenating QuerySets
+                    # Doing door instead of the filter, as below, results in Error: 'Door' object has no attribute '_clone'...???
+                    #doors_to_show = doors_to_show | door   # concatenating QuerySets
+            kwargs["queryset"] = doors_to_show
+
         return super(LockUserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
     #Don't display save, etc. buttons on bottom (to do: the remaining "Save and continue editing" and "Save")
     def has_delete_permission(self, request, obj=None):
         """ Don't display "delete" button """
         return False
+
+
 
 class AccessTimeAdmin(admin.ModelAdmin):
     def __init__(self, *args, **kwargs):
@@ -185,10 +283,13 @@ class AccessTimeAdmin(admin.ModelAdmin):
         """Don't display Save And Add button """
         return False
 
+#####################################################################
+# Customize User list display, change form fields
+#####################################################################
+"""
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-"""
 UserAdmin.list_display = ('email', 'first_name', 'last_name', 'is_active', 'is_staff')
 UserAdmin.fields = ('additional_attribute',)
 
@@ -226,6 +327,34 @@ class StaffUserAdmin(UserAdmin):
 
 
 
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
+UserAdmin.list_display = ('username','first_name', 'last_name', 'email', 'is_superuser','is_active', 'is_staff','get_all_permissions')
+#UserAdmin.fields = ('email', 'first_name', 'last_name', 'is_active', 'is_staff')
+#UserAdmin.fieldsets = (
+    #fieldsets = (
+#            (None, {
+                #'classes': ('wide',),
+                #'fields': ('username','password1','password2','email', 'first_name', 'last_name', 'is_active', 'is_staff','user_permissions')
+ #               'fields': ( \
+ #                           ('username'),\
+ #                           ('first_name', 'last_name'), \
+ #                           'username','email','is_active', 'is_staff','user_permissions',\
+ #                           'email',\
+ #                           ),
+ #               } ),
+ #       )
+
+    #readonly_fields = ('additional_attributes',)   
+
+
+
+
+
+
+#####################################################################
+# Custom user permissions
+#####################################################################
 
 #  should this stuff go in __init__.py? 
 from django.contrib.auth.models import Permission
@@ -244,7 +373,7 @@ permission = Permission.objects.get_or_create(codename='can_manage_door_1',  \
 # Making door permissions based on how many door there are right now, not hardcoding it in
 door_objects = Door.objects.all()
 for door in door_objects:
-    Permission.objects.get_or_create(\
+    perms, created = Permission.objects.get_or_create(\
                     codename='can_manage_door_%d' % door.pk, \
 
                     # TO DO: make sure door names are unique!
@@ -253,7 +382,10 @@ for door in door_objects:
                     content_type = content_type)   
                                                 
 
-# Run admin.site.register() for each model we wish to register
+
+#####################################################################
+# Register models
+#####################################################################
 admin.site.register(RFIDkeycard, RFIDkeycardAdmin)
 admin.site.register(LockUser,LockUserAdmin)
 admin.site.register(AccessTime,AccessTimeAdmin)
@@ -262,7 +394,7 @@ admin.site.register(Door, DoorAdmin)
 #admin.site.register(User)
 #admin.site.unregister(User)
 #admin.site.register(User, StaffUserAdmin)
-#admin.site.register(User, UserAdmin)
+admin.site.register(User, UserAdmin)
 
 # Globally disable deletion of selected objects (i.e this will not be an available action in the Actions dropdown of
 # all ModelAdmins/change_list pages.
