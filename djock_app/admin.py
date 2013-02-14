@@ -95,8 +95,7 @@ class RFIDkeycardForm(ModelForm):
 #        if commit: 
 #            rfcard.save()
 #        return rfcard
-
-
+#
 
 class RFIDkeycardAdmin(admin.ModelAdmin):
 
