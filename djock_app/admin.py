@@ -391,7 +391,7 @@ admin.site.register(AccessTime,AccessTimeAdmin)
 admin.site.register(Door, DoorAdmin)
 
 #admin.site.register(User)
-#admin.site.unregister(User)
+admin.site.unregister(User)
 #admin.site.register(User, StaffUserAdmin)
 admin.site.register(User, UserAdmin)
 

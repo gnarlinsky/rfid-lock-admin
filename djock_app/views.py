@@ -27,15 +27,29 @@ def is_allowed(request, rfid, door):
 #   (Should just do one method, with door defaulting to None/one urlconf? 
 #   Or just have an additional urlconf for get_allowed_one_door/doorid/ vs get_allowed_all_doors/
 def get_allowed_rfids(request, doorid=None):
-    pass
+    """ Returns list of allowed rfid's for the specified door, or 0 if none """
+    # check that door id is valid. 
+    #   Int of a certain length: taken care of in the urlconf
+    #   Check that there even is a such 
+    # if door id not valid, return ""
+    doors = Door.objects.filter(pk=doorid)    # doorid should not be pk; note, get returns an error if no such door; filter returns an empty list
+    if doors:
+        response = doors[0].get_allowed_rfids()
+    if not response: 
+        response = 0  # make sure not going to return empty set
+    return HttpResponse(response)
+    
+     
 
-
+    
 
 
 # TO DO: refactor below.. to return more immediately; 
 #           clean up the conditional logic
 def check(request,doorid, rfid): 
     response = 0
+    # if door id not valid or rfid not valid, return ""
+
     rfidkeycard_list =  RFIDkeycard.objects.all()
 
     for rfidkeycard in rfidkeycard_list:

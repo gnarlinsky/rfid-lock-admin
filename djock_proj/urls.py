@@ -74,8 +74,9 @@ urlpatterns = patterns('',
     # (later, in view, something like -
     #   return HttpResponse(data, mimetype='application/json')
     #url(r'^door/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'we_are_ok.html' }    ),
+    #url(r'checkdoor/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'admin/we_are_ok.html' }    ),
+    url(r'door/(?P<doorid>\d+)/getallowed/$', views.get_allowed_rfids ), 
     url(r'^checkdoor/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'admin/we_are_ok.html' }    ),
-    url(r'checkdoor/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'admin/we_are_ok.html' }    ),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     #url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

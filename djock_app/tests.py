@@ -345,9 +345,9 @@ class RFIDandDoorCheck(TestCase):
     def check_response_and_status(self,client,url,correct_status_code,correct_response_content):
         resp = client.get(url)
        # self.assert(give it url, check if response=1 or 0)
-        print colored("\tChecking response status code (%s) for %s" % (correct_response_content,url),"cyan")
+        print colored("\tChecking response status code (%s) for %s" % (correct_status_code,url),"cyan")
         self.assertEqual(resp.status_code,correct_status_code)
-        print colored("\tChecking response content (%s) for %s \n" % (correct_status_code, url) ,"cyan")
+        print colored("\tChecking response content (%s) for %s \n" % (correct_response_content, url) ,"cyan")
         self.assertEqual(resp.content,correct_response_content)
         
     def test_checking_url_response_and_status(self):
