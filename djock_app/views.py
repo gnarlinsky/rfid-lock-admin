@@ -19,9 +19,21 @@ def is_allowed(request, rfid, door):
         0
 """
 
+# TO DO: tests for get_all_allowed (across doors); e.g. all_allowed/
+# tests for URLS with door id's as well, e.g. all_allowed/door/x
+
+# return list of rfid's allowed for all doors, or a particular door,
+#   as json list 
+#   (Should just do one method, with door defaulting to None/one urlconf? 
+#   Or just have an additional urlconf for get_allowed_one_door/doorid/ vs get_allowed_all_doors/
+def get_allowed_rfids(request, doorid=None):
+    pass
 
 
 
+
+# TO DO: refactor below.. to return more immediately; 
+#           clean up the conditional logic
 def check(request,doorid, rfid): 
     response = 0
     rfidkeycard_list =  RFIDkeycard.objects.all()
@@ -31,10 +43,12 @@ def check(request,doorid, rfid):
         if allowed_doors:
             for door in rfidkeycard.get_allowed_doors():
                 if rfidkeycard.is_active():
-                    if int(rfidkeycard.the_rfid) == int(rfid):
+                    if rfidkeycard.the_rfid == rfid:
                         if int(door.id) == int(doorid):
                             response = 1
-        
+
+    # And in the case where we're actually assigning a new card, so need to get back to that template... 
+    # ......   can the response actually be a status code? 
     return HttpResponse(response)
 
 """def check(request, doorid, rfid):
