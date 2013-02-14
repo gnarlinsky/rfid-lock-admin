@@ -1,4 +1,6 @@
 import os
+# To access request variable in templates
+from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 
 SETTINGS_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
@@ -21,6 +23,9 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+
+
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -131,9 +136,10 @@ INSTALLED_APPS = (
      'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-
-
 )
+
+
+AUTH_PROFILE_MODULE = "djock_app.UserProfile"  # adding extra information for Users
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -163,3 +169,8 @@ LOGGING = {
         },
     }
 }
+
+# To access request variable in templates
+TEMPLATE_CONTEXT_PROCESSORS = TCP + (
+    'django.core.context_processors.request',
+    )

@@ -6,6 +6,7 @@
 
 ignore_me_for_readme
 NO
+#link: 
 admin_templates
 notes.txt
 .idea
@@ -14,6 +15,8 @@ activate
 #.idea/* 
 *.swp
 *.swo
+# link:
+django
 
 # Compiled source #
 ###################

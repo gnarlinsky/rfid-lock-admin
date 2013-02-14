@@ -8,9 +8,7 @@ from djock_app import views
 from django.contrib import admin
 admin.autodiscover()
 
-
-
-# This is a view, but putting it in here to test stuff
+# This is a view, but putting it in here to "test" stuff
 def blah(request, doorid, rfid):
 
     return list_detail.object_list(
@@ -24,14 +22,10 @@ def blah(request, doorid, rfid):
     )
 
 
-
-#rfidkeycard_info = {
- #       "queryset" : RFIDkeycard.objects.all(), 
-        #"template_object_name" : "rfidkeycard",  # So in template,  {% for rfidkeycard in rfidkeycard_list %} instead of   {% for rfidkeycard in object_list %} .....  although something isn't working.....
-#}
-
 urlpatterns = patterns('',
-    url(r'checkdoor/(?P<doorid>\d+)/checkrfid/(?P<rfid>\d+)/$',\
+    # door id is an int with no specified length (for now?);
+    # rfid is expected to be a string exactly 10 characters long
+    url(r'checkdoor/(?P<doorid>\d+)/checkrfid/(?P<rfid>\w{10})/$',\
                         views.check, \
                         #list_detail.object_list, \
                         #rfidkeycard_info
@@ -40,17 +34,16 @@ urlpatterns = patterns('',
     ),
 
 
-    # if don't provide template name to object_list view, inferred template will be "djock_app/rfidkeycard_list.html"
-    url(r'checkdoor/(?P<doorid>\d+)/checkrfid/(?P<rfid>\d+)/$',\
-                        blah, \
+
+
+
+ #   url(r'door/(?P<doorid>\d+)/checkrfid/(?P<rfid>\w{10})/$',\
+ #                       blah, \
                         #list_detail.object_list, \
                         #rfidkeycard_info
                         #direct_to_template, {'template': 'basic.html' }, \
 
-    ),
-
-
-
+  #  ),
 
 
 
@@ -70,7 +63,7 @@ urlpatterns = patterns('',
     # [ But since all I have to send back is a 1 or 0, maybe I don't have to write a template at all?])
     # direct_to_template passes the dictionary 'params' to the template, so to
     #   access 'doorid,' for example, you have to do {{ params.doorid }} )
-    url(r'door/(?P<doorid>\d+)/checkrfid/(?P<rfid>\d+)/$',\
+    url(r'/door/(?P<doorid>\d+)/checkrfid/(?P<rfid>\d+)/$',\
                         direct_to_template, {'template': 'basic.html' }, \
 
     ),
