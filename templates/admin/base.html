@@ -11,7 +11,12 @@
 <link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}" />
 
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap.css" />
+
+{% comment %} 
+disabling the bootstrap dropdown library because of javascript exceptions on some change form pages:
+"Uncaught TypeError: Cannot read property 'fn' of undefined"
 {% bootstrap_javascript_tag "dropdown" %}
+{% endcomment %}
 
 
 
