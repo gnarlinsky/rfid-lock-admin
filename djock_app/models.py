@@ -45,12 +45,16 @@ class Door(models.Model):
         """ Returns the HTML (which will have to escape) with links to /lockuser/the_id/ to display on the Door change list page """
         lockuser_links_list = []
         for lockuser in self.lockuser_set.all():
-            lockuser_link_html =  "<a href='/lockuser/%d/'>%s</a>" %  (lockuser.id, lockuser) 
+            lockuser_link_html =  "<a href='../lockuser/%d/'>%s</a>" %  (lockuser.id, lockuser) 
             lockuser_links_list.append(lockuser_link_html)
         return ", ".join(lockuser_links_list)
     # Django will HTML-escape the output by default. If you'd rather not escape the output of the method, 
     # give the method an allow_tags attribute whose value is True.
     get_allowed_lockusers_html_links.allow_tags = True
+
+    # to do: 
+    def get_all_access_times(self):
+        pass
 
 class RFIDkeycard(models.Model):
     """ Let's try this: door access represented by a (reusable) RFID *keycard*
@@ -224,6 +228,16 @@ class LockUser(models.Model):
         _door_names_list = [d.name for d in _doors] 
         return ", ".join(_door_names_list)
        
+    def get_allowed_doors_html_links(self):
+        """ Returns the HTML (which will have to escape) with links to /door/the_id/ to display on the LockUser change list page """
+        doors_links_list = []
+        for door in self.doors.all():
+            door_link_html =  "<a href='../door/%d/'>%s</a>" %  (door.id, door.name) 
+            doors_links_list.append(door_link_html)
+        return ", ".join(doors_links_list)
+    # Django will HTML-escape the output by default. If you'd rather not escape the output of the method, 
+    # give the method an allow_tags attribute whose value is True.
+    get_allowed_doors_html_links.allow_tags = True
 
     # TO DO here...  Hmm, something feels weird with the curr_rfid_only argument. Biggest issue is
     # how to pass arguments to list_display and fieldsets in admin. It's technically possible but

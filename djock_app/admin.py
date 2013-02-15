@@ -20,13 +20,13 @@ class DoorAdmin(admin.ModelAdmin):
     # Page listing all Doors:
     ####################################################################################################
     # # field names to display, as columns
-    list_display = ('name','id', 'get_allowed_lockusers','get_allowed_lockusers_html_links','prettify_get_allowed_rfids')
+    list_display = ('name','id', 'get_allowed_lockusers_html_links','get_all_access_times','prettify_get_allowed_rfids')
     actions=None  # don't provide the actions dropdown
     
     ####################################################################################################
     # Individual Door page
     ####################################################################################################
-    readonly_fields = ('get_allowed_lockusers',)   # because obviously these shouldn't be editable.  
+    readonly_fields = ('get_allowed_lockusers','get_all_access_times')   # because obviously these shouldn't be editable.  
     #(but commenting out if want to create some objects from admin vs shell just for fun)
 
 
@@ -154,8 +154,9 @@ class LockUserAdmin(admin.ModelAdmin):
 
     # fields (i.e. column headings)
     list_display = ('first_name','last_name','email',\
-                    'prettify_get_current_rfid','prettify_get_all_rfids','prettify_get_allowed_doors', \
-                    'prettify_get_last_access_time','prettify_get_all_access_times',\
+                    'prettify_get_current_rfid','prettify_get_all_rfids',\
+                    'get_allowed_doors_html_links',\
+                    'prettify_get_last_access_time',
                     'is_active')
 
     #list_filter = ('rfid','is_active')  # show filters by RFID and active/inactive on the right
