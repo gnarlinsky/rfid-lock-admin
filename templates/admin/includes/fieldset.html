@@ -25,7 +25,7 @@
 
                 {% comment %} using STATIC_URL for *my* static/ files; otherwise it's Django admin's originals {% endcomment %}
                  {% if  not object_id|is_lockuser_active %} 
-                    <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids" onclick="return showAddAnotherPopup(this);">
+                    <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids_40" onclick="return showAddAnotherPopup(this);">
                     <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign keycard and activate user </a>
                     <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif " width="10" height="10" readonly>Deactivate current keycard
 
