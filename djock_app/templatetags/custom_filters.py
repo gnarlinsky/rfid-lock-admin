@@ -6,12 +6,19 @@ register = template.Library()
 
 @register.filter
 def is_lockuser_active(object_id):
-    if LockUser.objects.filter(id=object_id)[0]:
-        return LockUser.objects.filter(id=object_id)[0].is_active
+    try:
+        this_lockuser = LockUser.objects.filter(id=object_id)[0]
+    except:
+        this_lockuser = None
+    if this_lockuser:
+        return this_lockuser.is_active
 
 @register.filter
 def does_lockuser_have_active_keycard(object_id):
-    this_lockuser = LockUser.objects.filter(id=object_id)[0]
+    try:
+        this_lockuser = LockUser.objects.filter(id=object_id)[0]
+    except:
+        this_lockuser = None
     if this_lockuser:
         if this_lockuser.get_current_rfid():
             return True
