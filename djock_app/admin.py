@@ -20,7 +20,7 @@ class DoorAdmin(admin.ModelAdmin):
     # Page listing all Doors:
     ####################################################################################################
     # # field names to display, as columns
-    list_display = ('name','id', 'get_allowed_lockusers','prettify_get_allowed_rfids')
+    list_display = ('name','id', 'get_allowed_lockusers','get_allowed_lockusers_html_links','prettify_get_allowed_rfids')
     actions=None  # don't provide the actions dropdown
     
     ####################################################################################################
@@ -390,9 +390,10 @@ admin.site.register(LockUser,LockUserAdmin)
 admin.site.register(AccessTime,AccessTimeAdmin)
 admin.site.register(Door, DoorAdmin)
 
-#admin.site.register(User)
-admin.site.unregister(User)
 #admin.site.register(User, StaffUserAdmin)
+
+admin.site.register(User)
+admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 # Globally disable deletion of selected objects (i.e this will not be an available action in the Actions dropdown of

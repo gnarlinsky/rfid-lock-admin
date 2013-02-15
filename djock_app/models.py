@@ -41,6 +41,16 @@ class Door(models.Model):
         """ Get the LockUsers with access to this Door """
         return ", ".join([str(lu) for lu in self.lockuser_set.all()])
 
+    def get_allowed_lockusers_html_links(self):
+        """ Returns the HTML (which will have to escape) with links to /lockuser/the_id/ to display on the Door change list page """
+        lockuser_links_list = []
+        for lockuser in self.lockuser_set.all():
+            lockuser_link_html =  "<a href='/lockuser/%d/'>%s</a>" %  (lockuser.id, lockuser) 
+            lockuser_links_list.append(lockuser_link_html)
+        return ", ".join(lockuser_links_list)
+    # Django will HTML-escape the output by default. If you'd rather not escape the output of the method, 
+    # give the method an allow_tags attribute whose value is True.
+    get_allowed_lockusers_html_links.allow_tags = True
 
 class RFIDkeycard(models.Model):
     """ Let's try this: door access represented by a (reusable) RFID *keycard*
