@@ -12,13 +12,7 @@ from selenium.webdriver.common.keys import Keys
 # - Separate functional tests and unit tests into separate .py's? 
 # - check if rfid not exactly 10 digits long and reject right away
 # - If some aspect of an object is updated, does that change cascade through... 
-
-
-
-
-
-
-
+# - on writing use cases: http://breathingtech.com/2009/writing-use-cases-for-agile-scrum-projects/
 
 
 
@@ -104,6 +98,7 @@ class RenameLaterTests(LiveServerTestCase):
 
 
 """
+
 USE CASES CONCERNING SPECIFICALLY ASSIGNING A NEW KEYCARD TO A LOCK USER THROUGH THE WEB INTERFACE.(so these parallel functional tests)
 
 * staff user or super user wants to assign a new keycard to a lockuser with an active keycard already. 
@@ -413,3 +408,13 @@ class RFIDandDoorCheck(TestCase):
 
         # TO DO: for all these tests, should also check calling the actual methods, or should that be
         # covered by the URL checks?  
+
+
+        def test_get_allowed_doors(self):
+        # Note this comment in models.py (RFIDkeycard.get_allowed_doors()) : 
+        # a lockuser may have more than one RFID associated with them, and each card may have
+        # more different door access.  So th    en this would return doors that are not actually associated with this RFID, but
+        # all doors associated with that lockuser. But the idea of a user having more than one card ju    st brings up a host of
+        # problems, including wasting cards; this issue here; more complicated queries that may take more time... So do we assume
+        # one keycard per lockuser, then, set in stone?
+            pass
