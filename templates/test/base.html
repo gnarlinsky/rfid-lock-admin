@@ -36,7 +36,9 @@
     <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+    {% comment %} disabling the bootstrap dropdown library because of javascript exceptions on some add pages 
     {% bootstrap_javascript_tag "dropdown" %}
+    {% endcomment %}
     {% block extra_head %}{% endblock %}
 </head>
 
