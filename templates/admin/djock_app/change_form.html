@@ -24,8 +24,6 @@
             </center>
             <hr>
             
-            {{ request }}<hr>
-            {{ context }}
             <hr>
             <center>
             <h2>Go scan in a new card........</h2>
@@ -34,9 +32,11 @@
             <p>http://192.168.x.x:8080/checkdoor/doorid/checkrfid/rfid/ (if ran ./manage.py runserver 192.168.x.x:8080)</p>
             <h5> OK, got it. Click "Save" to finish creating new keycard.</h5>
             </center>
-
-
     {% endif %}
+
+    <p>Request:</p>{{ request }}<hr>
+    <p>Context:</p>{{ context }}
+
 
     {% if change %}{% if not is_popup %}
         <ul class="object-tools">

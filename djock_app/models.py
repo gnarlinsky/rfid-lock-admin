@@ -16,7 +16,6 @@ from django.db.models import signals
 
 
 
-# the field labeled "rfids" should not be required. 
 
 
 
@@ -162,7 +161,7 @@ class LockUser(models.Model):
     # (Also, which specific doors are check-able/show up should depend on the permissions [or staff vs
     # superuser, etc.] for the person doing the assigning. E.g. someone only involved with the Bike Project
     # shouldn't be able to assign keycard access to the Makerspace door. 
-    doors = models.ManyToManyField(Door)
+    doors = models.ManyToManyField(Door,blank=True)
 
     ####  contact infoz ######
     first_name      = models.CharField(max_length=50)
@@ -195,6 +194,7 @@ class LockUser(models.Model):
         return self.rfids.all()
 
     def prettify_get_all_rfids(self):
+        """ Or... if get_all_rfids() return self.rfids, do I need this? Or any other prettify method? """
         _rfid_keycards = self.get_all_rfids()
         _rfid_nums_list = [str(r.the_rfid) for r in _rfid_keycards]
         return ", ".join(_rfid_nums_list)

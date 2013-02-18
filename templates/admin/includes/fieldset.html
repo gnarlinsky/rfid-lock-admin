@@ -41,6 +41,42 @@
                  {% endif %}
 
                  {{ field.field }} {% comment %} show RFIDs for debuggage {% endcomment %}
+
+
+
+
+
+
+                LOOK {{ field.field.field }} {% comment %} show RFIDs for debuggage {% endcomment %}
+                {% comment %}
+                <hr>
+                ['__class__', '__deepcopy__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__',
+                '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_get_choices', '_get_queryset', '_set_choices', '_set_queryset', 'bound_data', 'choices', 'clean', 'creation_counter', 'default_error_messages',
+                'default_validators', 'hidden_widget', 'label_from_instance', 'prepare_value', 'queryset', 'run_validators', 'to_python', 'valid_value', 'validate', 'widget', 'widget_attrs']
+                <br>
+                <hr>
+                1<br> {{ field.field.field.choices }}<br>
+                2<br> {{ field.field.field.widget_attrs }} <br>
+                3<br> {{ field.field.field.widget }}<br>
+                4<br> {{ field.field.field.label_from_instance }} <br>
+                5<br> {{ field.field.field.queryset }} <br>
+                <br>
+                <hr>
+                 <hr>
+                 field.choices,.field.choices {{ field.choices }} , {{ field.field.choices }} 
+                 <hr>
+                 field.html_name <br>
+                {{ field.field.html_name }}
+                <br><br>
+                 field.html_name <br>
+                {{ field.field.field.html_name }}
+                <br><br>
+                field.auto_id <br>
+                {{ field.field.auto_id }}
+                <br>
+                {% endcomment %}
+
+                 <hr>
                  
 
                     </div>

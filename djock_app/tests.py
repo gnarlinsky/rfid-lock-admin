@@ -1,9 +1,12 @@
+from django.contrib.auth.models import User
 from django.test import TestCase, LiveServerTestCase
 from django.test.client import Client
 from djock_app.models import RFIDkeycard, LockUser, Door, AccessTime
 from termcolor import colored
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 
 # to run only some tests: 
 #   $ ./manage.py test djock_app.LockUserModelTest
@@ -15,18 +18,17 @@ from selenium.webdriver.common.keys import Keys
 # - on writing use cases: http://breathingtech.com/2009/writing-use-cases-for-agile-scrum-projects/
 
 
-
-
-
 #######################################################################################
 #  Functional tests 
 #######################################################################################
-#  "We start by writing some browser tests - what I call functional tests, which
+#  "We start by writing some browser tests - functional tests, which
 #  simulate what an actual user would see and do. We'll use Selenium, a test tool which
 #  actually opens up a real web browser, and then drives it like a real user, clicking
 #  on links and buttons, and checking what is shown on the screen. These are the tests
 #  that will tell us whether or not our application behaves the way we want it to, from
 #  the user's point of view."  (http://www.tdd-django-tutorial.com/tutorial/1/)
+#  Selenium: in-browser framework to test rendered HTML and the behavior of Web pages,
+#   e.g. JavaScript
 #######################################################################################
 
 
@@ -187,8 +189,109 @@ class DoorModelTests(TestCase):
 
         
 
-
 class UserTests(TestCase):
+    """
+    TO DO: 
+    In the list of accesstimes, 
+    - staff can only see the doors they have permission to. 
+    - staff users should not be able to the actual RFID's,  
+    - and they should be able to see only the doors they have permissions for 
+
+    - should only be able to see buttons + top menu options for: 
+    (1) add new lock user
+    (2) lock users
+    (3) Locks 
+    (4) Room access log and graphs
+
+        # TO DO:
+        # Staff vs superusers:
+        # Only superusers see the RFID numbers and certain other fields 
+        # # both on change forms and display lists.  To regular staff users, 
+        # # these fields are meaningless. 
+        # #            (Here's a short list just to get started, there are others)
+        # #     - prettify get current rfid, get current rfid
+        # #     - prettify get all rfid's, get all rfid's
+
+    ----------------- More on permissions ----------------------------------
+    Custom user permissions for door management are dynamically created, based on the doors that are present in the system -- so load the door fixture as well as the staff user fixture if using fixtures, using natural keys (https://docs.djangoproject.com/en/1.4/ref/django-admin/#django-admin-option---natural) 
+        TO DO: (a) Check that custom user permissions exist for all  doors in the system...
+               (b) which is a separate test from: does user have certain custom permissions!  (so probably that test should not even
+                 be in UserTests suite? It just concerns Permissions and Doors.....) 
+               (c) which is a separate test from just assigning regular permissions to staff users!
+
+            (a) 
+            * CREATE door objects (or load fixture)
+            * check that there are now custom permissions with the right door names, codenames, etc. 
+            
+            (b) 
+            * Now should be able to reference those permissions (know what the codenames are), and try to assign, unassign them
+              for staff user. 
+            * check that they actually control what the staff user can/can't do/view
+
+            (c) 
+            * Assign/unassign these
+                #    [<Permission: djock_app | door | Can add door>]               (pk = 2)
+                #    [<Permission: djock_app | lock user | Can add lock user>] (pk = 6) 
+                #    [<Permission: djock_app | lock user | Can change lock user>]  (pk=10)
+                #    [<Permission: djock_app | rfi dkeycard | Can add rfi dkeycard>]  (pk = 12)
+                #    [<Permission: djock_app | rfi dkeycard | Can change rfi dkeycard>] (pk=8)
+            * and check that these permissions actually control what the user can and can't do/view
+
+    ---------------------------------------------------
+
+    """
+
+
+    
+
+
+
+    ############################
+    # Load fixtures
+    ############################
+
+    #Custom user permissions for door management are dynamically created, based on the doors that are present in the system -- so load the door fixture as well as the staff user fixture. 
+    #fixtures = ['just_doors.json','test_staff-only_user2.json']  # so loading a staff-only user, when testing for super user sstuff just reset is_superuser to True and back again to False for staff-only
+    # The staff user in the fixture (test_staff-only_user2) has these permissions:
+        #    [<Permission: djock_app | door | Can add door>]               (pk = 2)
+        #    [<Permission: djock_app | lock user | Can add lock user>] (pk = 6) 
+        #    [<Permission: djock_app | lock user | Can change lock user>]  (pk=10)
+        #    [<Permission: djock_app | rfi dkeycard | Can add rfi dkeycard>]  (pk = 12)
+        #    [<Permission: djock_app | rfi dkeycard | Can change rfi dkeycard>] (pk=8)
+        #    [<Permission: djock_app | lock user | Can manage door to Bike Project>] (pk=39)
+        #    [<Permission: djock_app | lock user | Can manage door to Makerspace>] (pk = 38)
+        #    [<Permission: djock_app | lock user | Can manage door to Door X>] (pk=35)
+        #   (These right? So no deleting of anything, not even Doors. And what about only
+        #   being able to AccessTimes' display list, but not be able to go into the
+        #   individual objects' change forms (can set things as readonly at template level/
+        #   admin.py, but is that secure enough? Make a custom permission?)
+            # But!  
+            # Either don't use a fixture at all, or make sure to redo the permissions in each test, 
+            # identifying by their code names!
+            # Because in the fixture, the custom permissions are just identified with their pk's ... 
+            # And since custom user permissions for door management are dynamically
+            # created, based on the doors that are present in the system -- those pk's are 
+            # not guaranteed to refer to what you want them to refer to, so a fixture is kind of useless. (?)
+            # Update: 
+                # From the docs: "Use natural keys to represent any foreign key and many-to-many relationship with a model 
+                # that provides a natural key definition. If you are dumping contrib.auth Permission objects or 
+                # contrib.contenttypes ContentType objects, you should probably be using this flag."
+                # (https://docs.djangoproject.com/en/1.4/ref/django-admin/#django-admin-option---natural) 
+
+    #
+    # The staff user in the fixture:
+    #       "is_active": true, 
+    #       "is_superuser": false, 
+    #       "is_staff": true, 
+    # and check for all three
+
+
+
+
+
+
+
+
     def setUp(self):
         print colored("\nSETTING UP / TestCase UserTests", "white", "on_green")
         #       This?  get diff types of users  from a fixture or create here.
@@ -196,41 +299,58 @@ class UserTests(TestCase):
         #       superuser to false for a staff-only user;  then set superuser to true (staff status
         #       doesn't matter) to test the other side of the coin.
 
-        # Check that all that happened, e.g. 
-        """def test_can_change_non_staff_users(self):
-            self.assertFalse(self.user.has_perm('logical_change_user', self.non_staff.profile)) # can't change non staff users without permission
 
-            # now add the permission and test it again
-            self.user.user_permissions.add(Permission.objects.get(codename='change_user'))
-
-            # refetch user from the database
-            self.user = User.objects.get(pk=self.user.pk)
-            print self.user.get_all_permissions() # should now include new permission
-            self.assertTrue(self.user.has_perm('logical_change_user', self.non_staff.profile))
-        """
-
-        # load fixtures with test users
-        # fixtures = ['test_staff_superuser.json', 'test_staff-only_user.json']  
-        fixtures = ['test_staff-only_user.json']  # so loading a staff-only user, when testing for super user sstuff just reset is_superuser to True and back again to False for staff-only
-
-
-
-        # if (testing) setting up here, set: 
-        #       "is_active": true, 
-        #             "is_superuser": false, 
-        #                   "is_staff": true, 
-        # and check for all three
+        self.staff_only_user = User.objects.create_user('Chevy Chase', 'chevy@chase.com', 'chevyspassword')
+        #self.staff_only_user = User.objects.get(username="staff_only_test_user")
 
         # c = client, etc.; make sure both types users above can login first? 
+
+
+    def tearDown(self):
+        # Clean up after each test
+        self.staff_only_user.delete()
 
     # - when active staff users add/update a lock user they should only see doors
     #   for which they themselves have permissions
     def test_staff_only_user_can_only_see_doors_they_have_permission_for(self):
+        """ or.... right now it's just test_can_add_and_check_for_random_permission(self): """
         print colored("\nTEST: staff-only user can only see the doors they have permission to see?", "blue")
 
-        print colored("\t(get_all_permissions(): ", "cyan")
-        print self.user.get_all_permissions() # should now include new permission
-        print colored("\t(get_all_permissions(): ", "cyan")
+        print colored("\nAssign permissions (only superuser should be able to)", "cyan") # am I doing this as superuser? 
+        perm_codename = "some_permission_x"
+        perm_name = "Permission Number X"
+      
+        # Create the permission object:
+        content_type = ContentType.objects.get(app_label='djock_app', model='lockuser')
+        perm = Permission.objects.create(codename=perm_codename, name=perm_name, content_type=content_type)
+
+        # Testing whether user has the permission already (should not)
+        self.assertFalse(self.staff_only_user.has_perm(perm_codename))
+
+        # now add the permission
+        #self.staff_only_user.user_permissions.add(perm, self.staff_only_user.profile)
+        self.staff_only_user.user_permissions.add(perm)
+
+        # Django does cache user permissions, which screws with things. So 
+        # refetch user from the database (http://stackoverflow.com/a/10103291)
+        self.staff_only_user = User.objects.get(pk=self.staff_only_user.pk)  # should now have the assigned permission
+
+        # Testing whether user has the permission already (should not)
+        #self.assertTrue(self.staff_only_user.has_perm(perm_codename), self.staff_only_user.profile)  
+        self.assertTrue(self.staff_only_user.has_perm('djock_app.'+perm_codename))  
+        #print self.staff_only_user.get_all_permissions() # should now include new permission
+        #print colored("\t(doors)"+str(Door.objects.all()), "cyan")
+
+        """ give these permissions:
+        #    [<Permission: djock_app | door | Can add door>]               (pk = 2)
+        #    [<Permission: djock_app | lock user | Can add lock user>] (pk = 6) 
+        #    [<Permission: djock_app | lock user | Can change lock user>]  (pk=10)
+        #    [<Permission: djock_app | rfi dkeycard | Can add rfi dkeycard>]  (pk = 12)
+        #    [<Permission: djock_app | rfi dkeycard | Can change rfi dkeycard>] (pk=8)
+        #    [<Permission: djock_app | lock user | Can manage door to Bike Project>] (pk=39)
+        #    [<Permission: djock_app | lock user | Can manage door to Makerspace>] (pk = 38)
+        #    [<Permission: djock_app | lock user | Can manage door to Door X>] (pk=35)
+        """
 
         # staff-only users can only see/assign Doors that they themselves have access to. 
         # So whatever is in the list that user.doors returns (pk's), those are the only ones that this
@@ -238,10 +358,12 @@ class UserTests(TestCase):
         # lockuser with certain door permissions
 
         # self.user.user_permissions.add(Permission.objects.get(codename='change_user'))
-        self.fail("getting to this.....")
+        #self.fail("getting to this.....")
         
+
+
     # Actually, staff-only users should not be able to delete anything, only deactivate
-    def test_deleting_lockuser(self):
+    def _test_deleting_lockuser(self):
         # Do I have to create and save a lockuser again like above?
         # Only the superuser should be able to actually delete a user object; regular, staff users
         #   should only have the power to deactivate, not delete. (Right?)
@@ -279,45 +401,16 @@ class UserTests(TestCase):
 
 
 
-
-
-
-
-
-        ################ ################
-        # new fixture.. maybe
-        ################ ################
-
-        # This fixture is similar to the above, only changing permission set for
-        # additional tests in case the above rely on the other fixture 
-        fixtures = ['test_staff-only_user.json']  # so loading a staff-only user, when testing for super user sstuff just reset is_superuser to True and back again to False for staff-only
-        # The staff user in the fixture has these permissions:
-        #    [<Permission: djock_app | door | Can add door>]               (pk = 2)
-        #    [<Permission: djock_app | lock user | Can add lock user>] (pk = 6) 
-        #    [<Permission: djock_app | lock user | Can change lock user>]  (pk=10)
-        #    [<Permission: djock_app | rfi dkeycard | Can add rfi dkeycard>]  (pk = 12)
-        #    [<Permission: djock_app | rfi dkeycard | Can change rfi dkeycard>] (pk=8)
-        #    [<Permission: djock_app | lock user | Can manage door to Bike Project>] (pk=39)
-        #    [<Permission: djock_app | lock user | Can manage door to Makerspace>] (pk = 38)
-        #    [<Permission: djock_app | lock user | Can manage door to Door X>] (pk=35)
-        #   (These right? So no deleting of anything, not even Doors. And what about only
-        #   being able to AccessTimes' display list, but not be able to go into the
-        #   individual objects' change forms (can set things as readonly at template level/
-        #   admin.py, but is that secure enough? Make a custom permission?)
-        #
-        # The staff user in the fixture: is_active is true; is_superuser is false;
-        # is_staff is true
-
-
-        # TO DO:
-        # Staff vs superusers:
-        # Only superusers see the RFID numbers and certain other fields 
-        # # both on change forms and display lists.  To regular staff users, 
-        # # these fields are meaningless. 
-        # #            (Here's a short list just to get started, there are others)
-        # #     - prettify get current rfid, get current rfid
-        # #     - prettify get all rfid's, get all rfid's
-
+#def test_can_change_non_staff_users(self):
+#    self.assertFalse(self.user.has_perm('logical_change_user', self.non_staff.profile)) # can't change non staff users without permission
+#
+#    # now add the permission and test it again
+#    self.user.user_permissions.add(Permission.objects.get(codename='change_user'))
+#
+#    # refetch user from the database
+#    self.user = User.objects.get(pk=self.user.pk)
+#    print self.user.get_all_permissions() # should now include new permission
+#    self.assertTrue(self.user.has_perm('logical_change_user', self.non_staff.profile))
 
 
 class RFIDandDoorCheck(TestCase):
@@ -327,27 +420,28 @@ class RFIDandDoorCheck(TestCase):
     def setUp(self):
         print colored("\nSETTING UP / TestCase RFIDandDoorCheck", "white","on_green")
 
+        c = Client()  
+
         # So would set up the Model objects I need here?  #   Rather than reference my test data.
         #   NOPE: Model creation and manipulation are tests in and of themselves.  Tests for other stuff
         #   should assume that we already have the objects we need. 
-        """
-        self.test_lockuser = LockUser(phone_number = "2175555555", first_name = "Michael", last_name = "Jackson", middle_name = "", birthdate = None, address = "", email = "michael@thejackson5.com")
-        """
+        #self.test_lockuser = LockUser(phone_number = "2175555555", first_name = "Michael", last_name = "Jackson", middle_name = "", birthdate = None, address = "", email = "michael@thejackson5.com")
 
     # Should take arguments? So that other tests can call it... For example, when door perms
     # for door x are changed, want to test that URL with door x's id return
     # the appropriate response. 
     def check_response_and_status(self,client,url,correct_status_code,correct_response_content):
         resp = client.get(url)
-       # self.assert(give it url, check if response=1 or 0)
+        # self.assert(give it url, check if response=1 or 0)
         print colored("\tChecking response status code (%s) for %s" % (correct_status_code,url),"cyan")
         self.assertEqual(resp.status_code,correct_status_code)
         print colored("\tChecking response content (%s) for %s \n" % (correct_response_content, url) ,"cyan")
         self.assertEqual(resp.content,correct_response_content)
-        
-    def test_checking_url_response_and_status(self):
+   
 
-        """ the cases:  door not good; rfid not good; not active
+    def test_checking_url_response_and_status(self):
+        """
+        the cases:  door not good; rfid not good; not active
             (although in some cases Django already does the is_active check, 
                 doublecheck that) 
             (Not setting anything up in here, but just using test db,
@@ -370,7 +464,7 @@ class RFIDandDoorCheck(TestCase):
                 don't match,  the debug page is displayed (DEBUG is set to 
                 True in settings.py), but in real life a standard 404 
                 will be returned -- the status code
-            """
+        """
 
 
         print colored("\nTEST: checking correct response/status for a particular URL - Given URL with door and rfid id's, is the response/status (whether the rfid is good for that door) correct?","blue")
@@ -382,7 +476,6 @@ class RFIDandDoorCheck(TestCase):
                         \n\t- 1123456789 is NOT active (i.e. date_revoked is not None)\
                         \n\t- 2123456789 is active  (pk 3) (i.e. no date_revoked)\n\t)", "green")
 
-        c = Client()  # in a setUp? 
 
         # TO DO: the tests below... don't call an additional method, put everything in here?
         # Yes, it modularizes like this, but not in a really comprehensible way, plus have to remember

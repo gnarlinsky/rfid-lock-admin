@@ -3,7 +3,7 @@
     "pk": 2, 
     "model": "auth.user", 
     "fields": {
-      "username": "staff-only_test_user", 
+      "username": "staff_only_test_user", 
       "first_name": "Staff-only-Jane", 
       "last_name": "Doe", 
       "is_active": true, 

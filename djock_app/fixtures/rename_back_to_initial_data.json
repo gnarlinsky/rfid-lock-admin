@@ -238,7 +238,7 @@
       "last_name": "Simpson", 
       "middle_name": "", 
       "birthdate": null, 
-      "is_active":false,
+      "is_active":true,
       "doors": [
         3, 
         6
