@@ -11,7 +11,10 @@
             {% if line.fields|length_is:'1' %}{{ line.errors }}{% endif %}
             {% for field in line %}
                 <div{% if not line.fields|length_is:'1' %} class="field-box{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% if not field.is_readonly and field.errors %} errors{% endif %}"{% endif %}>
-                {% comment %} If this is the rfid form row, this is the place for the "assign new keycard"/"deactivate current keycard" controls {% endcomment %}
+
+
+
+                {% comment %} (start nk stuff) If this is the rfid form row, this is the place for the "assign new keycard"/"deactivate current keycard" controls {% endcomment %}
                 {% if field.field.name == "rfids" %}
                     <h2>Manage keycards ({% if object_id|does_lockuser_have_active_keycard %}user currently has active keycard{% else %}user does not have a keycard{%endif%})</h2>
 
@@ -45,9 +48,8 @@
 
 
 
-
-
-                LOOK {{ field.field.field }} {% comment %} show RFIDs for debuggage {% endcomment %}
+                {% comment %} show RFIDs for debuggage {% endcomment %}
+                <p> RFID's for debuggage</p>    <p>{{ field.field.field }}</p>
                 {% comment %}
                 <hr>
                 ['__class__', '__deepcopy__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__',

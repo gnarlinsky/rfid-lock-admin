@@ -12,10 +12,10 @@
             <center style="background-color:#fdd;">
 
             <p style="font-size:10px; color:#666;width:700px;">
-            (This popup should go away; then the change_form should refresh so that superusers see the number there and non-superusers don't see the number but see the other signs that mean that a keycard is assigned and is active, like the place by "Manage keycard" that says whether or not lock user has an active keycard, and which options of "assign new keycard" and "deactivate current keycard" are functional. 
+            (This popup should go away; then the change_form should refresh so that superusers see the number there and non-superusers don't see the number but see the other signs that mean that a keycard is assigned and is active, like the place by "Manage keycard" that says whether or not lock user has an active keycard, and which options of "assign new keycard" and "deactivate current keycard" are functional.
             <p>
             <p style="font-size:10px; color:#777;width:700px; ">
-            Note that the "Save" is really "Save and Assign" - the association with this LockUser already happens by the time back at the form.  
+            Note that the "Save" is really "Save and Assign" - the association with this LockUser already happens by the time back at the form.
             Also, since manage keycards stuff will actually be below everything else and the save bar -- i.e. saving everything else about the
             lockuser is a separate thing.... so that refreshing when come back out of the popup doesn't screw things up/lose things.  The manage
             keycards bar will now reflect that that user now has active keycard. The superuser should see the fields listing current and all
@@ -34,20 +34,45 @@
             </center>
     {% endif %}
 
-{% comment %}
+
+
+    {% comment %}
     <p>Request:</p>{{ request }}<hr>
     <p>Context:</p>{{ context }}
    {% endcomment %}
 
 
-
+{% comment %} below: original, not mine {% endcomment %}
     {% if change %}{% if not is_popup %}
         <ul class="object-tools">
             {% block object-tools-items %} {{block.super}} {% endblock %}
         </ul>
     {% endif %}{% endif %}
-{% endblock %}
 
+{% endblock %} {% comment %}  end object-tools block  {% endcomment %}
+
+
+
+
+
+
+
+{% comment %}  submit row block {% endcomment %}
+{% block submit_buttons_bottom %}
+    <div class="submit-row"> lsakdjflsjflskdjflksdjflksdjflsdkfj
+        <h1>lasdkjflkj</h1>
+    {% if request.path == "/lockadmin/djock_app/lockuser/add/"  %}
+        <p style="font-size:10px; color:#666;width:700px; background-color:#fdd;">
+            lockuser change form
+        </p>
+    {%  endif  %}
+    </div> 
+
+
+     {{ block.super }}
+
+
+{% endblock %}   {% comment %}  end submit row block {% endcomment %}
 
 
 
