@@ -1,0 +1,98 @@
+{% load custom_filters %}
+
+{% load i18n %}
+<div class="submit-row">
+{% if show_save %} <input type="submit" value="{% trans 'Save' %}" class="default" name="_save" {{ onclick_attrib }}/> {% endif %}
+{% if show_delete_link %}<p class="deletelink-box"><a href="delete/" class="deletelink">{% trans "Delete" %}</a></p>{% endif %}
+{% if show_save_as_new %}<input type="submit" value="{% trans 'Save as new' %}" name="_saveasnew" {{ onclick_attrib }}/>{%endif%}
+{% if show_save_and_add_another %}<input type="submit" value="{% trans 'Save and add another' %}" name="_addanother" {{ onclick_attrib }} />{% endif %}
+{% if show_save_and_continue %}<input type="submit" value="{% trans 'Save and continue editing' %}" name="_continue" {{ onclick_attrib }}/>{% endif %}
+
+{% comment %}
+    nk: this is the place for the "assign new keycard"/"deactivate current keycard" controls, if this is the LockUser change form
+{% endcomment %}
+
+<h1> request:  </h1>
+    <p>{{ request }}</p>
+    <hr>
+<h1> context: </h1>
+    <p> {{context}} </p>
+    <hr>
+<h1> field: </h1>
+    <p> {{field.field}} </p>
+    <hr>
+<h1> object_id: </h1>
+    <p> {{object_id}} </p>
+    <hr>
+
+
+    {% comment %} (start nk stuff) If this is the rfid form row, this is the place for the "assign new keycard"/"deactivate current keycard" controls {% endcomment %}
+    {% if field.field.name == "rfids" %}
+        <h2>Manage keycards ({% if object_id|does_lockuser_have_active_keycard %}user currently has active keycard{% else %}user does not have a keycard{%endif%})</h2>
+
+
+    {% comment %} 
+    note, turned on the template_context_processors per http://stackoverflow.com/questions/2882490/get-the-current-url-within-a-django-template
+    Can I avoid filters, then? ...
+    so look at {{ context }} 
+    {% endcomment %} 
+
+
+    {% comment %} using STATIC_URL for *my* static/ files; otherwise it's Django admin's originals {% endcomment %}
+     {% if  not object_id|is_lockuser_active %} 
+        <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids_40" onclick="return showAddAnotherPopup(this);">
+        <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign keycard and activate user </a>
+        <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif " width="10" height="10" readonly>Deactivate current keycard
+
+     {% elif  object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %}
+        <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids" onclick="return showAddAnotherPopup(this);">
+        <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign new keycard </a>
+        <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif" width="10" height="10">Deactivate current keycard
+
+     {% elif  object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
+        <img src="{{ STATIC_URL }}/admin/img/disabled_icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign new keycard
+        <a href="/" class="add-another" id="add_id_rfids" onclick="return showAddAnotherPopup(this);"> 
+            <img src="/static/admin/img/icon_deletelink.gif " width="10" height="10"> Deactivate current keycard </a>
+     {% endif %}
+
+     {{ field.field }} {% comment %} show RFIDs for debuggage {% endcomment %}
+
+
+
+
+    {% comment %} show RFIDs for debuggage {% endcomment %}
+    <p> RFID's for debuggage</p>    <p>{{ field.field.field }}</p>
+    {% comment %}
+    <hr>
+    ['__class__', '__deepcopy__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__',
+    '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_get_choices', '_get_queryset', '_set_choices', '_set_queryset', 'bound_data', 'choices', 'clean', 'creation_counter', 'default_error_messages',
+    'default_validators', 'hidden_widget', 'label_from_instance', 'prepare_value', 'queryset', 'run_validators', 'to_python', 'valid_value', 'validate', 'widget', 'widget_attrs']
+    <br>
+    <hr>
+    1<br> {{ field.field.field.choices }}<br>
+    2<br> {{ field.field.field.widget_attrs }} <br>
+    3<br> {{ field.field.field.widget }}<br>
+    4<br> {{ field.field.field.label_from_instance }} <br>
+    5<br> {{ field.field.field.queryset }} <br>
+    <br>
+    <hr>
+     <hr>
+     field.choices,.field.choices {{ field.choices }} , {{ field.field.choices }} 
+     <hr>
+     field.html_name <br>
+    {{ field.field.html_name }}
+    <br><br>
+     field.html_name <br>
+    {{ field.field.field.html_name }}
+    <br><br>
+    field.auto_id <br>
+    {{ field.field.auto_id }}
+    <br>
+    {% endcomment %}
+
+     <hr>
+     
+
+        </div>   {% comment %}  end nk {% endcomment %}
+    {% endif %}
+</div>
