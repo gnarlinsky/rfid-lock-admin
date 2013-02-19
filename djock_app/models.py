@@ -9,14 +9,10 @@ from django.contrib.auth.management import create_superuser
 from django.db.models import signals
 
 
-############### TO DO ##########################
+############### TO DO #############################################
 # make sure various stuff are set unique
 # consistency with _var vs var
-################################################
-
-
-
-
+####################################################################
 
 
 class Door(models.Model):
@@ -42,12 +38,14 @@ class Door(models.Model):
 
     def get_allowed_lockusers_html_links(self):
         """ Returns the HTML (which will have to escape) with links to /lockuser/the_id/ to display on the Door change list page """
+
         lockuser_links_list = []
         for lockuser in self.lockuser_set.all():
             lockuser_link_html =  "<a href='../lockuser/%d/'>%s</a>" %  (lockuser.id, lockuser) 
             lockuser_links_list.append(lockuser_link_html)
         return ", ".join(lockuser_links_list)
-    # Django will HTML-escape the output by default. If you'd rather not escape the output of the method, 
+
+    # Django will HTML-escape the output by default. If you'd rather not escape the output of the method,
     # give the method an allow_tags attribute whose value is True.
     get_allowed_lockusers_html_links.allow_tags = True
 
@@ -68,11 +66,29 @@ class RFIDkeycard(models.Model):
          OR if today's date is between assigned/revoked...
     """
     the_rfid    = models.CharField(max_length=10,null=True,editable=True) # the radio-frequency id
-    date_revoked = models.DateTimeField(null=True, blank=True) # note that blank=True is at form validation level, while null=True is at db level
-    # actually, this should not be a field that staff users can fill in.  It should be created
-    # automatically when the associated **LockUser** is deactivateh
+    date_revoked = models.DateTimeField(null=True, blank=True) # note that blank=True is at form validation level,
+    # while null=True is at db level
+    # This should not be a field that staff users can fill in.  It should be created
+    # automatically when the associated **LockUser** is deactivated
 
-    date_created = models.DateTimeField(auto_now_add=True) 
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    ####################################################################
+    # Switching to Foreign Key relationship for RFIDkeycard/LockUser
+    ####################################################################
+    # An RFIDkeycard can only be connected to one LockUser; a LockUser
+    #   can have multiple RFIDkeycards (though only one can be active
+    #   at a time).
+    #   - So now we have a ForeignKeyField in **RFIDkeycard** to LockUser,
+    #   - with unique=True, meaning that in the RFIDkeycard table, the
+    #     each LockUser field must be unique (i.e. no sharing of keycards)
+    #
+    # So now, to get a lockuser: rfidkeycard_object.lockuser
+    #         to get a lockuser's field: rfidkeycard_object.lockuser.first_name,
+    #                                    rfidkeycard_object.lockuser.doors  ??? (m2m)
+    #                                    rfidkeycard_object.lockuser.get_blah ???  func???
+    ####################################################################
+    lockuser = models.ForeignKey("LockUser")
 
     # Nope.  Don't have to do the below; just use auto_now_add
     #def __init__(self,*args,**kwargs):   # i don't have to include args, kwargs, right? 
@@ -88,37 +104,28 @@ class RFIDkeycard(models.Model):
     def get_date_assigned(self): 
         # get from __init__
         pass
-    
-    def get_this_lockuser(self):
-        #return self.lockuser_set.all() 
-        if self.lockuser_set.all():
-            return self.lockuser_set.all()[0]  # There should only be one lockuser associated with this RFIDkeycard (not RFID num)
-        else:
-            return None
-
-    #  don't need this since there should only be one lockuser, and LockUser's __unicode__() returns first
-    #  name, last name string
-   # def prettify_get_this_lockuser(self):
-        # There should only be one lockuser associated with this RFIDkeycard (not RFID num)
-               # i.e. don't do this: 
-                   # _associated_lockusers_set =  self.get_this_lockuser() 
-                   # return ", ".join([str(lu) for lu in _associated_lockusers_set])
-
-       # _associated_lockuser =  self.get_this_lockuser()  
-       # return _associated_lockuser   # but now try str()'ing it
 
     def get_allowed_doors(self):
-        """ Get the Doors this user is allowed access to.
-            But wait, stop, collaborate and listen... a lockuser may have more than one RFID associated with them, and each card may have more different door access.  So then this would return doors that are not actually associated with this RFID, but all doors associated with that lockuser. But the idea of a user having more than one card just brings up a host of problems, including wasting cards; this issue here; more complicated queries that may take more time... So do we assume one keycard per lockuser, then, set in stone? """
-        lu = self.get_this_lockuser()
-        if lu:
-            return lu.get_allowed_doors()
+        """ Get the Doors this user is allowed access to. """
+        if self.lockuser:
+            return self.lockuser.get_allowed_doors()
         else:
             return None
 
     def prettify_get_allowed_doors(self):
-        lu = self.get_this_lockuser()
-        return lu.prettify_get_allowed_doors()
+        if self.lockuser:
+            return self.lockuser.prettify_get_allowed_doors()
+        else:
+            return None
+
+    def get_allowed_doors_html_links(self):
+        if self.lockuser:
+            return self.lockuser.get_allowed_doors_html_links()
+        else:
+            return None
+    # Django will HTML-escape the output by default. If you'd rather not escape the output of the method,
+    # give the method an allow_tags attribute whose value is True.
+    get_allowed_doors_html_links.allow_tags = True
 
     def is_active(self):
         # lu = self.get_this_lockuser()
@@ -154,8 +161,8 @@ class AccessTime(models.Model):
 class LockUser(models.Model):
     """ (Despite the misleading name, LockUsers are not subclassed Users, but subclassed Models.) """
 
-    rfids            = models.ManyToManyField("RFIDkeycard", help_text = "(Fake-assign new keycard)", blank=True)  # the field labeled "rfids" should not be required -- it's ok to have an active LockUser that is not currently assigned a keycard.  
 
+    ################################################################################
     # doors should be limited to the Doors, and should show up as checkable items for a specific LockUser. 
     ################################################################################
     # (Also, which specific doors are check-able/show up should depend on the permissions [or staff vs
@@ -163,13 +170,15 @@ class LockUser(models.Model):
     # shouldn't be able to assign keycard access to the Makerspace door. 
     doors = models.ManyToManyField(Door,blank=True)
 
+    ####################################################################
     ####  contact infoz ######
+    ####################################################################
     first_name      = models.CharField(max_length=50)
     middle_name     = models.CharField(max_length=50,blank=True)
     last_name       = models.CharField(max_length=50)
     address         = models.CharField(max_length=100,blank=True)
-    email           = models.EmailField()
-    phone_number    = models.IntegerField(max_length=30,null=True)
+    email           = models.EmailField(blank=True)  # blank okay for NOW, later - required
+    phone_number    = models.IntegerField(max_length=30,null=True,blank=True) # later - required
     birthdate       = models.DateField(null=True)
 
 
@@ -188,10 +197,23 @@ class LockUser(models.Model):
 
 
 
-
+    #rfids            = models.ManyToManyField("RFIDkeycard", help_text = "(Fake-assign new keycard)", blank=True)  # the field labeled "rfids" should not be required -- it's ok to have an active LockUser that is not currently assigned a keycard.
+    ####################################################################
+    # Switching to Foreign Key relationship for RFIDkeycard/LockUser
+    ####################################################################
+    # An RFIDkeycard can only be connected to one LockUser; a LockUser
+    #   can have multiple RFIDkeycards (though only one can be active
+    #   at a time).
+    #   - So now we have a ForeignKeyField in **RFIDkeycard** to LockUser,
+    #   - with unique=True, meaning that in the RFIDkeycard table, the
+    #     each LockUser field must be unique (i.e. no sharing of keycards)
+    #
+    #      - so rfids changes from a field to get_rfids()?  How to get
+    # To get the RFIDkeycards assigned to this LockUser: lockuser_object.rfidkeycard_set.all()
+    ####################################################################
     def get_all_rfids(self):
         """ Get all RFID's associated with this Lock User (i.e. not just the current one, which is just the rfid field) """
-        return self.rfids.all()
+        return self.rfidkeycard_set.all()
 
     def prettify_get_all_rfids(self):
         """ Or... if get_all_rfids() return self.rfids, do I need this? Or any other prettify method? """
@@ -221,13 +243,13 @@ class LockUser(models.Model):
 
     def get_allowed_doors(self):
         """ Get the Doors this user is allowed access to. """
-        return self.doors.all()
+        return self.doors.all()            # don't have to prettify if just return self.doors?
 
     def prettify_get_allowed_doors(self):
         _doors = self.get_allowed_doors()
         _door_names_list = [d.name for d in _doors] 
         return ", ".join(_door_names_list)
-       
+
     def get_allowed_doors_html_links(self):
         """ Returns the HTML (which will have to escape) with links to /door/the_id/ to display on the LockUser change list page """
         doors_links_list = []
@@ -315,6 +337,12 @@ class LockUser(models.Model):
 
 
 
+
+####################################################################
+# Prevent interactive question about wanting a superuser created.
+####################################################################
+
+
 # From http://stackoverflow.com/questions/1466827/ --
 #
 # Prevent interactive question about wanting a superuser created.  (This code
@@ -345,13 +373,14 @@ signals.post_syncdb.connect(create_testuser,
     sender=auth_models, dispatch_uid='common.models.create_testuser')
 
 
-
+######################### notes ######################################
 # Note - no need to do explicit memoization, I think. From the docs: 
 # "In a newly created QuerySet, the cache is empty. The first
 #  time a QuerySet is evaluated -- and, hence, a database query happens -- Django 
 #  saves the query results in the QuerySet's cache and returns the results that have
 #  been explicitly requested (e.g., the next element, if the QuerySet is being
 #  iterated over). Subsequent evaluations of the QuerySet reuse the cached results."
+####################################################################
 
 
 

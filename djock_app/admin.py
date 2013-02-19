@@ -105,14 +105,15 @@ class RFIDkeycardAdmin(admin.ModelAdmin):
     form = RFIDkeycardForm
 
     #inlines = (OpenershipInline,)
-    list_display = ["the_rfid","id", "date_created","date_revoked","is_active", "get_this_lockuser", "prettify_get_allowed_doors"]
+    list_display = ["the_rfid","id", "date_created","date_revoked","is_active", "lockuser",
+                    "get_allowed_doors_html_links"]
 
     ####################################################################################################
     # Individual page (change form)
     ####################################################################################################
     #prepopulated_fields = { 'the_rfid': ('id',)} 
     #fields = ("the_rfid","date_revoked","date_created","id")
-    fields = ("the_rfid",)
+    fields = ("the_rfid","lockuser")
     #readonly_fields = ("the_rfid",)   # I only see None when readonly. Maybe need to save first in RFIDkeycardForm's __init__?
                                         # But since regular staff users shouldn't see it at all... forget it. 
 
@@ -129,7 +130,7 @@ class RFIDkeycardInline(admin.StackedInline):
     #extra = 1
 
 class LockUserAdmin(admin.ModelAdmin):
-    inlines = [RFIDkeycardInline]
+    #inlines = [RFIDkeycardInline]
 
 
 
@@ -181,7 +182,8 @@ class LockUserAdmin(admin.ModelAdmin):
     fieldsets = (
             (None, {
                 'fields': ( \
-                            ('first_name', 'last_name'), 'email',\
+                            ('first_name', 'last_name'), \
+                            #'email',\
                             'phone_number','address', \
                             # will error if the below are not set as read_only...  which makes sense; these are methods and
                             # things I can't edit from the form.. right?
@@ -189,7 +191,7 @@ class LockUserAdmin(admin.ModelAdmin):
                             'prettify_get_last_access_time', 'prettify_get_all_access_times', \
                             'is_active',\
                             'doors',
-                            'rfids',
+                          #  'rfids',
                             ),
 
                 'description': ('description.....  Create/modify new lock user and assign keycard')
@@ -204,6 +206,21 @@ class LockUserAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
         }
+
+
+    ####################################################################
+    # Switching to Foreign Key relationship for RFIDkeycard/LockUser,
+    #   so need a change in the interface (which makes more sense
+    #   anyways):
+    #       - "Assign new keycard" is a primary action, accessible from main
+    #       - Goes to rfidkeycard/add -- same "go scan in, I'm waiting" deal as before
+    #       - Can't create an RFIDkeycard without ****assigning it a LockUser -- which
+    #           can be done from the RFIDkeycard change_form****
+    #       - But can create a LockUser without assigning a keycard, same as before
+    #       - Eliminating: create a new RFIDkeycard from LockUser page as a popup/inline
+    #       - But "assign new keycard"/"deactivate keycard" (fieldset.html) should
+    #           still behave the same way for the user.
+    ####################################################################
 
 
      

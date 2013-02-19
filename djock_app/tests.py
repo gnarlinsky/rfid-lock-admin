@@ -11,11 +11,22 @@ from django.contrib.contenttypes.models import ContentType
 # to run only some tests: 
 #   $ ./manage.py test djock_app.LockUserModelTest
 
+#######################################################################################
 # TO DO: 
+#######################################################################################
 # - Separate functional tests and unit tests into separate .py's? 
 # - check if rfid not exactly 10 digits long and reject right away
 # - If some aspect of an object is updated, does that change cascade through... 
 # - on writing use cases: http://breathingtech.com/2009/writing-use-cases-for-agile-scrum-projects/
+#
+# - what happens when you have a lockuser with a specific door perm, but you delete the door? 
+# - what happens to an rfidkeycard when its active or not active lockuser has been deleted? 
+#
+# ----------------------------------------
+#  post fk/m2m change: 
+# ----------------------------------------
+# - rfidkeycard: can't add a lockuser that already has an active keycard
+# - rfidkeycard: can't add a lockuser/create a lockuser with no door permissions. 
 
 
 #######################################################################################
