@@ -30,3 +30,14 @@ def get_object_type(the_object):
     """ get class of object """
     return the_object.__class__.__name__
     
+@register.filter
+def get_original_id(referrer_path):
+    """ given the HTTP_REFERER, get the last part of the URL, 
+        which should be the object id. No checking of any kind here, 
+        but the expected referer url is something like '...lockuser/3/' 
+    """
+    split_path = referrer_path.split("/")
+    if len(split_path)>1: # more than just "/"
+        return split_path[-2]
+    else: 
+        return None
