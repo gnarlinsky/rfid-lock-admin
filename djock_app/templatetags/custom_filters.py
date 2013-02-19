@@ -11,7 +11,7 @@ def is_lockuser_active(object_id):
     except:
         this_lockuser = None
     if this_lockuser:
-        return this_lockuser.is_active
+        return this_lockuser.activate
 
 @register.filter
 def does_lockuser_have_active_keycard(object_id):

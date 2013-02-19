@@ -17,11 +17,32 @@
             <p>http://192.168.x.x:8080/checkdoor/doorid/checkrfid/rfid/ (if ran ./manage.py runserver 192.168.x.x:8080)</p>
             <h5> OK, got it. Click "Save" to finish creating new keycard.</h5>
             </center>
-        {% if is_popup %}   {% comment %} should indicate that we're adding a new keycard to an EXISTING
-        lockuser/ got here from lockuser change page {% endcomment %}
-                <h1>Here's original id: 
+        {% if is_popup %}   {% comment %} should indicate that we're adding a new keycard to an EXISTING lockuser/ got here from lockuser change page {% endcomment %}
+                <h1>!!!!!!</h1>
+                {{ object_id }}
+                <h1>!!!!!!</h1>
+                <h1>Here's original object's id: 
                 <p> {{ request.META.HTTP_REFERER|get_original_id }}
                 </h1>
+                <hr> <h1> so we'd need, instead of the whole form-row field-lockuser (have to go back into
+                fieldset? ).......  if yeah... can I get object_id there??????
+                
+                </h1>
+{% comment %} 
+                <div>
+                        <label for="id_lockuser" class="required">Lockuser:</label>
+                            <select name="lockuser" id="id_lockuser">
+<option value="{{ request.META.HTTP_REFERER|get_original_id }}" selected="selected">{{ request.META.HTTP_REFERER|get_original_id }}</option>
+</select>
+                </div>
+{% endcomment %} 
+                <hr>
+                <hr>
+                <hr>
+                <hr>
+                <hr>
+                <hr>
+                <hr>
 
         {% endif %}
 
@@ -50,28 +71,19 @@
                 {% comment %} using STATIC_URL for *my* static/ files; otherwise it's Django admin's originals {% endcomment %}
                  {% if  not object_id|is_lockuser_active %} 
                         <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids_40" onclick="return showAddAnotherPopup(this);">
-                    {% comment %} 
-                    <a href="/lockadmin/djock_app/rfidkeycard/add/">
-                    {% endcomment %} 
                         <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign keycard and activate user 
                     </a>
                     <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif " width="10" height="10" readonly>Deactivate current keycard
 
                  {% elif  object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %}
-                {% comment %} 
                     <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids" onclick="return showAddAnotherPopup(this);">
-                {% endcomment %} 
-                    <a href="/lockadmin/djock_app/rfidkeycard/add/">
                         <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign new keycard 
                     </a>
                     <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif" width="10" height="10">Deactivate current keycard
 
                  {% elif  object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
                     <img src="{{ STATIC_URL }}/admin/img/disabled_icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign new keycard
-                {% comment %} 
                     <a href="/" class="add-another" id="add_id_rfids" onclick="return showAddAnotherPopup(this);"> 
-                {% endcomment %} 
-                    <a href="/">
                         <img src="/static/admin/img/icon_deletelink.gif " width="10" height="10"> Deactivate current keycard 
                     </a>
                  {% endif %}

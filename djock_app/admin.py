@@ -166,7 +166,9 @@ class LockUserAdmin(admin.ModelAdmin):
                     'prettify_get_current_rfid','prettify_get_all_rfids',\
                     'get_allowed_doors_html_links',\
                     'prettify_get_last_access_time',
-                    'is_active')
+                 #  'is_active',
+                    'activate',
+    )
 
     #list_filter = ('rfid','is_active')  # show filters by RFID and active/inactive on the right
     #exclude = ("birthdate ", "middle_name")   # temp exclusion
@@ -189,7 +191,8 @@ class LockUserAdmin(admin.ModelAdmin):
                             # things I can't edit from the form.. right?
                             'prettify_get_current_rfid','prettify_get_all_rfids',\
                             'prettify_get_last_access_time', 'prettify_get_all_access_times', \
-                            'is_active',\
+                            #'is_active', \
+                            'activate', \
                             'doors',
                           #  'rfids',
                             ),

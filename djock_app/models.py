@@ -184,16 +184,19 @@ class LockUser(models.Model):
 
     # but a lock user could be still be active without having a current rfid... We could define active as having a current rfid, but
     # that doesn't seem intuitive.... So just doing a field instead of this: 
-    #def is_active(self):
-    #    """ Determine whether this lock user is active, based on whether they have a current active rfid """
-    #    if self.get_current_rfid():
-    #        return True
-    #    else:
-    #        return False
+    def is_active(self):
+        """ Determine whether this lock user is active, based on whether they have a current active rfid
+         and whether staff has chosen to deactivate"""
+        if activate == False:   # staff user is trying to deactivate this lockuser
+            return False
+        if self.get_current_rfid():
+            return True
+        else:
+            return False
 
     # Is this person allowed access? (Non-superuser staff should not have the ability to delete models -- 
     # but rather to DEACTIVATE.) 
-    is_active       =   models.BooleanField(default=False)
+    activate       =   models.BooleanField(default=False)   #i.e. defaults to NOT activated
 
 
 
