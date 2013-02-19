@@ -28,5 +28,5 @@ def does_lockuser_have_active_keycard(object_id):
 @register.filter
 def get_object_type(the_object):
     """ get class of object """
-    return the_object.__class__
+    return the_object.__class__.__name__
     
