@@ -103,6 +103,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'djock_proj.urls'
@@ -120,7 +121,7 @@ TEMPLATE_DIRS = (
 INSTALLED_APPS = (
     'djock_app',
     'bootstrap_toolkit',
-#    'debug_toolbar',
+    'debug_toolbar',
 # " if you are relying on your application's templates directory, make sure to list your app
 # before django.contrib.admin in the INSTALLED_APPS setting. Arguably TEMPLATE_DIRS is the
 # better place for global overrides. "
@@ -174,3 +175,12 @@ LOGGING = {
 TEMPLATE_CONTEXT_PROCESSORS = TCP + (
     'django.core.context_processors.request',
     )
+
+# for debug toolbar - requires that the requesting IP address be listed here
+INTERNAL_IPS =  ('127.0.0.1', )
+
+
+# To prevent "The Django Debug Toolbar has intercepted a redirect to the above URL for debug viewing purposes." 
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS':False,
+    }
