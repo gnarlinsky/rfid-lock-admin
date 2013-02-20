@@ -1,0 +1,796 @@
+[
+  {
+    "pk": 1, 
+    "model": "djock_app.door", 
+    "fields": {
+      "name": "Makerspace 2"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "djock_app.door", 
+    "fields": {
+      "name": "Door X"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "djock_app.door", 
+    "fields": {
+      "name": "Narnia"
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "djock_app.door", 
+    "fields": {
+      "name": "Music Room"
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "djock_app.door", 
+    "fields": {
+      "name": "Makerspace"
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "djock_app.door", 
+    "fields": {
+      "name": "Bike Project"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "djock_app.rfidkeycard", 
+    "fields": {
+      "date_created": "2013-02-20T03:28:19.835Z", 
+      "the_rfid": "1123456789", 
+      "lockuser": 1, 
+      "date_revoked": null
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "djock_app.rfidkeycard", 
+    "fields": {
+      "date_created": "2013-02-20T03:28:40.487Z", 
+      "the_rfid": "3123456789", 
+      "lockuser": 3, 
+      "date_revoked": null
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "djock_app.rfidkeycard", 
+    "fields": {
+      "date_created": "2013-02-20T03:31:38.367Z", 
+      "the_rfid": "5123456789", 
+      "lockuser": 4, 
+      "date_revoked": null
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "djock_app.lockuser", 
+    "fields": {
+      "phone_number": null, 
+      "first_name": "michael", 
+      "last_name": "jackson", 
+      "middle_name": "", 
+      "birthdate": null, 
+      "activate": true, 
+      "doors": [
+        1, 
+        2
+      ], 
+      "address": "", 
+      "email": ""
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "djock_app.lockuser", 
+    "fields": {
+      "phone_number": null, 
+      "first_name": "Janet", 
+      "last_name": "Jackson", 
+      "middle_name": "", 
+      "birthdate": null, 
+      "activate": true, 
+      "doors": [
+        1
+      ], 
+      "address": "", 
+      "email": ""
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "djock_app.lockuser", 
+    "fields": {
+      "phone_number": null, 
+      "first_name": "Tito", 
+      "last_name": "Jackson", 
+      "middle_name": "", 
+      "birthdate": null, 
+      "activate": true, 
+      "doors": [
+        2
+      ], 
+      "address": "", 
+      "email": ""
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "djock_app.lockuser", 
+    "fields": {
+      "phone_number": null, 
+      "first_name": "Latoya", 
+      "last_name": "Jackson", 
+      "middle_name": "", 
+      "birthdate": null, 
+      "activate": false, 
+      "doors": [
+        3
+      ], 
+      "address": "", 
+      "email": ""
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "accesstime", 
+      "name": "access time", 
+      "app_label": "djock_app"
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "contenttype", 
+      "name": "content type", 
+      "app_label": "contenttypes"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "door", 
+      "name": "door", 
+      "app_label": "djock_app"
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "group", 
+      "name": "group", 
+      "app_label": "auth"
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "lockuser", 
+      "name": "lock user", 
+      "app_label": "djock_app"
+    }
+  }, 
+  {
+    "pk": 11, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "logentry", 
+      "name": "log entry", 
+      "app_label": "admin"
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "permission", 
+      "name": "permission", 
+      "app_label": "auth"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "rfidkeycard", 
+      "name": "rfi dkeycard", 
+      "app_label": "djock_app"
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "session", 
+      "name": "session", 
+      "app_label": "sessions"
+    }
+  }, 
+  {
+    "pk": 10, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "site", 
+      "name": "site", 
+      "app_label": "sites"
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "contenttypes.contenttype", 
+    "fields": {
+      "model": "user", 
+      "name": "user", 
+      "app_label": "auth"
+    }
+  }, 
+  {
+    "pk": "b1ce130f175e0671b5a4c4e82c7cf453", 
+    "model": "sessions.session", 
+    "fields": {
+      "expire_date": "2013-03-06T03:03:04.695Z", 
+      "session_data": "MGFkYmM2MDY5YTkyM2Q3NmRhYmZkZjdjMmNjMDI2YjlkMTc0NDViYzqAAn1xAShVEl9hdXRoX3Vz\nZXJfYmFja2VuZHECVSlkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZHED\nVQ1fYXV0aF91c2VyX2lkcQRLAXUu\n"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "sites.site", 
+    "fields": {
+      "domain": "example.com", 
+      "name": "example.com"
+    }
+  }, 
+  {
+    "pk": 31, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_logentry", 
+      "name": "Can add log entry", 
+      "content_type": 11
+    }
+  }, 
+  {
+    "pk": 32, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_logentry", 
+      "name": "Can change log entry", 
+      "content_type": 11
+    }
+  }, 
+  {
+    "pk": 33, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_logentry", 
+      "name": "Can delete log entry", 
+      "content_type": 11
+    }
+  }, 
+  {
+    "pk": 13, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_group", 
+      "name": "Can add group", 
+      "content_type": 6
+    }
+  }, 
+  {
+    "pk": 16, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_group", 
+      "name": "Can change group", 
+      "content_type": 6
+    }
+  }, 
+  {
+    "pk": 19, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_group", 
+      "name": "Can delete group", 
+      "content_type": 6
+    }
+  }, 
+  {
+    "pk": 14, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_permission", 
+      "name": "Can add permission", 
+      "content_type": 5
+    }
+  }, 
+  {
+    "pk": 17, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_permission", 
+      "name": "Can change permission", 
+      "content_type": 5
+    }
+  }, 
+  {
+    "pk": 20, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_permission", 
+      "name": "Can delete permission", 
+      "content_type": 5
+    }
+  }, 
+  {
+    "pk": 15, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_user", 
+      "name": "Can add user", 
+      "content_type": 7
+    }
+  }, 
+  {
+    "pk": 18, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_user", 
+      "name": "Can change user", 
+      "content_type": 7
+    }
+  }, 
+  {
+    "pk": 21, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_user", 
+      "name": "Can delete user", 
+      "content_type": 7
+    }
+  }, 
+  {
+    "pk": 22, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_contenttype", 
+      "name": "Can add content type", 
+      "content_type": 8
+    }
+  }, 
+  {
+    "pk": 23, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_contenttype", 
+      "name": "Can change content type", 
+      "content_type": 8
+    }
+  }, 
+  {
+    "pk": 24, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_contenttype", 
+      "name": "Can delete content type", 
+      "content_type": 8
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_accesstime", 
+      "name": "Can add access time", 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_accesstime", 
+      "name": "Can change access time", 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_accesstime", 
+      "name": "Can delete access time", 
+      "content_type": 3
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_door", 
+      "name": "Can add door", 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_door", 
+      "name": "Can change door", 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 10, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_door", 
+      "name": "Can delete door", 
+      "content_type": 1
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_lockuser", 
+      "name": "Can add lock user", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 34, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "can_manage_door_1", 
+      "name": "Can manage door to Makerspace 2", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 35, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "can_manage_door_2", 
+      "name": "Can manage door to Door X", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 36, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "can_manage_door_3", 
+      "name": "Can manage door to Narnia", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 37, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "can_manage_door_4", 
+      "name": "Can manage door to Music Room", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 38, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "can_manage_door_5", 
+      "name": "Can manage door to Makerspace", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 39, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "can_manage_door_6", 
+      "name": "Can manage door to Bike Project", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_lockuser", 
+      "name": "Can change lock user", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 11, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_lockuser", 
+      "name": "Can delete lock user", 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_rfidkeycard", 
+      "name": "Can add rfi dkeycard", 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_rfidkeycard", 
+      "name": "Can change rfi dkeycard", 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 12, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_rfidkeycard", 
+      "name": "Can delete rfi dkeycard", 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 25, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_session", 
+      "name": "Can add session", 
+      "content_type": 9
+    }
+  }, 
+  {
+    "pk": 26, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_session", 
+      "name": "Can change session", 
+      "content_type": 9
+    }
+  }, 
+  {
+    "pk": 27, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_session", 
+      "name": "Can delete session", 
+      "content_type": 9
+    }
+  }, 
+  {
+    "pk": 28, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "add_site", 
+      "name": "Can add site", 
+      "content_type": 10
+    }
+  }, 
+  {
+    "pk": 29, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "change_site", 
+      "name": "Can change site", 
+      "content_type": 10
+    }
+  }, 
+  {
+    "pk": 30, 
+    "model": "auth.permission", 
+    "fields": {
+      "codename": "delete_site", 
+      "name": "Can delete site", 
+      "content_type": 10
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "auth.user", 
+    "fields": {
+      "username": "test", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": true, 
+      "is_staff": true, 
+      "last_login": "2013-02-20T03:03:04.678Z", 
+      "groups": [], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$10000$d9iSEIf8aYMV$9A/gVRDITnMRaxFrA7/xsoCN47er2O0vd6o6SGzdhwQ=", 
+      "email": "x@x.com", 
+      "date_joined": "2013-02-20T03:02:58.218Z"
+    }
+  }, 
+  {
+    "pk": 13, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 3, 
+      "action_time": "2013-02-20T03:34:53.326Z", 
+      "object_repr": "2123456789", 
+      "object_id": "2", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 12, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-02-20T03:31:38.378Z", 
+      "object_repr": "5123456789", 
+      "object_id": "4", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 11, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-02-20T03:28:40.493Z", 
+      "object_repr": "3123456789", 
+      "object_id": "3", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 10, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-02-20T03:28:29.526Z", 
+      "object_repr": "2123456789", 
+      "object_id": "2", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-02-20T03:28:19.845Z", 
+      "object_repr": "1123456789", 
+      "object_id": "1", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 2
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-02-20T03:26:39.139Z", 
+      "object_repr": "Latoya Jackson", 
+      "object_id": "4", 
+      "change_message": "Changed doors.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-02-20T03:26:28.281Z", 
+      "object_repr": "michael jackson", 
+      "object_id": "1", 
+      "change_message": "Changed activate.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-02-20T03:26:19.497Z", 
+      "object_repr": "Janet Jackson", 
+      "object_id": "2", 
+      "change_message": "Changed activate.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 2, 
+      "action_time": "2013-02-20T03:25:49.742Z", 
+      "object_repr": "Tito Jackson", 
+      "object_id": "3", 
+      "change_message": "Changed activate.", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-02-20T03:25:34.156Z", 
+      "object_repr": "Latoya Jackson", 
+      "object_id": "4", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-02-20T03:24:40.374Z", 
+      "object_repr": "Tito Jackson", 
+      "object_id": "3", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-02-20T03:24:08.936Z", 
+      "object_repr": "Janet Jackson", 
+      "object_id": "2", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "admin.logentry", 
+    "fields": {
+      "action_flag": 1, 
+      "action_time": "2013-02-20T03:21:21.431Z", 
+      "object_repr": "michael jackson", 
+      "object_id": "1", 
+      "change_message": "", 
+      "user": 1, 
+      "content_type": 4
+    }
+  }
+]
