@@ -409,10 +409,20 @@ admin.site.register(LockUser,LockUserAdmin)
 admin.site.register(RFIDkeycard, RFIDkeycardAdmin)
 admin.site.register(AccessTime,AccessTimeAdmin)
 admin.site.register(Door, DoorAdmin)
+
+# Register User with UserAdmin. Note that in settings.py, in INSTALLED_APPS,
+#   make sure that 'django.contrib.auth' appears on the list before the app
+#   - this app - that is replacing the default admin.  This means that things
+#   happen in the right order: first Django registers the User model, then
+#   we un-register it here, then we re-register with our own ModelAdmin -
+#   User Admin. (If the ordering is wrong, will get error like "The model
+#   User is already registered.")
 #admin.site.register(User, StaffUserAdmin)
 #admin.site.register(User)
-#admin.site.unregister(User)
+admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+
+
 
 # Globally disable deletion of selected objects (i.e this will not be an available action in the Actions dropdown of
 # all ModelAdmins/change_list pages.

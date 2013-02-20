@@ -119,12 +119,16 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    'djock_app',
-    'bootstrap_toolkit',
-    'debug_toolbar',
 # " if you are relying on your application's templates directory, make sure to list your app
 # before django.contrib.admin in the INSTALLED_APPS setting. Arguably TEMPLATE_DIRS is the
 # better place for global overrides. "
+
+# Another note on ordering: Make sure that 'django.contrib.auth' appears on the list before the app
+#   - djock_app - that is replacing the default admin.  This means that things
+#   happen in the right order: first Django registers the User model, then
+#   the replacement app un-registers it in admin.py, then re-registers it with
+#   its own ModelAdmin. ( If the ordering is wrong, will get error like "The model
+#   User is already registered.")
     'django.contrib.auth',   # for user authentication
     'django.contrib.contenttypes',  # for user authentication
     # provides get_profile -- run against a request, that will return the 
@@ -137,6 +141,11 @@ INSTALLED_APPS = (
      'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+
+    # mine
+    'djock_app',
+    'bootstrap_toolkit',
+    'debug_toolbar',
 )
 
 
