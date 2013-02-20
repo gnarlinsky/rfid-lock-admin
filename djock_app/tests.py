@@ -8,6 +8,8 @@ from selenium.webdriver.common.keys import Keys
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
+
+"""
 # to run only some tests: 
 #   $ ./manage.py test djock_app.LockUserModelTest
 
@@ -41,7 +43,7 @@ from django.contrib.contenttypes.models import ContentType
 #  Selenium: in-browser framework to test rendered HTML and the behavior of Web pages,
 #   e.g. JavaScript
 #######################################################################################
-
+"""
 
 # The most atomic bits for functional tests are magenta; unit tests cyan
 
@@ -52,8 +54,6 @@ class RenameLaterTests(LiveServerTestCase):
                                             # well, though... Test for that? )
     # (make sure the only staff user is the superuser in the db currently, then 
     #   ./manage.py dumpdata auth.User --indent=2 > test_staff_superuser.json )
-
-
     def setUp(self):
         """ Start up Selenium WebDriver browser instance """
         print colored("\nSETTING UP / LiveServerTestCase RenameLaterTests - test doing stuff in the *browser*", "white","on_green")
@@ -110,44 +110,36 @@ class RenameLaterTests(LiveServerTestCase):
         self.fail("not done yet...  same thing for the other Models")
 
 
-"""
-
-USE CASES CONCERNING SPECIFICALLY ASSIGNING A NEW KEYCARD TO A LOCK USER THROUGH THE WEB INTERFACE.(so these parallel functional tests)
-
-* staff user or super user wants to assign a new keycard to a lockuser with an active keycard already. 
-    (lockuser is active, since have active keycard). 
-- What should happen: The staff user should not be able to do that.  This is what the staff user should see: 
-    * The thing link/img for "assign new keycard" should be grayed out/non-functional; 
-    * but right nearby there should also be a button/link "Deactivate current keycard." 
-    (or just have one control, but switch between these two)
-
-* staff user/superuser wants to assign a new keycard to an active lockuser, but no keycard already:
-    - Deactivate current keycard" should not be functional
-    - "Assign new keycard" should be functional
-
-* staff user/superuser wants to assign a new keycard to a lockuser, but lockuser is inactive :
-    - Deactivate current keycard" should not be functional
-    - text for "assign new keycard" should actually be "activate lockuser and assign new keycard" (or
-      just have one control, but switch between these two)
-
-fixture rename_back_initial_data.json: only lisa and ralph don't have a current rfid; only lisa is inactive 
-"""
-
-
-
-
-
-
-
-
-
-
-
-
 #######################################################################################
-#  Unit tests 
+#  Unit tests
 #######################################################################################
+class RFIDkeycardAssignmentTest(TestCase):
+    """
+    USE CASES CONCERNING SPECIFICALLY ASSIGNING A NEW KEYCARD TO A LOCK USER THROUGH THE WEB INTERFACE.(so these parallel functional tests)
 
+    * staff user or super user wants to assign a new keycard to a lockuser with an active keycard already.
+        (lockuser is active, since have active keycard).
+    - What should happen: The staff user should not be able to do that.  This is what the staff user should see:
+        * The thing link/img for "assign new keycard" should be grayed out/non-functional;
+        * but right nearby there should also be a button/link "Deactivate current keycard."
+        (or just have one control, but switch between these two)
+
+    * staff user/superuser wants to assign a new keycard to an active lockuser, but no keycard already:
+        - Deactivate current keycard" should not be functional
+        - "Assign new keycard" should be functional
+
+    * staff user/superuser wants to assign a new keycard to a lockuser, but lockuser is inactive :
+        - Deactivate current keycard" should not be functional
+        - text for "assign new keycard" should actually be "activate lockuser and assign new keycard" (or
+          just have one control, but switch between these two)
+
+    fixture rename_back_initial_data.json: only lisa and ralph don't have a current rfid; only lisa is inactive
+    """
+    def SetUp(self):
+        pass
+
+    def TearDown(self):
+        pass
 
 class LockUserModelTest(TestCase):
     # here won't be using Selenium; interacting with application at a lower level
@@ -187,18 +179,12 @@ class LockUserModelTest(TestCase):
         self.assertEquals(the_only_lockuser_in_db.email,"chunkylover53@aol.com")
         self.assertEquals(the_only_lockuser_in_db.address,"742 Evergreen Terrace, Springfield, USA")
         self.assertEquals(the_only_lockuser_in_db.phone_number,9395555555)
-
-
-
 # TO DO: same as above for the other models
-        
-        
+
 class DoorModelTests(TestCase):
     def setUp(self):
         print colored("\nSETTING UP / TestCase DoorModelTests", "white", "on_green")
         fixtures = ['just_doors.json'] 
-
-        
 
 class UserTests(TestCase):
     """
@@ -206,13 +192,12 @@ class UserTests(TestCase):
     In the list of accesstimes, 
     - staff can only see the doors they have permission to. 
     - staff users should not be able to the actual RFID's,  
-    - and they should be able to see only the doors they have permissions for 
-
+    - and they should be able to see only the doors they have permissions for
     - should only be able to see buttons + top menu options for: 
-    (1) add new lock user
-    (2) lock users
-    (3) Locks 
-    (4) Room access log and graphs
+        (1) add new lock user
+        (2) lock users
+        (3) Locks
+        (4) Room access log and graphs
 
         # TO DO:
         # Staff vs superusers:
@@ -224,10 +209,14 @@ class UserTests(TestCase):
         # #     - prettify get all rfid's, get all rfid's
 
     ----------------- More on permissions ----------------------------------
-    Custom user permissions for door management are dynamically created, based on the doors that are present in the system -- so load the door fixture as well as the staff user fixture if using fixtures, using natural keys (https://docs.djangoproject.com/en/1.4/ref/django-admin/#django-admin-option---natural) 
+    Custom user permissions for door management are dynamically created, based on the doors that are present in the
+        system -- so load the door fixture as well as the staff user fixture if using fixtures, using natural keys
+        (https://docs.djangoproject.com/en/1.4/ref/django-admin/#django-admin-option---natural).
+        (More on natural keys:  see #1 in expanded_comments)
+
         TO DO: (a) Check that custom user permissions exist for all  doors in the system...
-               (b) which is a separate test from: does user have certain custom permissions!  (so probably that test should not even
-                 be in UserTests suite? It just concerns Permissions and Doors.....) 
+               (b) which is a separate test from: does user have certain custom permissions!  (so probably that test
+               should not  be in UserTests suite? It just concerns Permissions and Doors.....)
                (c) which is a separate test from just assigning regular permissions to staff users!
 
             (a) 
@@ -246,76 +235,27 @@ class UserTests(TestCase):
                 #    [<Permission: djock_app | lock user | Can change lock user>]  (pk=10)
                 #    [<Permission: djock_app | rfi dkeycard | Can add rfi dkeycard>]  (pk = 12)
                 #    [<Permission: djock_app | rfi dkeycard | Can change rfi dkeycard>] (pk=8)
+                        (others:
+                        #    [<Permission: djock_app | lock user | Can manage door to Bike Project>] (pk=39)
+                        #    [<Permission: djock_app | lock user | Can manage door to Makerspace>] (pk = 38)
+                        #    [<Permission: djock_app | lock user | Can manage door to Door X>] (pk=35)
+                        )
             * and check that these permissions actually control what the user can and can't do/view
-
-    ---------------------------------------------------
-
     """
-
-
-    
-
-
-
-    ############################
-    # Load fixtures
-    ############################
-
-    #Custom user permissions for door management are dynamically created, based on the doors that are present in the system -- so load the door fixture as well as the staff user fixture. 
-    #fixtures = ['just_doors.json','test_staff-only_user2.json']  # so loading a staff-only user, when testing for super user sstuff just reset is_superuser to True and back again to False for staff-only
-    # The staff user in the fixture (test_staff-only_user2) has these permissions:
-        #    [<Permission: djock_app | door | Can add door>]               (pk = 2)
-        #    [<Permission: djock_app | lock user | Can add lock user>] (pk = 6) 
-        #    [<Permission: djock_app | lock user | Can change lock user>]  (pk=10)
-        #    [<Permission: djock_app | rfi dkeycard | Can add rfi dkeycard>]  (pk = 12)
-        #    [<Permission: djock_app | rfi dkeycard | Can change rfi dkeycard>] (pk=8)
-        #    [<Permission: djock_app | lock user | Can manage door to Bike Project>] (pk=39)
-        #    [<Permission: djock_app | lock user | Can manage door to Makerspace>] (pk = 38)
-        #    [<Permission: djock_app | lock user | Can manage door to Door X>] (pk=35)
-        #   (These right? So no deleting of anything, not even Doors. And what about only
-        #   being able to AccessTimes' display list, but not be able to go into the
-        #   individual objects' change forms (can set things as readonly at template level/
-        #   admin.py, but is that secure enough? Make a custom permission?)
-            # But!  
-            # Either don't use a fixture at all, or make sure to redo the permissions in each test, 
-            # identifying by their code names!
-            # Because in the fixture, the custom permissions are just identified with their pk's ... 
-            # And since custom user permissions for door management are dynamically
-            # created, based on the doors that are present in the system -- those pk's are 
-            # not guaranteed to refer to what you want them to refer to, so a fixture is kind of useless. (?)
-            # Update: 
-                # From the docs: "Use natural keys to represent any foreign key and many-to-many relationship with a model 
-                # that provides a natural key definition. If you are dumping contrib.auth Permission objects or 
-                # contrib.contenttypes ContentType objects, you should probably be using this flag."
-                # (https://docs.djangoproject.com/en/1.4/ref/django-admin/#django-admin-option---natural) 
-
-    #
-    # The staff user in the fixture:
-    #       "is_active": true, 
-    #       "is_superuser": false, 
-    #       "is_staff": true, 
-    # and check for all three
-
-
-
-
-
-
-
 
     def setUp(self):
         print colored("\nSETTING UP / TestCase UserTests", "white", "on_green")
         #       This?  get diff types of users  from a fixture or create here.
-        #       Explicitly set its staff to false and
-        #       superuser to false for a staff-only user;  then set superuser to true (staff status
-        #       doesn't matter) to test the other side of the coin.
+        #       Explicitly set its
+        #       - staff to false and
+        #       - superuser to false for a staff-only user;
+        #       - then set superuser to true (staff status doesn't matter) to test the other side of the coin.
 
 
         self.staff_only_user = User.objects.create_user('Chevy Chase', 'chevy@chase.com', 'chevyspassword')
         #self.staff_only_user = User.objects.get(username="staff_only_test_user")
 
         # c = client, etc.; make sure both types users above can login first? 
-
 
     def tearDown(self):
         # Clean up after each test
@@ -352,17 +292,6 @@ class UserTests(TestCase):
         #print self.staff_only_user.get_all_permissions() # should now include new permission
         #print colored("\t(doors)"+str(Door.objects.all()), "cyan")
 
-        """ give these permissions:
-        #    [<Permission: djock_app | door | Can add door>]               (pk = 2)
-        #    [<Permission: djock_app | lock user | Can add lock user>] (pk = 6) 
-        #    [<Permission: djock_app | lock user | Can change lock user>]  (pk=10)
-        #    [<Permission: djock_app | rfi dkeycard | Can add rfi dkeycard>]  (pk = 12)
-        #    [<Permission: djock_app | rfi dkeycard | Can change rfi dkeycard>] (pk=8)
-        #    [<Permission: djock_app | lock user | Can manage door to Bike Project>] (pk=39)
-        #    [<Permission: djock_app | lock user | Can manage door to Makerspace>] (pk = 38)
-        #    [<Permission: djock_app | lock user | Can manage door to Door X>] (pk=35)
-        """
-
         # staff-only users can only see/assign Doors that they themselves have access to. 
         # So whatever is in the list that user.doors returns (pk's), those are the only ones that this
         # user has the permission to add to lockuser.doors.   i.e. create/verify the existence of a
@@ -370,8 +299,6 @@ class UserTests(TestCase):
 
         # self.user.user_permissions.add(Permission.objects.get(codename='change_user'))
         #self.fail("getting to this.....")
-        
-
 
     # Actually, staff-only users should not be able to delete anything, only deactivate
     def _test_deleting_lockuser(self):
@@ -410,37 +337,35 @@ class UserTests(TestCase):
         #self.assertEquals(len(all_lockusers_in_db),1)
         self.fail("(to do)")
 
+    #def test_can_change_non_staff_users(self):
+    #    self.assertFalse(self.user.has_perm('logical_change_user', self.non_staff.profile)) # can't change non staff users without permission
+    #
+    #    # now add the permission and test it again
+    #    self.user.user_permissions.add(Permission.objects.get(codename='change_user'))
+    #
+    #    # refetch user from the database
+    #    self.user = User.objects.get(pk=self.user.pk)
+    #    print self.user.get_all_permissions() # should now include new permission
+    #    self.assertTrue(self.user.has_perm('logical_change_user', self.non_staff.profile))
 
 
-#def test_can_change_non_staff_users(self):
-#    self.assertFalse(self.user.has_perm('logical_change_user', self.non_staff.profile)) # can't change non staff users without permission
-#
-#    # now add the permission and test it again
-#    self.user.user_permissions.add(Permission.objects.get(codename='change_user'))
-#
-#    # refetch user from the database
-#    self.user = User.objects.get(pk=self.user.pk)
-#    print self.user.get_all_permissions() # should now include new permission
-#    self.assertTrue(self.user.has_perm('logical_change_user', self.non_staff.profile))
-
-
-class RFIDandDoorCheck(TestCase):
-    fixtures = ['rename_back_to_initial_data.json']  # to save the test user so can succeed on login tests
+class LockCommunicationTests(TestCase):  # i.e. with the Raspberry Pi
+    #fixtures = ['rename_back_to_initial_data.json']  # to save the test user so can succeed on login tests
     # TO DO: copy and rename the above to something that makes sense for here
 
     def setUp(self):
         print colored("\nSETTING UP / TestCase RFIDandDoorCheck", "white","on_green")
 
-        c = Client()  
+        c = Client()
 
         # So would set up the Model objects I need here?  #   Rather than reference my test data.
         #   NOPE: Model creation and manipulation are tests in and of themselves.  Tests for other stuff
-        #   should assume that we already have the objects we need. 
+        #   should assume that we already have the objects we need.
         #self.test_lockuser = LockUser(phone_number = "2175555555", first_name = "Michael", last_name = "Jackson", middle_name = "", birthdate = None, address = "", email = "michael@thejackson5.com")
 
     # Should take arguments? So that other tests can call it... For example, when door perms
     # for door x are changed, want to test that URL with door x's id return
-    # the appropriate response. 
+    # the appropriate response.
     def check_response_and_status(self,client,url,correct_status_code,correct_response_content):
         resp = client.get(url)
         # self.assert(give it url, check if response=1 or 0)
@@ -448,36 +373,35 @@ class RFIDandDoorCheck(TestCase):
         self.assertEqual(resp.status_code,correct_status_code)
         print colored("\tChecking response content (%s) for %s \n" % (correct_response_content, url) ,"cyan")
         self.assertEqual(resp.content,correct_response_content)
-   
 
     def test_checking_url_response_and_status(self):
         """
         the cases:  door not good; rfid not good; not active
-            (although in some cases Django already does the is_active check, 
-                doublecheck that) 
+            (although in some cases Django already does the is_active check,
+                doublecheck that)
             (Not setting anything up in here, but just using test db,
-            just to see if I can do this... 
+            just to see if I can do this...
 
             Testing urls like /checkdoor/doorid/checkrfid/rfid/
 
-            Return 0 if at least one of these is true: 
+            Return 0 if at least one of these is true:
             - No RFIDkeycard with the rfid number;
             - doorid is not in the list of doors this keycard can access
             - keycard not currently active
-            - .....  user currently active... 
+            - .....  user currently active...
               although some of these imply other ones....
               A lock user being inactive: they wouldn't even have a current rfid
 
-            - Also, the rfid must be exactly 10 digits long (and the only 
-                characters allowed: alphanumeric, _ [ doublecheck that though ] ); 
-                the door id has to be an int right now, no length limit. 
-            The urlconf should take care of this.  If either of those 
-                don't match,  the debug page is displayed (DEBUG is set to 
-                True in settings.py), but in real life a standard 404 
+            - Also, the rfid must be exactly 10 digits long (and the only
+                characters allowed: alphanumeric, _ [ doublecheck that though ] );
+                the door id has to be an int right now, no length limit.
+            The urlconf should take care of this.  If either of those
+                don't match,  the debug page is displayed (DEBUG is set to
+                True in settings.py), but in real life a standard 404
                 will be returned -- the status code
         """
 
-
+        c = Client()   # not saving from SetUp??
         print colored("\nTEST: checking correct response/status for a particular URL - Given URL with door and rfid id's, is the response/status (whether the rfid is good for that door) correct?","blue")
 
         print colored("\t(In fixture: \n\t- door with doorid 2 does exist; but no doors with id's aaaaa\
@@ -491,7 +415,7 @@ class RFIDandDoorCheck(TestCase):
         # TO DO: the tests below... don't call an additional method, put everything in here?
         # Yes, it modularizes like this, but not in a really comprehensible way, plus have to remember
         #  what the arguments are there............
-        
+
         # this is not comprehensive....
         self.check_response_and_status(c,"/checkdoor/aaaaa/checkrfid/0123456789/", 404,"")
         self.check_response_and_status(c,"/checkdoor/2/checkrfid/abc123/", 404,"")
@@ -511,14 +435,45 @@ class RFIDandDoorCheck(TestCase):
 
 
         # TO DO: for all these tests, should also check calling the actual methods, or should that be
-        # covered by the URL checks?  
+        # covered by the URL checks?
+
+    def test_get_allowed_rfids_for_door(self):
+        """ Using a different fixture for this... current fixtures are defunct,
+        so just want to test getting the allowed rfid's for a door quickly:
+            Door id = 1, name = 'Makerspace 2':
+                allowed rfids:
+                        Michael Jackson - 1123456789
+                not allowed:
+                        Tito Jackson - 3123456789  (this door *is* in Tito's allowed doors, but Tito is INACTIVE)
+                        Janet - 2123456789 (this door *is* in the allowed list of doors for a PAST, INACTIVE keycard, which is 4123456789)    (TO DO - pending code for inactive RFIDkeycards)
+                        Latoya - 5123456789 (TO DO -- see Janet above)
 
 
-        def test_get_allowed_doors(self):
-        # Note this comment in models.py (RFIDkeycard.get_allowed_doors()) : 
-        # a lockuser may have more than one RFID associated with them, and each card may have
-        # more different door access.  So th    en this would return doors that are not actually associated with this RFID, but
-        # all doors associated with that lockuser. But the idea of a user having more than one card ju    st brings up a host of
-        # problems, including wasting cards; this issue here; more complicated queries that may take more time... So do we assume
-        # one keycard per lockuser, then, set in stone?
-            pass
+
+            Door id = 2, name = 'Door x':
+                allowed rfids:
+                        Michael
+                        Tito
+                not allowed:
+                        Michael
+                        Janet (TO DO -- pending code for inactive RFIDkeycards)
+
+                        Latoya (TO DO -- pending code for inactive RFIDkeycards)
+
+            Door id=3, name='Narnia':
+                allowed rfids:  none
+                                (though Latoya has perms for Narnia, she is deactivated (TO DO - pending code for inactive RFIDkeycards))
+                not allowed:
+                        Janet,
+                        Michael,
+                        Tito,
+                        Latoya
+
+            And Latoya Jackson is not allowed anywhere, because inactive, but has door perms for Narnia  (TO DO - pending code for inactive RFIDkeycards)
+        """
+        c = Client()
+        fixtures = ['checks.json']  # early version of fixture, pending (at least) code for inactive RFIDkeycards
+
+        # url: door/(?P<doorid>\d+)/getallowed/$
+        # view: get_allowed_rfids(request, doorid=None)
+        pass

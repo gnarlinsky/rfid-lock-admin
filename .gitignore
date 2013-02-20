@@ -17,6 +17,7 @@ activate
 *.swo
 # link:
 django
+expanded_comments.txt
 
 # Compiled source #
 ###################

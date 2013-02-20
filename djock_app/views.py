@@ -8,16 +8,8 @@ import random
 # pseudocoding how to  handle the incoming request to verify rfid
 # I think we discussed two ways of verifying: id 
 #   - primary: /door/<door_id>/check/<rfid_id>
-#   - secondary (if stuff is down): cached version on arduino????
-"""
-def is_allowed(request, rfid, door):
-    alloweds = door.get_allowed_rfids()
+#   - secondary (if stuff is down): cached version on arduino -- but obv no code here for that
 
-    if rfid in alloweds:
-        return HttpResponse with 1
-    else:
-        0
-"""
 
 # TO DO: tests for get_all_allowed (across doors); e.g. all_allowed/
 # tests for URLS with door id's as well, e.g. all_allowed/door/x
@@ -34,14 +26,10 @@ def get_allowed_rfids(request, doorid=None):
     # if door id not valid, return ""
     doors = Door.objects.filter(pk=doorid)    # doorid should not be pk; note, get returns an error if no such door; filter returns an empty list
     if doors:
-        response = doors[0].get_allowed_rfids()
+        response = ",".join(doors[0].get_allowed_rfids())
     if not response: 
         response = 0  # make sure not going to return empty set
     return HttpResponse(response)
-    
-     
-
-    
 
 
 # TO DO: refactor below.. to return more immediately; 
