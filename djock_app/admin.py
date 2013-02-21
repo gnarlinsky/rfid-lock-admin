@@ -113,7 +113,12 @@ class RFIDkeycardAdmin(admin.ModelAdmin):
     ####################################################################################################
     #prepopulated_fields = { 'the_rfid': ('id',)} 
     #fields = ("the_rfid","date_revoked","date_created","id")
-    fields = ("the_rfid","lockuser")
+    fields = ("the_rfid","lockuser","date_created","date_revoked",)
+    readonly_fields = ("lockuser","date_created","date_revoked")
+    # if lockuser and date_revoked were not readonly, superuser would be able to edit these... 
+    #   Should I check for that at other levels of the code
+
+
     #readonly_fields = ("the_rfid",)   # I only see None when readonly. Maybe need to save first in RFIDkeycardForm's __init__?
                                         # But since regular staff users shouldn't see it at all... forget it. 
 

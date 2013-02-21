@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.management import create_superuser
 from django.db.models import signals
+from datetime import datetime
 
 
 ############### TO DO #############################################
@@ -41,7 +42,7 @@ class Door(models.Model):
 
         lockuser_links_list = []
         for lockuser in self.lockuser_set.all():
-            lockuser_link_html =  "<a href='../lockuser/%d/'>%s</a>" %  (lockuser.id, lockuser) 
+            lockuser_link_html =  "<a href='../lockuser/%d/'>%s</a>" %  (lockuser.id, lockuser)
             lockuser_links_list.append(lockuser_link_html)
         return ", ".join(lockuser_links_list)
 
@@ -49,7 +50,7 @@ class Door(models.Model):
     # give the method an allow_tags attribute whose value is True.
     get_allowed_lockusers_html_links.allow_tags = True
 
-    # to do: 
+    # to do:
     def get_all_access_times(self):
         pass
 
@@ -91,17 +92,17 @@ class RFIDkeycard(models.Model):
     lockuser = models.ForeignKey("LockUser")
 
     # Nope.  Don't have to do the below; just use auto_now_add
-    #def __init__(self,*args,**kwargs):   # i don't have to include args, kwargs, right? 
+    #def __init__(self,*args,**kwargs):   # i don't have to include args, kwargs, right?
     #    """ We want to automatically create the date this keycard was created/assigned. """
     #    super(RFIDkeycard, self).__init__(*args,**kwargs)
-    #    # date_created = blah blah blah        
+    #    # date_created = blah blah blah
 
     def __unicode__(self):
         # Represent keycard object with the rfid number (which may not be unique, blah blah
         #   blah, but it's a useful for showing on the page for a particular LockUser, for ex.
         return u'%s' % (self.the_rfid)
 
-    def get_date_assigned(self): 
+    def get_date_assigned(self):
         # get from __init__
         pass
 
@@ -131,17 +132,17 @@ class RFIDkeycard(models.Model):
         # lu = self.get_this_lockuser()
         # return lu.is_active()
         # The above is not going to work, because
-        #   The way the code is right now, a LockUser is active if there's an RFIDkeycard currently associated with them. If you determine an RFIDkeycard's being active by appealing to its lockusers is_active, that is not going to be correct, because then it would be true if the associated lockuser has ANY RFIDkeycard currently, not the one we're inquiring about.  So getting the lockuser_set gets any past lockusers of this keycard! ... right?  
+        #   The way the code is right now, a LockUser is active if there's an RFIDkeycard currently associated with them. If you determine an RFIDkeycard's being active by appealing to its lockusers is_active, that is not going to be correct, because then it would be true if the associated lockuser has ANY RFIDkeycard currently, not the one we're inquiring about.  So getting the lockuser_set gets any past lockusers of this keycard! ... right?
         #   So you either have to do something like check if the returned lockuser's current rfid num matches this one... Or do a separate check that only looks at whether this RFIDkeycard has a revoked date.
         #   So doing the latter:
-        if self.date_revoked: # additional checks? 
+        if self.date_revoked: # additional checks?
             return False
-        else: 
+        else:
             return True
 
 
 
-        
+
 
 class AccessTime(models.Model):
     the_rfid           = models.CharField(max_length=10,null=True) # the radio-frequency id, however represented....
@@ -149,25 +150,25 @@ class AccessTime(models.Model):
 
     def get_this_lockuser(self):
         """ Return the user's name associated with the RFID for this access time """
-        # Get RFIDkeycard (there should only be one!) with the rfid associated with this access time; 
+        # Get RFIDkeycard (there should only be one!) with the rfid associated with this access time;
         # get the lock user names associated with those RFIDkeycards
         _rfid_keycard = RFIDkeycard.objects.all().filter(the_rfid__exact=self.the_rfid)
         if _rfid_keycard:
             return _rfid_keycard[0].get_this_lockuser()
         else:
             return None
-        
+
 
 class LockUser(models.Model):
     """ (Despite the misleading name, LockUsers are not subclassed Users, but subclassed Models.) """
 
 
     ################################################################################
-    # doors should be limited to the Doors, and should show up as checkable items for a specific LockUser. 
+    # doors should be limited to the Doors, and should show up as checkable items for a specific LockUser.
     ################################################################################
     # (Also, which specific doors are check-able/show up should depend on the permissions [or staff vs
     # superuser, etc.] for the person doing the assigning. E.g. someone only involved with the Bike Project
-    # shouldn't be able to assign keycard access to the Makerspace door. 
+    # shouldn't be able to assign keycard access to the Makerspace door.
     doors = models.ManyToManyField(Door,blank=True)
 
     ####################################################################
@@ -181,22 +182,33 @@ class LockUser(models.Model):
     phone_number    = models.IntegerField(max_length=30,null=True,blank=True) # later - required
     birthdate       = models.DateField(null=True)
 
+    # Is this person allowed access? (Non-superuser staff should not have the ability to delete models --
+    # but rather to DEACTIVATE.)
+    #   Note that a lockuser can be activated, but have no keycard. 
+    activate       =   models.BooleanField(default=False)   #i.e. defaults to deactivated
 
-    # but a lock user could be still be active without having a current rfid... We could define active as having a current rfid, but
-    # that doesn't seem intuitive.... So just doing a field instead of this: 
-    def is_active(self):
-        """ Determine whether this lock user is active, based on whether they have a current active rfid
-         and whether staff has chosen to deactivate"""
-        if activate == False:   # staff user is trying to deactivate this lockuser
-            return False
-        if self.get_current_rfid():
-            return True
-        else:
-            return False
+    def save(self, *args, **kwargs):
+        # saving before any work with keys and m2m, to obtain self.id
+        lu = super(LockUser, self).save(*args, **kwargs)
+        #rfid_keycards = RFIDkeycard.objects.filter(...)
 
-    # Is this person allowed access? (Non-superuser staff should not have the ability to delete models -- 
-    # but rather to DEACTIVATE.) 
-    activate       =   models.BooleanField(default=False)   #i.e. defaults to NOT activated
+        # If the Lockuser has been deactivated, its current keycard should be deactivated as well,
+        #   so we assign it a date revoked here
+        #if lu.activate == False:   # not self.activate?
+        if self.activate == False:   # not self.activate?
+            try:
+                current_keycard = self.get_current_rfid()[0]   # self or lu? 
+            except:
+                current_keycard = None
+            if current_keycard: 
+                # there should be at most one... for now just get the first one
+                current_keycard.date_revoked == datetime.now()
+                current_keycard.save()# save keycard if you have changed it
+
+        # save obj again if you want
+        #lu.save()
+        return lu
+
 
 
 
@@ -208,7 +220,7 @@ class LockUser(models.Model):
     #   can have multiple RFIDkeycards (though only one can be active
     #   at a time).
     #   - So now we have a ForeignKeyField in **RFIDkeycard** to LockUser,
-    #   - with unique=True, meaning that in the RFIDkeycard table, the
+    #   - with unique=True, meaning that in the RFIDkeycard table, 
     #     each LockUser field must be unique (i.e. no sharing of keycards)
     #
     #      - so rfids changes from a field to get_rfids()?  How to get
@@ -230,7 +242,7 @@ class LockUser(models.Model):
         """
         #_rfid_keycards = self.rfids.all()   # or call get_all_rfids for consistency
         _rfid_keycards = self.get_all_rfids()
-        _curr_rfid = _rfid_keycards.filter(date_revoked=None)  # note there can be more than one
+        _curr_rfid = _rfid_keycards.filter(date_revoked=None)  
         return _curr_rfid
        
     def prettify_get_current_rfid(self):

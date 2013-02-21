@@ -69,7 +69,7 @@
                     
         <div class="submit-row"> 
                 {% comment %} using STATIC_URL for *my* static/ files; otherwise it's Django admin's originals {% endcomment %}
-                 {% if  not object_id|is_lockuser_active %} 
+                 {% if  not object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %} 
                         <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids_40" onclick="return showAddAnotherPopup(this);">
                         <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign keycard and activate user 
                     </a>
@@ -86,6 +86,10 @@
                     <a href="/" class="add-another" id="add_id_rfids" onclick="return showAddAnotherPopup(this);"> 
                         <img src="/static/admin/img/icon_deletelink.gif " width="10" height="10"> Deactivate current keycard 
                     </a>
+                    {% comment %} Should not happen: 
+                 {% if  not object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
+                 {% endcomment %}
+                 
                  {% endif %}
                     </div> {% comment %} end nk submit-row {% endcomment %}
     {%  endif  %}
