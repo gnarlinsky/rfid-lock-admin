@@ -1,8 +1,9 @@
 #from django.views.generic.simple import redirect_to, direct_to_template
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 from djock_app.models import Door, LockUser, RFIDkeycard, AccessTime
 import random
+from datetime import datetime
 
 
 # pseudocoding how to  handle the incoming request to verify rfid
@@ -68,7 +69,15 @@ def check(request,doorid, rfid):
 """
 
 
+def deactivate_keycard(request,object_id):
+    """ object_id was in the url -- it contains the id of the lockuser that needs its
+    current keycard deactivated. 
+        I.e. - get this lockuser's current keycard
+             - set this keycard's date_revoked to now
+    """
 
+    ######   Do I save() either keycard or lockuser object???????????
+    return render(request, 'basic.html')
     
     
 
@@ -101,30 +110,4 @@ ON ASSIGNING NEW KEYCARD:
 - Clicking on that button should  result in the same thing that scanning in a new card should result in.  
 -  For now, just generate some random long number. 
 - Then create a new keycard with that number
-
-If there is already a keycard assigned, but deactivated, show a REactivate button. 
-        just set the is_active to True. 
-
-
-So this was in admin.py.........
-    def make_active(self, request, queryset):
-        # check if REactivating
-        queryset = blah blah
-        queryset.update(is_active=True)
-
-    def make_inactive(self, request, queryset):
-        queryset = blah blah
-        queryset.update(is_active=False)
-
-
-ON CHECKING IF AN RFID/KEY IN THE URL IS APPROVED FOR THE SPECIFIED DOOR(S):
-- Get the door object for the (slugified?) door name in the url
-- Get the QuerySet of associated RFIDkeycards
-- Filter those for RFIDkeycard's rfid_num = rfid num in url
-
-
-LATER........
-- When a user is modified or added (in terms of being active at all or more/fewer doors access), e-mail all the staff. 
 """
-
-

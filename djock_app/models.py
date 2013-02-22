@@ -188,26 +188,46 @@ class LockUser(models.Model):
     activate       =   models.BooleanField(default=False)   #i.e. defaults to deactivated
 
     def save(self, *args, **kwargs):
+        """If the Lockuser has been deactivated, its current keycard should be deactivated 
+        as well,  so we assign it a date revoked here """
+        
+        print "========> self.activate before: ", self.activate
+        #print "========> current_keycard before: ", self.get_current_rfid()[0]
+        super(LockUser, self).save(*args, **kwargs)
+        print "***************** HERE IN SAVE() *****************"
+        print "\t\t========> self.activate after: ", self.activate
+
+        # ??????????????????????????????????????????????
         # saving before any work with keys and m2m, to obtain self.id
-        lu = super(LockUser, self).save(*args, **kwargs)
+        #super(LockUser, self).save(*args, **kwargs)
+
+
         #rfid_keycards = RFIDkeycard.objects.filter(...)
 
-        # If the Lockuser has been deactivated, its current keycard should be deactivated as well,
-        #   so we assign it a date revoked here
         #if lu.activate == False:   # not self.activate?
+        print "\t************checking self.activate"
         if self.activate == False:   # not self.activate?
             try:
+                print "\tnow in try"
+                # there should be at most one... for now just get the first one
                 current_keycard = self.get_current_rfid()[0]   # self or lu? 
             except:
                 current_keycard = None
+                print "\tnow in except"
+            # moving this up into the try
             if current_keycard: 
-                # there should be at most one... for now just get the first one
-                current_keycard.date_revoked == datetime.now()
+                print "\twhat's up with ", current_keycard, "????????????????????????????????????"
+                print "\t\t date revoked before: ", current_keycard.date_revoked
+                print "\t\t\t\t datetime.now: ", datetime.now()
+                current_keycard.date_revoked = datetime.now()
+                print "\t\t date revoked AFTER: ", current_keycard.date_revoked
                 current_keycard.save()# save keycard if you have changed it
+                print "\t\t date revoked AFTER AFTER: ", current_keycard.date_revoked
+        #print "\t\t========> current_keycard AFTER: ", self.get_current_rfid()[0]
 
         # save obj again if you want
         #lu.save()
-        return lu
+        #return lu
 
 
 

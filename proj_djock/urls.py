@@ -85,6 +85,7 @@ urlpatterns = patterns('',
     url(r'^t/$', direct_to_template, {'template': 'test/index.html' }    ),
     #url(r'fake/$', 'djock_app.views.fake_assign' ), 
 
+    url(r'^deactivate_keycard/<?P<object_id>\d+/$', views.deactivate_keycard),
 )
 
 

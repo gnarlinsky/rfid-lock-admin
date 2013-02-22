@@ -83,7 +83,7 @@
 
                  {% elif  object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
                     <img src="{{ STATIC_URL }}/admin/img/disabled_icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign new keycard
-                    <a href="/" class="add-another" id="add_id_rfids" onclick="return showAddAnotherPopup(this);"> 
+                    <a href="/deactivate_keycard/"> 
                         <img src="/static/admin/img/icon_deletelink.gif " width="10" height="10"> Deactivate current keycard 
                     </a>
                     {% comment %} Should not happen: 
