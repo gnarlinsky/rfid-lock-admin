@@ -133,7 +133,7 @@ class RFIDkeycardInline(admin.TabularInline):
     """ The inline form that staff users will see. """
     form = RFIDkeycardForm
     model = RFIDkeycard
-    extra = 0  # how many inline objects to add at a time
+    extra = 0  # how many inline objects to add a time/how many blank inlines to show
 
     can_delete = False # Specifies whether or not inline objects can be deleted in the inline.
 
@@ -152,6 +152,16 @@ class RFIDkeycardInline(admin.TabularInline):
     #fields['the_rfid'].initial = str(random.randint(0000000000,9999999999)) # rfid's should be 10 char long... just str'ing ints, because I don't want to mess with random crap anymore.
 
 
+    def queryset(self,request):
+        """
+            Limit the existing RFIDkeycard objects displayed inline on LockUser's change_form. Don't show any - 
+            - - only the "+" should be there,
+        """ 
+        # temporarily show some keycards there, for debugging
+        rfk_queryset = super(RFIDkeycardInline, self).queryset(request).none() # creates an EmptyQueryset  
+        return rfk_queryset
+
+
 class LockUserAdmin(admin.ModelAdmin):
     inlines = [RFIDkeycardInline]
 
@@ -161,19 +171,32 @@ class LockUserAdmin(admin.ModelAdmin):
     # Page listing all LockUsers ("change list" page):
     ####################################################
 
-    ####  no!  creating views to activate/deactivate that are more complex now, so these may
-    # reference those instead of just independent updates
+
+    #-------------------
+    # Actions dropdown
+    #------------------
     def make_active(self, request, queryset):
         """ Staff should not have the ability to delete LockUsers, only to DEACTIVATE them.  """
- #       queryset.update(is_active=True)
-        pass
+        queryset.update(activate=True)
+        # Must save after update(), since update()  doesn't run any save() methods on your models, or emit the pre_save
+        # or post_save signals (which are a consequence of calling save()).
+        for obj in queryset:
+            obj.save()    
     make_active.short_description = "Activate selected lock users"
 
     def make_inactive(self, request, queryset):
         """ Staff should not have the ability to delete LockUsers, only to DEACTIVATE them. """
-        #queryset.update(is_active=False)
-        pass
+        queryset.update(activate=False)
+        for obj in queryset:
+            obj.save()    #otherwise associated keycard won't become deactivated
     make_inactive.short_description = "Deactivate selected lock users"
+
+    def deactivate_keycard(self, request, queryset):
+        """ Deactivate associated keycard """
+        queryset.update(deactivate_current_keycard=True)
+        for obj in queryset:
+            obj.save()    
+    deactivate_keycard.short_description = "Deactivate selected lock users' keycards"
 
     def email_selected(self, request, queryset):
         """ Upon choosing this action, get new screen with field for entering body of email, etc. """
@@ -182,8 +205,13 @@ class LockUserAdmin(admin.ModelAdmin):
 
     # Only the following actions will be shown in the dropdown
     #actions = (activate_keycard, deactivate_keycard, reactivate_keycard, make_active, make_inactive,email_selected)
-    actions = (make_active, make_inactive,email_selected)
+    actions = (make_active, make_inactive, deactivate_keycard, email_selected)
 
+
+    
+    #-------------------------
+    # Which fields to display
+    #-------------------------
     # fields (i.e. column headings)
     list_display = ('first_name','last_name','email',\
                     'prettify_get_current_rfid','prettify_get_all_rfids',\
@@ -251,7 +279,7 @@ class LockUserAdmin(admin.ModelAdmin):
 
 
      
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
         """ 'Like the formfield_for_foreignkey method, the formfield_for_manytomany method can be overridden to change the default formfield for a many to many field. '  - django docs;
         Here, need specific behavior for rfid keycards and Doors"""
 
@@ -268,6 +296,7 @@ class LockUserAdmin(admin.ModelAdmin):
             kwargs["queryset"] = RFIDkeycard.objects.all()  
         
 
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
         ################
         #  doors
         ################
