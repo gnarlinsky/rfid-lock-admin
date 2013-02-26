@@ -13,7 +13,7 @@
                 <div{% if not line.fields|length_is:'1' %} class="field-box{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% if not field.is_readonly and field.errors %} errors{% endif %}"{% endif %}>
 
 
-                {% comment %} If this is an RFIDkeycard inline/popup (indicating that we're adding a new keycard to an EXISTING lockuser/ got here from lockuser change page -- so
+                {% comment %} If this is an RFIDkeycard popup (indicating that we're adding a new keycard to an EXISTING lockuser/ got here from lockuser change page -- so
                 we don't want the circular confusion of having the lockusers field show up there {% endcomment %}
                 {% if field.field.name == "lockuser" and is_popup %}
                     <select name="lockuser" id="id_lockuser" style="display:none;">   {% comment %}  display:none because want this hidden {% endcomment %}

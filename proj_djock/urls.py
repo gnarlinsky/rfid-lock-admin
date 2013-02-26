@@ -78,14 +78,15 @@ urlpatterns = patterns('',
     url(r'door/(?P<doorid>\d+)/getallowed/$', views.get_allowed_rfids ), 
     url(r'^checkdoor/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'admin/we_are_ok.html' }    ),
 
-    # Uncomment the admin/doc line below to enable admin documentation:
-    #url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'deactivate_keycard/(?P<object_id>\d+)/$', views.deactivate_keycard),
 
     # testing stuff/temp
     url(r'^t/$', direct_to_template, {'template': 'test/index.html' }    ),
     #url(r'fake/$', 'djock_app.views.fake_assign' ), 
 
-    url(r'^deactivate_keycard/<?P<object_id>\d+/$', views.deactivate_keycard),
+    # Uncomment the admin/doc line below to enable admin documentation:
+    #url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+
 )
 
 

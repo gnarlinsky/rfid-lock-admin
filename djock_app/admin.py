@@ -100,11 +100,8 @@ class RFIDkeycardForm(ModelForm):
 #
 
 class RFIDkeycardAdmin(admin.ModelAdmin):
+    form = RFIDkeycardForm # prepopulating with random num
 
-    # playing with prepopulating stuff 
-    form = RFIDkeycardForm
-
-    #inlines = (OpenershipInline,)
     list_display = ["the_rfid","id", "date_created","date_revoked","is_active", "lockuser",
                     "get_allowed_doors_html_links"]
 
@@ -113,9 +110,8 @@ class RFIDkeycardAdmin(admin.ModelAdmin):
     ####################################################################################################
     #prepopulated_fields = { 'the_rfid': ('id',)} 
     #fields = ("the_rfid","date_revoked","date_created","id")
-    fields = ("the_rfid","lockuser","date_created","date_revoked",)
-    readonly_fields = ("date_created","date_revoked")
-    # if date_revoked were not readonly, superuser would be able to edit these... 
+    fields = ("the_rfid","lockuser","date_created","date_revoked","is_active","get_allowed_doors")  # here showing fields wouldn't show to a staff user, since the real (not inline) RFIDkeycard change_form would only be visible to superuser.
+    readonly_fields = ("date_created","is_active","get_allowed_doors")
     #   Should I check for that at other levels of the code
     # lockuser should be editable after creation....  But it should show only one lockuser in the
     # dropdown, so theoretically it's ok. 
@@ -132,12 +128,32 @@ class RFIDkeycardAdmin(admin.ModelAdmin):
       # exist" if I have "the_rfid" ????!!!
 
 
-class RFIDkeycardInline(admin.StackedInline):
+#class RFIDkeycardInline(admin.StackedInline):
+class RFIDkeycardInline(admin.TabularInline):
+    """ The inline form that staff users will see. """
+    form = RFIDkeycardForm
     model = RFIDkeycard
-    #extra = 1
+    extra = 0  # how many inline objects to add at a time
+
+    can_delete = False # Specifies whether or not inline objects can be deleted in the inline.
+
+    fields = ("the_rfid","lockuser","date_created","date_revoked","is_active")
+    readonly_fields = ("date_created","date_revoked","is_active")   # TO DO:  show date_created, date_revoked (along with some other fields?) only on existing keycards, not at creation time. 
+
+    # override __init__ to prepopulate the_rfid field with a random number, just to 
+    #   simulate assigning a new card
+    """
+    def __init__(self, *args, **kwargs):
+        super(RFIDkeycardInline, self).__init__(*args, **kwargs)
+        self.fields['the_rfid'] = IntegerField(help_text = "(This is a random number to simulate getting a new keycard number after it's scanned in.<br>Only superuser can actually see the number.)")
+        self.fields['the_rfid'].initial = str(random.randint(0000000000,9999999999)) # rfid's should be 10 char long... just str'ing ints, because I don't want to mess with random crap anymore.
+    """
+    #fields['the_rfid'] = IntegerField(help_text = "(This is a random number to simulate getting a new keycard number after it's scanned in.<br>Only superuser can actually see the number.)")
+    #fields['the_rfid'].initial = str(random.randint(0000000000,9999999999)) # rfid's should be 10 char long... just str'ing ints, because I don't want to mess with random crap anymore.
+
 
 class LockUserAdmin(admin.ModelAdmin):
-    #inlines = [RFIDkeycardInline]
+    inlines = [RFIDkeycardInline]
 
 
 
@@ -201,6 +217,7 @@ class LockUserAdmin(admin.ModelAdmin):
                             #'is_active', \
                             'activate', \
                             'doors',
+                            'deactivate_current_keycard',
                           #  'rfids',
                             ),
 

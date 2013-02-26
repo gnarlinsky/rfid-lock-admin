@@ -8,6 +8,8 @@ from django.contrib.auth import models as auth_models
 from django.contrib.auth.management import create_superuser
 from django.db.models import signals
 from datetime import datetime
+from django.utils.timezone import utc
+
 
 
 ############### TO DO #############################################
@@ -91,6 +93,7 @@ class RFIDkeycard(models.Model):
     ####################################################################
     lockuser = models.ForeignKey("LockUser")
 
+
     # Nope.  Don't have to do the below; just use auto_now_add
     #def __init__(self,*args,**kwargs):   # i don't have to include args, kwargs, right?
     #    """ We want to automatically create the date this keycard was created/assigned. """
@@ -129,19 +132,39 @@ class RFIDkeycard(models.Model):
     get_allowed_doors_html_links.allow_tags = True
 
     def is_active(self):
-        # lu = self.get_this_lockuser()
-        # return lu.is_active()
-        # The above is not going to work, because
-        #   The way the code is right now, a LockUser is active if there's an RFIDkeycard currently associated with them. If you determine an RFIDkeycard's being active by appealing to its lockusers is_active, that is not going to be correct, because then it would be true if the associated lockuser has ANY RFIDkeycard currently, not the one we're inquiring about.  So getting the lockuser_set gets any past lockusers of this keycard! ... right?
-        #   So you either have to do something like check if the returned lockuser's current rfid num matches this one... Or do a separate check that only looks at whether this RFIDkeycard has a revoked date.
-        #   So doing the latter:
         if self.date_revoked: # additional checks?
             return False
         else:
             return True
 
+    def deactivate(self):
+        # When time zone support is enabled, Django uses time-zone-aware 
+        # datetime objects. If your code creates datetime objects, they should
+        # be aware too.
+        #now = datetime.now()
+        now = datetime.utcnow().replace(tzinfo=utc)
+        self.date_revoked = now
 
 
+    def save(self,*args,**kwargs):
+        """ Overriding save():  When assign new keycard, if the LockUser was inactive before, they will
+        automatically become active.
+        """
+        # Check if the object is in the database yet. If no pk, means it hasn't
+        #   been saved yet -- i.e. we're creating this RFIDkeycard. Note that 
+        #   at this point, other attributes *are* available, like lockuser, 
+        #   they just haven't been saved yet.
+        if not self.pk:  
+            if self.lockuser.activate == False: 
+                # activate the keycard's lock user, and save
+                self.lockuser.activate = True
+                self.lockuser.save()
+        
+        # and now save the keycard itself
+        super(RFIDkeycard,self).save(*args,**kwargs)
+
+
+        
 
 
 class AccessTime(models.Model):
@@ -187,49 +210,52 @@ class LockUser(models.Model):
     #   Note that a lockuser can be activated, but have no keycard. 
     activate       =   models.BooleanField(default=False)   #i.e. defaults to deactivated
 
+    # "Deactivate keycard?" on LockUser, RFIDkeycard change_form:
+    deactivate_current_keycard = models.BooleanField(default=False)    # So, upon creation, the RFIDkeycard is activated automatically
+
     def save(self, *args, **kwargs):
-        """If the Lockuser has been deactivated, its current keycard should be deactivated 
-        as well,  so we assign it a date revoked here """
-        
-        print "========> self.activate before: ", self.activate
-        #print "========> current_keycard before: ", self.get_current_rfid()[0]
-        super(LockUser, self).save(*args, **kwargs)
-        print "***************** HERE IN SAVE() *****************"
-        print "\t\t========> self.activate after: ", self.activate
-
-        # ??????????????????????????????????????????????
+        """ Why overriding save(): 
+            - If the Lockuser has been deactivated, its current keycard should be deactivated as well.
+            - We'll deactivate a LockUser's current keycard here, if deactivate_current_keycard is checked
+              on the LockUser's change_form. 
+        """
         # saving before any work with keys and m2m, to obtain self.id
-        #super(LockUser, self).save(*args, **kwargs)
-
+        super(LockUser, self).save(*args, **kwargs)
 
         #rfid_keycards = RFIDkeycard.objects.filter(...)
 
-        #if lu.activate == False:   # not self.activate?
-        print "\t************checking self.activate"
-        if self.activate == False:   # not self.activate?
-            try:
-                print "\tnow in try"
-                # there should be at most one... for now just get the first one
-                current_keycard = self.get_current_rfid()[0]   # self or lu? 
-            except:
-                current_keycard = None
-                print "\tnow in except"
-            # moving this up into the try
-            if current_keycard: 
-                print "\twhat's up with ", current_keycard, "????????????????????????????????????"
-                print "\t\t date revoked before: ", current_keycard.date_revoked
-                print "\t\t\t\t datetime.now: ", datetime.now()
-                current_keycard.date_revoked = datetime.now()
-                print "\t\t date revoked AFTER: ", current_keycard.date_revoked
-                current_keycard.save()# save keycard if you have changed it
-                print "\t\t date revoked AFTER AFTER: ", current_keycard.date_revoked
-        #print "\t\t========> current_keycard AFTER: ", self.get_current_rfid()[0]
+        try:
+            # there should be at most one... for now just get the first one
+            current_keycard = self.get_current_rfid()[0]   # self or lu? 
+        except:
+            current_keycard = None
 
+        # If the Lockuser has been deactivated, its current keycard should be deactivated as well.
+        #if lu.activate == False:   # not self.activate?
+        # Note that it would seem that this conditional would actually also
+        # cover the case where just created a current keycard, and need to 
+        # automatically set user to be activated.  However, we can do that in the
+        # RFIDkeycard's save(), since there we can check whether RFIDkeycard
+        # object was just created
+        if current_keycard and self.activate == False:   
+            #current_keycard.date_revoked = datetime.now()
+            current_keycard.deactivate()
+            current_keycard.save()# save keycard if you have changed it
+
+        # We'll deactivate a LockUser's current keycard here, if deactivate_current_keycard is checked on the LockUser's change_form. 
+        if current_keycard and self.deactivate_current_keycard:
+            #current_keycard.date_revoked = datetime.now()
+            current_keycard.deactivate()
+            current_keycard.save()# save keycard since have changed it
+
+            self.deactivate_current_keycard = False   # because no current keycard to deactivate anymore
+
+            super(LockUser, self).save(*args, **kwargs)  # save again
+
+            
         # save obj again if you want
         #lu.save()
         #return lu
-
-
 
 
     #rfids            = models.ManyToManyField("RFIDkeycard", help_text = "(Fake-assign new keycard)", blank=True)  # the field labeled "rfids" should not be required -- it's ok to have an active LockUser that is not currently assigned a keycard.

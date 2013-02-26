@@ -37,6 +37,19 @@ from django.contrib.contenttypes.models import ContentType
 # - can't add a lockuser/create a lockuser with no door permissions. 
 #
 # - After deactivating keycard from LockUser's change_form, do we come back to the change_form?
+#
+# - In the inline form for RFIDkeycards (on LockUser change_form):
+#       - show date_created (along with some other fields?) only on
+#       existing keycards, not at creation time.
+#       - never show date_revoked and certain other fields to staff users
+#
+# ----------------------------------------
+# stuff having to do with overriding save()'s
+# ----------------------------------------
+# - When assign new keycard, if the LockUser was inactive before, they will automatically become active.
+# - If the Lockuser has been deactivated, its current keycard should be deactivated as well.
+# - We'll deactivate a LockUser's current keycard here, if deactivate_current_keycard is checked
+#   on the LockUser's change_form. 
 
 
 

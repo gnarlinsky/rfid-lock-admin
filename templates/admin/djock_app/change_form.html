@@ -17,34 +17,29 @@
             <p>http://192.168.x.x:8080/checkdoor/doorid/checkrfid/rfid/ (if ran ./manage.py runserver 192.168.x.x:8080)</p>
             <h5> OK, got it. Click "Save" to finish creating new keycard.</h5>
             </center>
-        {% if is_popup %}   {% comment %} should indicate that we're adding a new keycard to an EXISTING lockuser/ got here from lockuser change page {% endcomment %}
-                <h1>!!!!!!</h1>
-                {{ object_id }}
-                <h1>!!!!!!</h1>
-                <h1>Here's original object's id: 
-                <p> {{ request.META.HTTP_REFERER|get_original_id }}
-                </h1>
-                <hr> <h1> so we'd need, instead of the whole form-row field-lockuser (have to go back into
-                fieldset? ).......  if yeah... can I get object_id there??????
-                
-                </h1>
-{% comment %} 
-                <div>
-                        <label for="id_lockuser" class="required">Lockuser:</label>
-                            <select name="lockuser" id="id_lockuser">
+
+        {% comment %} should indicate that we're adding a new keycard to an EXISTING lockuser/ got here from lockuser change page {% endcomment %}
+    {% comment %} 
+        {% if is_popup %}   
+            <h1>!!!!!!</h1>
+            {{ object_id }}
+            <h1>!!!!!!</h1>
+            <h1>Here's original object's id: 
+            <p> {{ request.META.HTTP_REFERER|get_original_id }}
+            </h1>
+            <hr> <h1> so we'd need, instead of the whole form-row field-lockuser (have to go back into
+            fieldset? ).......  if yeah... can I get object_id there??????
+            
+            </h1>
+            <div>
+                    <label for="id_lockuser" class="required">Lockuser:</label>
+                        <select name="lockuser" id="id_lockuser">
 <option value="{{ request.META.HTTP_REFERER|get_original_id }}" selected="selected">{{ request.META.HTTP_REFERER|get_original_id }}</option>
 </select>
-                </div>
-{% endcomment %} 
-                <hr>
-                <hr>
-                <hr>
-                <hr>
-                <hr>
-                <hr>
-                <hr>
+            </div>
 
         {% endif %}
+    {% endcomment %} 
 
     {% endif %} {% comment %} end nk for this block {% endcomment %}
     {% if change %}{% if not is_popup %}
@@ -54,6 +49,23 @@
     {% endif %}{% endif %}
 {% endblock %} {% comment %}  end object-tools block  {% endcomment %}
 
+
+
+{% comment %}  Overriding inline form for RFIDkeycard on LockUser's change_form {% endcomment %}
+{% block inline_field_sets %}
+{% for inline_admin_formset in inline_admin_formsets %}
+
+    {% comment %}
+        admin/edit_inline/tabular.html  or admin/edit_inline/stacked.html. 
+        So, since I need similar behavior to that of my fieldset.html (for keycard activation) , 
+        going to create a modified template based on tabular.html. 
+    {% endcomment %}
+    {% include "admin/edit_inline/tabular_with_rfidkeycard_special.html" %}
+    {% comment %} {% include inline_admin_formset.opts.template %} {% endcomment %}
+
+
+{% endfor %}
+{% endblock %}
 
 
 
@@ -83,7 +95,7 @@
 
                  {% elif  object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
                     <img src="{{ STATIC_URL }}/admin/img/disabled_icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign new keycard
-                    <a href="/deactivate_keycard/"> 
+                    <a href="/deactivate_keycard/{{object_id}}"> 
                         <img src="/static/admin/img/icon_deletelink.gif " width="10" height="10"> Deactivate current keycard 
                     </a>
                     {% comment %} Should not happen: 

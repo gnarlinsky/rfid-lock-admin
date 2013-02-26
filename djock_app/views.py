@@ -1,6 +1,5 @@
-#from django.views.generic.simple import redirect_to, direct_to_template
 from django.http import HttpResponse
-from django.shortcuts import render_to_response, render
+from django.shortcuts import render_to_response, render, redirect
 from djock_app.models import Door, LockUser, RFIDkeycard, AccessTime
 import random
 from datetime import datetime
@@ -73,12 +72,37 @@ def deactivate_keycard(request,object_id):
     """ object_id was in the url -- it contains the id of the lockuser that needs its
     current keycard deactivated. 
         I.e. - get this lockuser's current keycard
-             - set this keycard's date_revoked to now
+             - deactivate it (set this keycard's date_revoked to now)
     """
 
-    ######   Do I save() either keycard or lockuser object???????????
-    return render(request, 'basic.html')
-    
+    # to do: exceptions
+    try:
+        lu = LockUser.objects.filter(id=object_id)[0]
+        rfk = lu.get_current_rfid()[0]
+    except:
+        # raise exception?
+        return render(request,'basic.html')
+    print "********* object_id is ", object_id
+    print "\ti.e. the lockuser is ", lu
+    print "\t and their keycard: ", rfk
+    print "\t keycard is active? ", rfk.is_active()
+    print "\t keycard's date revoked ", rfk.date_revoked
+
+    #if rfk.is_active():
+        #rfk.date_revoked = datetime.now()
+        #rfk.save()
+    rfk.deactivate()
+    print "\t AFTER - keycard's date revoked ", rfk.date_revoked
+    print "\t AFTER - is_active(): ", rfk.is_active()
+    rfk.save()   # save RFIDkeycard object
+
+    #return render(request, 'basic.html')
+    #return HttpResponse(request,
+
+    # back to the lockuser's (the one who we deactivated the card for) change_form
+    back_to_lockuser = "/lockadmin/djock_app/lockuser/%s/" % lu.id
+    return redirect(back_to_lockuser)
+    #return redirect(lu)
     
 
 #generate a random number to simulate an actual keycard being scanned in and the num retrieved """
