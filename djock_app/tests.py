@@ -24,11 +24,20 @@ from django.contrib.contenttypes.models import ContentType
 # - what happens when you have a lockuser with a specific door perm, but you delete the door? 
 # - what happens to an rfidkeycard when its active or not active lockuser has been deleted? 
 #
+# - RFIDkeycard: if date_revoked is not None, deactivate field should be False; otherwise, deactivate
+# should be True
+#
+# - Deactivating a LockUser:  should deactivate LockUser's RFIDkeycard
+# - Deactivating RFIDkeycard: should NOT deactivate its LockUser
+#
 # ----------------------------------------
 #  post fk/m2m change: 
 # ----------------------------------------
-# - rfidkeycard: can't add a lockuser that already has an active keycard
-# - rfidkeycard: can't add a lockuser/create a lockuser with no door permissions. 
+# - can't add a lockuser that already has an active keycard
+# - can't add a lockuser/create a lockuser with no door permissions. 
+#
+# - After deactivating keycard from LockUser's change_form, do we come back to the change_form?
+
 
 
 #######################################################################################
