@@ -24,6 +24,7 @@
      </tr></thead>
 
      <tbody>
+
      {% for inline_admin_form in inline_admin_formset %}
 
         {% if inline_admin_form.form.non_field_errors %}
@@ -35,36 +36,47 @@
 
 
         <td class="original">
-
          {% comment %} nk changes .............  Since I need special behavior for an inline RFIDkeycard, using a a modified template based on tabular.html. 
              To do:  - smarter way to do this, not using verbose_name ?
                      - why is there a space -   "rfi dkeycard"???
         {% endcomment %}
         {% if inline_admin_formset.opts.verbose_name == "rfi dkeycard" %} 
-        <table>
-                <center>
-                    <font color="red">
-                        <h5>Go scan in a new card........</h5>
-                        <h5>..................... waiting .....................</h5>
-                    </font>
-                    <font color="orange">
-                        <h5>(Be the Arduino and go to
-                        http://192.168.x.x:port_num/checkdoor/doorid/checkrfid/rfid/ (if ran ./manage.py runserver 192.168.x.x:port_num)<h5>
-                    </font>
-                    <font color="green"> 
-                        <h5> OK, got it. Click "Save" to finish creating new keycard.</h5>
-                    </font>
-                </center>
-                </td>
-        </table>
+                    Click "Scan new card," then scan the keycard<br> to be assigned at (any) door
+                    lock.<br> (Note: will time out after 2 minutes.)<br>
+                     <button><a href="/start_scan/{{object_id}}/">Scan new card</a></button><br><br>
+                    {% comment %}
+                     <button><a href="/start_scan/">Scan new card</a></button><br><br>
+                    {% endcomment %}
+                    <i>(I.e.  (Be the Arduino and go to<br>
+                    http://192.168.x.x:port_num/checkdoor/doorid/checkrfid/rfid/<br> (if ran ./manage.py
+                    runserver 192.168.x.x:port_num))</i><br><br>
+                     Click "Done" when you're finished scanning.<br>
+                     <button><a href="/done_scan/{{object_id}}/">Done</a></button><br><br>
+                    <i>After "Done," the new keycard should be available....  For staff users, the
+                    indications that a keycard is assigned: can now deactivate current keycard;
+                    ______</i><br><br>
+                    [ Here's test_return_message: {{ test_return_message }} ]
+
+                    [ And here's the messages block: ] 
+                        {% if messages %}
+                        <ul class="messages">
+                          {% for message in messages %}
+                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                                {{ message }}
+                            </li>
+                              {% endfor %}
+                          </ul>
+                          {% endif %}
         {% endif %} {% comment %} end nk changes for this part (so the else: proceed as normal)   {% endcomment %}
 
 
 
-          {% if inline_admin_form.original or inline_admin_form.show_url %}<p>
-          {% if inline_admin_form.original %} {{ inline_admin_form.original }}{% endif %}
-          {% if inline_admin_form.show_url %}<a href="../../../r/{{ inline_admin_form.original_content_type_id }}/{{ inline_admin_form.original.id }}/">{% trans "View on site" %}</a>{% endif %}
-            </p>{% endif %}
+          {% if inline_admin_form.original or inline_admin_form.show_url %}
+              <p>
+              {% if inline_admin_form.original %} {{ inline_admin_form.original }}{% endif %}
+              {% if inline_admin_form.show_url %}<a href="../../../r/{{ inline_admin_form.original_content_type_id }}/{{ inline_admin_form.original.id }}/">{% trans "View on site" %}</a>{% endif %}
+             </p>
+            {% endif %}
 
           {% if inline_admin_form.has_auto_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
           {{ inline_admin_form.fk_field.field }}
@@ -81,7 +93,11 @@
         {% for fieldset in inline_admin_form %}
           {% for line in fieldset %}
             {% for field in line %}
-              <td{% if field.field.name %} class="field-{{ field.field.name }}"{% endif %}>
+
+            <td{% if field.field.name %} 
+                class="field-{{ field.field.name }}"
+            {% endif %}>
+
               {% if field.is_readonly %}
                   <p>{{ field.contents }}</p>
               {% else %}
