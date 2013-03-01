@@ -439,8 +439,8 @@ class LockCommunicationTests(TestCase):  # i.e. with the Raspberry Pi
         #  what the arguments are there............
 
         # this is not comprehensive....
-        self.check_response_and_status(c,"/checkdoor/aaaaa/checkrfid/0123456789/", 404,"")
-        self.check_response_and_status(c,"/checkdoor/2/checkrfid/abc123/", 404,"")
+        self.check_response_and_status(c,"/checkdoor/aaaaa/checkrfid/0123456789/", 404,"")   # or 400?
+        self.check_response_and_status(c,"/checkdoor/2/checkrfid/abc123/", 404,"")    # or 400?
         self.check_response_and_status(c,"/checkdoor/2/checkrfid/0123456789/", 200,"1")
         self.check_response_and_status(c,"/checkdoor/2/checkrfid/1123456789/", 200,"0")
 

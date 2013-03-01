@@ -3,26 +3,33 @@ from django.views.generic.simple import redirect_to, direct_to_template
 from django.conf.urls import patterns, include, url
 from djock_app.models import RFIDkeycard, Door
 from djock_app import views
+from django.http import HttpResponse
+from django.shortcuts import redirect
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
 # This is a view, but putting it in here to "test" stuff
-def blah(request, doorid, rfid):
+#def blah(request, doorid, rfid):
+def blah(request):
 
     return list_detail.object_list(
         request,
         queryset = RFIDkeycard.objects.all(), 
-        template_name = "basic.html",
+       # template_name = "basic.html",
         #template_object_name = "rfidkeycard_list",  # So in template,  {% for rfidkeycard in rfidkeycard_list %} instead of   {% for rfidkeycard in object_list %} .....  although something isn't working.....
-        extra_context = {"params" :{'doorid': doorid, 'rfid':rfid}, \
-                        "doors_list": Door.objects.all(), 
-                         }
+        #extra_context = {"params" :{'doorid': doorid, 'rfid':rfid}, \
+        #                "doors_list": Door.objects.all(), 
+        #                 }
     )
 
 
 urlpatterns = patterns('',
+    url(r'test_jquery/$',views.test_jquery),
+    url(r'start_scan/(?P<lockuser_object_id>\d+)/$',views.initiate_new_keycard_scan), 
+    url(r'done_scan/(?P<lockuser_object_id>\d+)/$',views.finished_new_keycard_scan), 
+
     # door id is an int with no specified length (for now?);
     # rfid is expected to be a string exactly 10 characters long
     url(r'checkdoor/(?P<doorid>\d+)/checkrfid/(?P<rfid>\w{10})/$',\

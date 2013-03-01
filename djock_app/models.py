@@ -7,8 +7,8 @@ from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.management import create_superuser
 from django.db.models import signals
-from datetime import datetime
 from django.utils.timezone import utc
+import datetime
 
 
 
@@ -55,6 +55,25 @@ class Door(models.Model):
     # to do:
     def get_all_access_times(self):
         pass
+
+
+class NewKeycardScan(models.Model):
+    """ For checking whether the current request is for authenticating a keycard or assigning new keycard. """
+    time_initiated = models.DateTimeField(auto_now_add=True)
+    waiting_for_scan = models.BooleanField(default=True) 
+    doorid = models.CharField(max_length=50)   # doorid as in the requesting url
+    rfid = models.CharField(max_length=10)   # rfid as in the requesting url
+    # to do: additional parameters for door, rfid? 
+
+    def timed_out(self,minutes=2):
+        """ Check whether specified number of minutes have passed since user indicated they were going to go scan in a card for assigning it.  Defaults to 2 minutes. """
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        max_time = datetime.timedelta(minutes=minutes)
+        if now - self.time_initiated > max_time:
+            return True
+        return False
+
+
 
 class RFIDkeycard(models.Model):
     """ Let's try this: door access represented by a (reusable) RFID *keycard*
@@ -141,8 +160,8 @@ class RFIDkeycard(models.Model):
         # When time zone support is enabled, Django uses time-zone-aware 
         # datetime objects. If your code creates datetime objects, they should
         # be aware too.
-        #now = datetime.now()
-        now = datetime.utcnow().replace(tzinfo=utc)
+        #now = datetime.datetime.now()
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
         self.date_revoked = now
 
 
@@ -154,7 +173,7 @@ class RFIDkeycard(models.Model):
         #   been saved yet -- i.e. we're creating this RFIDkeycard. Note that 
         #   at this point, other attributes *are* available, like lockuser, 
         #   they just haven't been saved yet.
-        if not self.pk:  
+        if not self.pk and self.lockuser: 
             if self.lockuser.activate == False: 
                 # activate the keycard's lock user, and save
                 self.lockuser.activate = True

@@ -1,4 +1,28 @@
 {% load i18n admin_static admin_modify %}
+
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"/></script>
+<script> alert("Done button" + $("#done_button")); </script> 
+<script> 
+$(function() {
+    var get_rfid = function() {
+       $.getJSON("/test_jquery/", function(result) {
+            if (result.success == true) {
+               $("#id_rfidkeycard_set-0-the_rfid").val(result.rfid);
+            } else {
+              setTimeout(get_rfid, 250);
+            }
+        });
+    };
+
+    $("#done_button").bind("click", function(e) {
+        e.preventDefault();
+        alert('foo');
+        get_rfid();
+    });
+});
+</script>
+
+
 <div class="inline-group" id="{{ inline_admin_formset.formset.prefix }}-group">
   <div class="tabular inline-related {% if forloop.last %}last-related{% endif %}">
 {{ inline_admin_formset.formset.management_form }}
@@ -51,22 +75,10 @@
                     http://192.168.x.x:port_num/checkdoor/doorid/checkrfid/rfid/<br> (if ran ./manage.py
                     runserver 192.168.x.x:port_num))</i><br><br>
                      Click "Done" when you're finished scanning.<br>
-                     <button><a href="/done_scan/{{object_id}}/">Done</a></button><br><br>
+                     <input type="button" id="done_button" value="Done"><br><br>
                     <i>After "Done," the new keycard should be available....  For staff users, the
                     indications that a keycard is assigned: can now deactivate current keycard;
                     ______</i><br><br>
-                    [ Here's test_return_message: {{ test_return_message }} ]
-
-                    [ And here's the messages block: ] 
-                        {% if messages %}
-                        <ul class="messages">
-                          {% for message in messages %}
-                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
-                                {{ message }}
-                            </li>
-                              {% endfor %}
-                          </ul>
-                          {% endif %}
         {% endif %} {% comment %} end nk changes for this part (so the else: proceed as normal)   {% endcomment %}
 
 

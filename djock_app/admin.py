@@ -3,8 +3,9 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.forms import CheckboxSelectMultiple, IntegerField, ModelForm
 from django.db import models
-from djock_app.models import LockUser, AccessTime, RFIDkeycard, Door
-import random
+from djock_app.models import LockUser, AccessTime, RFIDkeycard, Door, NewKeycardScan
+import random  #temp
+from termcolor import colored   #temp
 
 
 
@@ -77,8 +78,17 @@ class RFIDkeycardForm(ModelForm):
     #   simulate assigning a new card
     def __init__(self, *args, **kwargs):
         super(RFIDkeycardForm, self).__init__(*args, **kwargs)
-        self.fields['the_rfid'] = IntegerField(help_text = "(This is a random number to simulate getting a new keycard number after it's scanned in.<br>Only superuser can actually see the number.)")
-        self.fields['the_rfid'].initial = str(random.randint(0000000000,9999999999)) # rfid's should be 10 char long... just str'ing ints, because I don't want to mess with random crap anymore.
+        new_scan_queryset = NewKeycardScan.objects.all()
+        if new_scan_queryset: 
+            new_scan = new_scan_queryset.latest("time_initiated")  # get the latest NewKeycardScan object, ordered by the field time_initiated (i.e. time the object was created) 
+            print colored("the rfid? : "+ str(new_scan.rfid),"white","on_green")
+            print colored("is newKeycardScan obj available? " + str(new_scan),"white","on_green")
+            self.fields['the_rfid'] = IntegerField(help_text = "(Not a random number -- from door/rfid check request)")
+            self.fields['the_rfid'].initial = new_scan.rfid
+        else: 
+            print colored("is newKeycardScan obj available? NOPE " ,"white","on_green")
+            self.fields['the_rfid'] = IntegerField(help_text = "(This is a random number to simulate getting a new keycard number after it's scanned in.<br>Only superuser can actually see the number.)")
+            self.fields['the_rfid'].initial = str(random.randint(0000000000,9999999999)) # rfid's should be 10 char long... just str'ing ints, because I don't want to mess with random crap anymore.
 
     class Meta:
         model = RFIDkeycard
@@ -133,7 +143,7 @@ class RFIDkeycardInline(admin.TabularInline):
     """ The inline form that staff users will see. """
     form = RFIDkeycardForm
     model = RFIDkeycard
-    extra = 0  # how many inline objects to add a time/how many blank inlines to show
+    extra = 1  # how many inline objects to add a time/how many blank inlines to show
 
     can_delete = False # Specifies whether or not inline objects can be deleted in the inline.
 

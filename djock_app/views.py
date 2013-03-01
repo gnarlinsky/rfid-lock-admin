@@ -1,8 +1,18 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, render, redirect
-from djock_app.models import Door, LockUser, RFIDkeycard, AccessTime
+from djock_app.models import Door, LockUser, RFIDkeycard, AccessTime, NewKeycardScan
 import random
 from datetime import datetime
+from django.utils import simplejson
+from termcolor import colored   # temp
+#from django.contrib import messages
+
+
+def test_jquery(request):
+    response_data = {'success':True, 'rfid':"1111111111"}
+    return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
+
+
 
 
 # pseudocoding how to  handle the incoming request to verify rfid
@@ -13,6 +23,7 @@ from datetime import datetime
 
 # TO DO: tests for get_all_allowed (across doors); e.g. all_allowed/
 # tests for URLS with door id's as well, e.g. all_allowed/door/x
+
 
 # return list of rfid's allowed for all doors, or a particular door,
 #   as json list 
@@ -35,23 +46,90 @@ def get_allowed_rfids(request, doorid=None):
 # TO DO: refactor below.. to return more immediately; 
 #           clean up the conditional logic
 def check(request,doorid, rfid): 
+    """ In addition to checking whether the given rfid is valid for the given door, 
+    also check whether we're actually trying to assign a new keycard rather than 
+    authenticating. """
     response = 0
     # if door id not valid or rfid not valid, return ""
 
-    rfidkeycard_list =  RFIDkeycard.objects.all()
+    # Is the request actually for new keycard assignment? 
+    new_scan_queryset = NewKeycardScan.objects.all()
+    if new_scan_queryset:
+        print colored("here we are .................", "green")
+        new_scan = new_scan_queryset.latest("time_initiated")  # get the latest NewKeycardScan object, ordered by the field time_initiated (i.e. time the object was created) 
+        if new_scan.waiting_for_scan == True:
+            new_scan.doorid = doorid  # record the door the new scan request came from (not necessary so far) 
+            new_scan.rfid = rfid
+            #messages.success(request,new_scan.rfid)
+            #print colored("messages.success "+ str(messages.success),"magenta")
+            print colored("the rfid? : "+ str(new_scan.rfid),"magenta")
+            new_scan.save()   #?????????
+    
+    # or is the request actually for authenticating an existing keycard for this door? 
+    else: 
+        rfidkeycard_list =  RFIDkeycard.objects.all()
+        for rfidkeycard in rfidkeycard_list:
+            allowed_doors = rfidkeycard.get_allowed_doors()
+            if allowed_doors:
+                for door in rfidkeycard.get_allowed_doors():
+                    if rfidkeycard.is_active():
+                        if rfidkeycard.the_rfid == rfid:
+                            if int(door.id) == int(doorid):
+                                response = 1
 
-    for rfidkeycard in rfidkeycard_list:
-        allowed_doors = rfidkeycard.get_allowed_doors()
-        if allowed_doors:
-            for door in rfidkeycard.get_allowed_doors():
-                if rfidkeycard.is_active():
-                    if rfidkeycard.the_rfid == rfid:
-                        if int(door.id) == int(doorid):
-                            response = 1
-
-    # And in the case where we're actually assigning a new card, so need to get back to that template... 
-    # ......   can the response actually be a status code? 
     return HttpResponse(response)
+
+def initiate_new_keycard_scan(request,lockuser_object_id):
+    n = NewKeycardScan()
+    n.waiting_for_scan = True
+    print colored("n.waiting_for_scan: "+str(n.waiting_for_scan), "red")
+    n.save()   
+
+    # back to the lockuser's (the one who we deactivated the card for) change_form
+    back_to_lockuser = "/lockadmin/djock_app/lockuser/%s/" % lockuser_object_id
+    return redirect(back_to_lockuser)
+    # todo: No refreshing, pls!   AJAX
+    
+def finished_new_keycard_scan(request, lockuser_object_id):
+
+
+    # todo: Does it make more sense to put this in RFIDkeycardForm, in admin.py? 
+    new_scan_queryset = NewKeycardScan.objects.all()
+    if new_scan_queryset:
+        new_scan = new_scan_queryset.latest("time_initiated")  # get the latest NewKeycardScan object, ordered by the field time_initiated (i.e. time the object was created) 
+        print colored("waiting? "+ str(new_scan.waiting_for_scan),"blue")
+        print colored("time_initiated? "+ str(new_scan.time_initiated),"blue")
+        print colored("timed_out?, 2 min default: "+ str(new_scan.timed_out()),"blue")
+        print colored("the doorid? : "+ str(new_scan.doorid),"blue")
+        print colored("the rfid? : "+ str(new_scan.rfid),"blue")
+        # if waiting for new keycard to be scanned, but timed out
+        if new_scan.timed_out(minutes=2):
+            pass
+
+        # set waiting status to False and save NewKeycardScan object
+        new_scan.waiting_for_scan = False
+        new_scan.save()
+        # todo: or should I delete the NewKeycardScan object when done with it?
+
+    # Return message indicating whether we're good to go (so staff user can go ahead and hit "save" for
+    # this lockuser), or whether we timed out. 
+    #######################################
+    # Also can send back extra stuff in the redirect url, e.g. /blah/?var=5 -- You would then parse that
+    # variable with request.GET in the view code and show the appropriate text
+    #######################################
+    #print colored("here's messages.info: "+str(messages.success), "red")
+
+    # back to the lockuser's (the one who we deactivated the card for) change_form
+    back_to_lockuser = "/lockadmin/djock_app/lockuser/%s/" % lockuser_object_id
+    return redirect(back_to_lockuser)
+    # todo: No refreshing, pls!   AJAX
+
+
+
+
+
+
+
 
 """def check(request, doorid, rfid):
 
