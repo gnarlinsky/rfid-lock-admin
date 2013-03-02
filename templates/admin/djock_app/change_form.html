@@ -3,7 +3,75 @@
 {% load i18n admin_urls %}
 
 
-{% comment %} 
+{% block extrahead %}
+    {{ block.super }}
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"/></script>
+<!-- <script> alert("Done button" + $("#done_button")); </script>  --> 
+<script> 
+
+$(function() {
+    var start_get_rfid = function() {
+       $.getJSON("/start_scan/", function(result) {
+            message_div = document.getElementById("keycard_assignment_scan_message"); 
+            if (result.success == true) {
+                // NewKeycardScan object should be initiated and saved now
+                message_div.innerHTML = "OK, ready to read keycard"; 
+
+            } else {
+                message_div.innerHTML = "Unable to read keycard (NewKeycardScan object not initiated/saved [?] ) ";             }
+        });
+    };
+
+    var done_get_rfid = function() {
+        message_div = document.getElementById("keycard_assignment_scan_message"); 
+       $.getJSON("/done_scan/", function(result) {
+            if (result.success == true) {
+               // todo:  double check id (id comes from field.field }}
+               $("#id_rfidkeycard_set-0-the_rfid").val(result.rfid); 
+                message_div.innerHTML = "Success! Save to complete keycard assignment. ("+result.rfid+")"; 
+
+            } else {
+                message_div.innerHTML = "Didn't read new keycard... Try again."; 
+              //setTimeout(done_get_rfid, 250); // wait 250 sec before trying done_get_rfid again
+            }
+        });
+    };
+
+
+    $("#start_button").bind("click", function(e) {
+        e.preventDefault();
+        start_get_rfid();
+    });
+
+    $("#done_button").bind("click", function(e) {
+        e.preventDefault();
+        done_get_rfid();
+    });
+
+    $("#cancel_add_keycard_and_activate_user_button").bind("click", function(e) {
+        e.preventDefault();
+        new_keycard_div = document.getElementById("assign_new_keycard_buttons_and_instructions"); 
+        new_keycard_div.style.display="none"; 
+        // todo: do anything else to cancel? 
+    });
+
+    // don't show the keycard assignment instructions/buttons by default, but only when user clicks on 'assign new keycard'
+    $("#add_keycard_and_activate_user_button").bind("click", function(e) {
+        e.preventDefault();
+        new_keycard_div = document.getElementById("assign_new_keycard_buttons_and_instructions"); 
+        new_keycard_div.style.display="inline"; 
+    });
+    
+
+});
+</script>
+{% endblock extrahead %}
+
+
+    
+    
+    
+    {% comment %} 
     If this is an RFIDkeycard inline/popup (http://localhost:8080/lockadmin/djock_app/rfidkeycard/add/?_popup=1), insert some extra temporary text 
 {% endcomment %} 
 {% block object-tools %}
@@ -50,22 +118,20 @@
 {% endblock %} {% comment %}  end object-tools block  {% endcomment %}
 
 
-
 {% comment %}  Overriding inline form for RFIDkeycard on LockUser's change_form {% endcomment %}
+{% comment %}
 {% block inline_field_sets %}
 {% for inline_admin_formset in inline_admin_formsets %}
-
-    {% comment %}
+    <!-- 
         admin/edit_inline/tabular.html  or admin/edit_inline/stacked.html. 
         So, since I need similar behavior to that of my fieldset.html (for keycard activation) , 
         going to create a modified template based on tabular.html. 
-    {% endcomment %}
+        UPDATE: nope, no more inline form.
+        --> 
     {% include "admin/edit_inline/tabular_with_rfidkeycard_special.html" %}
-    {% comment %} {% include inline_admin_formset.opts.template %} {% endcomment %}
-
-
 {% endfor %}
 {% endblock %}
+{% endcomment %}
 
 
 
@@ -76,36 +142,67 @@
 {% block submit_buttons_bottom %}
     {% comment %} (start nk stuff)  This is the place for the "assign new keycard"/"deactivate current keycard" controls, if this is the LockUser change form {% endcomment %}
 
+
+
+
+{% comment %} testing hiding elements with javascript {% endcomment %}
+
         {% comment %} Check:  that we're modifying a model, rather than creating it (so not model/add/ but model/object_id); also check if we're dealing with LockUser  {% endcomment %}
-        {% if change and original|get_object_type == "LockUser" %}<br>
-                    
-        <div class="submit-row"> 
-                {% comment %} using STATIC_URL for *my* static/ files; otherwise it's Django admin's originals {% endcomment %}
-                 {% if  not object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %} 
-                        <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids_40" onclick="return showAddAnotherPopup(this);">
-                        <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign keycard and activate user 
-                    </a>
-                    <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif " width="10" height="10" readonly>Deactivate current keycard
+{% if change and original|get_object_type == "LockUser" %}<br>
+                
+    <div class="submit-row"> 
+        {% comment %} using STATIC_URL for *my* static/ files; otherwise it's Django admin's originals {% endcomment %}
+         {% if  not object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %} 
+            <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids_40" 
+            onclick="return showAddAnotherPopup(this);">
+                <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/>
+                Assign new keycard and activate user 
+            </a>
+            <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif " width="10" height="10" readonly>
+            Deactivate current keycard
 
-                 {% elif  object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %}
-                    <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids" onclick="return showAddAnotherPopup(this);">
-                        <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign new keycard 
-                    </a>
-                    <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif" width="10" height="10">Deactivate current keycard
+         {% elif  object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %}
+            <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids" 
+            onclick="return showAddAnotherPopup(this);">
+                <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/>
+                Assign new keycard 
+            </a>
+            <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif" width="10" height="10">
+            Deactivate current keycard
 
-                 {% elif  object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
-                    <img src="{{ STATIC_URL }}/admin/img/disabled_icon_addlink.gif" width="10" height="10" alt="Add Another"/> Assign new keycard
-                    <a href="/deactivate_keycard/{{object_id}}"> 
-                        <img src="/static/admin/img/icon_deletelink.gif " width="10" height="10"> Deactivate current keycard 
-                    </a>
-                    {% comment %} Should not happen: 
-                 {% if  not object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
-                 {% endcomment %}
-                 
-                 {% endif %}
-                    </div> {% comment %} end nk submit-row {% endcomment %}
+         {% elif  object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
+            <img src="{{ STATIC_URL }}/admin/img/disabled_icon_addlink.gif" width="10" height="10" alt="Add Another"/> 
+            Assign new keycard
+            <a href="/deactivate_keycard/{{object_id}}"> 
+                <img src="/static/admin/img/icon_deletelink.gif " width="10" height="10">
+                Deactivate current keycard 
+            </a>
+
+            {% comment %} Should not happen (LockUser can't be inactive but have an active keycard
+         {% if  not object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
+         {% endcomment %}
     {%  endif  %}
-    </div> 
+
+        {% comment %} If creating the current object rather than modifying (so model/add/, not  model/object_id); also check if we're dealing with LockUser  {% endcomment %}
+
+        {% comment %} Don't have "original" in add_view, so verify that we're dealing with the right object with opts.module_name {% endcomment %}
+{% elif not change and opts.module_name == "lockuser" %}<br>
+            <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/>
+            <input type="button" id="add_keycard_and_activate_user_button" value="Assign new keycard and activate user" />
+            <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif " width="10" height="10" readonly>
+            Deactivate current keycard
+    {%  endif  %}
+
+    <div id="assign_new_keycard" style="border:2px solid green;font-color:green;text-align:center; color:green;">
+        <div id="assign_new_keycard_buttons_and_instructions" style="display:none">
+
+        Click "Scan new card," then scan the keycard<br> to be assigned at (any) door lock.<br> (Note: will time out after 2 minutes.)<br> <input type="button" id="start_button" value="Scan new card"><br><br> {% comment %} <button><a href="/start_scan/{{object_id}}">Scan new card</a></button><br><br> {% endcomment %} <i>(I.e.  (Be the Arduino and go to<br> http://192.168.x.x:port_num/checkdoor/doorid/checkrfid/rfid/<br> (if ran ./manage.py runserver 192.168.x.x:port_num))</i><br><br> Click "Done" when you are finished scanning.<br> <input type="button" id="done_button" value="Done"><br><br> <i>After "Done," the new keycard should be available....  For staff users, the indications that a keycard is assigned: can now deactivate current keycard; ______</i><br><br> <input type="button" id="cancel_add_keycard_and_activate_user_button" value="Cancel" />'; 
+            <div id="keycard_assignment_scan_message" style="color:red; font-size:15px;">
+                (div for scan message)
+            </div>
+        </div>
+    </div>
+
      {{ block.super }}
 {% endblock %}   {% comment %}  end submit row block {% endcomment %}
 
