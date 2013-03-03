@@ -27,8 +27,10 @@ def blah(request):
 
 urlpatterns = patterns('',
     url(r'test_jquery/$',views.test_jquery),
-    url(r'start_scan/(?P<lockuser_object_id>\d+)/$',views.initiate_new_keycard_scan), 
-    url(r'done_scan/(?P<lockuser_object_id>\d+)/$',views.finished_new_keycard_scan), 
+    #url(r'start_scan/(?P<lockuser_object_id>\d+)/$',views.initiate_new_keycard_scan), 
+    url(r'start_scan/$',views.initiate_new_keycard_scan), 
+    #url(r'done_scan/(?P<lockuser_object_id>\d+)/$',views.finished_new_keycard_scan), 
+    url(r'done_scan/$',views.finished_new_keycard_scan), 
 
     # door id is an int with no specified length (for now?);
     # rfid is expected to be a string exactly 10 characters long

@@ -9,6 +9,7 @@ from django.contrib.auth.management import create_superuser
 from django.db.models import signals
 from django.utils.timezone import utc
 import datetime
+from termcolor import colored   # temp
 
 
 
@@ -63,6 +64,7 @@ class NewKeycardScan(models.Model):
     waiting_for_scan = models.BooleanField(default=True) 
     doorid = models.CharField(max_length=50)   # doorid as in the requesting url
     rfid = models.CharField(max_length=10)   # rfid as in the requesting url
+    ready_to_assign = models.BooleanField(default=False)
     # to do: additional parameters for door, rfid? 
 
     def timed_out(self,minutes=2):
@@ -72,6 +74,8 @@ class NewKeycardScan(models.Model):
         if now - self.time_initiated > max_time:
             return True
         return False
+
+
 
 
 
@@ -87,7 +91,7 @@ class RFIDkeycard(models.Model):
          a separate is_active field here... just ask: is_active() --> can just check if there's a revoked date,
          OR if today's date is between assigned/revoked...
     """
-    the_rfid    = models.CharField(max_length=10,null=True,editable=True) # the radio-frequency id
+    the_rfid    = models.CharField(max_length=10,null=False,editable=False) # the radio-frequency id
     date_revoked = models.DateTimeField(null=True, blank=True) # note that blank=True is at form validation level,
     # while null=True is at db level
     # This should not be a field that staff users can fill in.  It should be created
@@ -110,7 +114,7 @@ class RFIDkeycard(models.Model):
     #                                    rfidkeycard_object.lockuser.doors  ??? (m2m)
     #                                    rfidkeycard_object.lockuser.get_blah ???  func???
     ####################################################################
-    lockuser = models.ForeignKey("LockUser")
+    lockuser = models.ForeignKey("LockUser",null=False)
 
 
     # Nope.  Don't have to do the below; just use auto_now_add
@@ -167,21 +171,21 @@ class RFIDkeycard(models.Model):
 
     def save(self,*args,**kwargs):
         """ Overriding save():  When assign new keycard, if the LockUser was inactive before, they will
-        automatically become active.
+        automatically become active.  
         """
+        print colored("SAVING-rfidkeycard", "magenta")
         # Check if the object is in the database yet. If no pk, means it hasn't
-        #   been saved yet -- i.e. we're creating this RFIDkeycard. Note that 
-        #   at this point, other attributes *are* available, like lockuser, 
-        #   they just haven't been saved yet.
+        #   been saved yet -- i.e. we're creating this RFIDkeycard, not updating
+        #   it. Note that at this point, other attributes *are* available, like
+        #   lockuser, they just haven't been saved yet.
         if not self.pk and self.lockuser: 
             if self.lockuser.activate == False: 
                 # activate the keycard's lock user, and save
                 self.lockuser.activate = True
                 self.lockuser.save()
-        
+
         # and now save the keycard itself
         super(RFIDkeycard,self).save(*args,**kwargs)
-
 
         
 
@@ -237,14 +241,40 @@ class LockUser(models.Model):
             - If the Lockuser has been deactivated, its current keycard should be deactivated as well.
             - We'll deactivate a LockUser's current keycard here, if deactivate_current_keycard is checked
               on the LockUser's change_form. 
+            - If we're assigning a new keycard, the keycard is created and saved here. 
         """
-        # saving before any work with keys and m2m, to obtain self.id
+        print colored("SAVING-lockuser", "magenta")
+        print colored("**** first creating the new keycard", "magenta")
+
+        
+        # Since djock_app_rfidkeycard.lockuser_id may not be NULL when saving RFIDkeycard object, we need
+        # to save the LockUser object first, so we can get self.id (which is also necessary before any work
+        # with FK's and M2M). 
         super(LockUser, self).save(*args, **kwargs)
 
-        #rfid_keycards = RFIDkeycard.objects.filter(...)
-
+        # assign the rfid from the keycard that was just scanned
+        print colored("assign the rfid from the keycard that was just scanned","white","on_blue")
+        new_scan_queryset = NewKeycardScan.objects.all()
+        if new_scan_queryset:
+            # get last created NewKeycardScan object
+            new_scan = new_scan_queryset.latest("time_initiated") # todo: see expanded_comments.txt, (2)
+            print colored("\tnew_scan id "+str(new_scan.id)+" (pk="+str(new_scan.pk)+")","white","on_blue")
+            if new_scan.ready_to_assign:
+                print colored("\tready_to_assign=True","white","on_green")
+                new_keycard = RFIDkeycard(lockuser=self, the_rfid=new_scan.rfid)
+                new_keycard.save()
+                new_scan.ready_to_assign = False
+                new_scan.save()
+                print colored("\tso just saved this NewKeycardScan object","white","on_green")
+                
+                
+            # else ???
+            #   .....
+        # else ???
+        #   .....
+        
         try:
-            # there should be at most one... for now just get the first one
+            # there should be at most one... for now just get the first one (todo)
             current_keycard = self.get_current_rfid()[0]   # self or lu? 
         except:
             current_keycard = None
@@ -260,6 +290,7 @@ class LockUser(models.Model):
             #current_keycard.date_revoked = datetime.now()
             current_keycard.deactivate()
             current_keycard.save()# save keycard if you have changed it
+        # to do:  the above check will happen every save() though... 
 
         # We'll deactivate a LockUser's current keycard here, if deactivate_current_keycard is checked on the LockUser's change_form. 
         if current_keycard and self.deactivate_current_keycard:
@@ -269,7 +300,17 @@ class LockUser(models.Model):
 
             self.deactivate_current_keycard = False   # because no current keycard to deactivate anymore
 
-            super(LockUser, self).save(*args, **kwargs)  # save again
+            # or 
+            #super(LockUser, self).save(*args, **kwargs)  # save again
+            # ?
+            self.save()
+
+
+        # or 
+        #super(LockUser, self).save(*args, **kwargs)  # save again
+        # ?
+
+        # self.save()
 
             
         # save obj again if you want

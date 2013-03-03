@@ -63,7 +63,7 @@ def check(request,doorid, rfid):
             #messages.success(request,new_scan.rfid)
             #print colored("messages.success "+ str(messages.success),"magenta")
             print colored("the rfid? : "+ str(new_scan.rfid),"magenta")
-            new_scan.save()   #?????????
+            new_scan.save()  
     
     # or is the request actually for authenticating an existing keycard for this door? 
     else: 
@@ -79,20 +79,22 @@ def check(request,doorid, rfid):
 
     return HttpResponse(response)
 
-def initiate_new_keycard_scan(request,lockuser_object_id):
+#def initiate_new_keycard_scan(request,lockuser_object_id):
+def initiate_new_keycard_scan(request):
     n = NewKeycardScan()
     n.waiting_for_scan = True
     print colored("n.waiting_for_scan: "+str(n.waiting_for_scan), "red")
     n.save()   
 
     # back to the lockuser's (the one who we deactivated the card for) change_form
-    back_to_lockuser = "/lockadmin/djock_app/lockuser/%s/" % lockuser_object_id
-    return redirect(back_to_lockuser)
+    #back_to_lockuser = "/lockadmin/djock_app/lockuser/%s/" % lockuser_object_id
+    #return redirect(back_to_lockuser)
     # todo: No refreshing, pls!   AJAX
+    response_data = {'success':True}
+    return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
     
-def finished_new_keycard_scan(request, lockuser_object_id):
-
-
+#def finished_new_keycard_scan(request, lockuser_object_id):
+def finished_new_keycard_scan(request):
     # todo: Does it make more sense to put this in RFIDkeycardForm, in admin.py? 
     new_scan_queryset = NewKeycardScan.objects.all()
     if new_scan_queryset:
@@ -102,12 +104,17 @@ def finished_new_keycard_scan(request, lockuser_object_id):
         print colored("timed_out?, 2 min default: "+ str(new_scan.timed_out()),"blue")
         print colored("the doorid? : "+ str(new_scan.doorid),"blue")
         print colored("the rfid? : "+ str(new_scan.rfid),"blue")
+        print colored("the ready_toassign?? : "+ str(new_scan.ready_to_assign),"blue")
+
+
         # if waiting for new keycard to be scanned, but timed out
         if new_scan.timed_out(minutes=2):
             pass
 
-        # set waiting status to False and save NewKeycardScan object
+        # Set waiting status to False; set ready to assign status (for
+        # RFIDkeycard's save() to True); and save NewKeycardScan object
         new_scan.waiting_for_scan = False
+        new_scan.ready_to_assign = True 
         new_scan.save()
         # todo: or should I delete the NewKeycardScan object when done with it?
 
@@ -120,9 +127,18 @@ def finished_new_keycard_scan(request, lockuser_object_id):
     #print colored("here's messages.info: "+str(messages.success), "red")
 
     # back to the lockuser's (the one who we deactivated the card for) change_form
-    back_to_lockuser = "/lockadmin/djock_app/lockuser/%s/" % lockuser_object_id
-    return redirect(back_to_lockuser)
+    #back_to_lockuser = "/lockadmin/djock_app/lockuser/%s/" % lockuser_object_id
+    #return redirect(back_to_lockuser)
     # todo: No refreshing, pls!   AJAX
+    if new_scan.rfid:  # and if not timed out......
+        response_data = {'success':True, 'rfid':new_scan.rfid}
+    else:
+        #response_data = {'success':False, 'rfid':new_scan.rfid}
+        #response_data = {'success':False}
+        response_data = {'success':False, 'rfid':"NOPE!  (put this message in another div though)"}
+
+    print colored("about to return response data","green")
+    return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
 
 
