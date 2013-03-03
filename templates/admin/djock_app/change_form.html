@@ -153,17 +153,13 @@ $(function() {
     <div class="submit-row"> 
         {% comment %} using STATIC_URL for *my* static/ files; otherwise it's Django admin's originals {% endcomment %}
          {% if  not object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %} 
-            <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids_40" 
-            onclick="return showAddAnotherPopup(this);">
-                <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/>
-                Assign new keycard and activate user 
+            <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/>
+            <input type="button" id="add_keycard_and_activate_user_button" value="Assign new keycard and activate user" />
             </a>
             <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif " width="10" height="10" readonly>
             Deactivate current keycard
 
          {% elif  object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %}
-            <a href="/lockadmin/djock_app/rfidkeycard/add/" class="add-another" id="add_id_rfids" 
-            onclick="return showAddAnotherPopup(this);">
                 <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/>
                 Assign new keycard 
             </a>
