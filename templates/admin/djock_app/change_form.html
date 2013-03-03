@@ -66,25 +66,12 @@ $(function() {
 });
 </script>
 {% endblock extrahead %}
-
-
-    
-    
     
     {% comment %} 
     If this is an RFIDkeycard inline/popup (http://localhost:8080/lockadmin/djock_app/rfidkeycard/add/?_popup=1), insert some extra temporary text 
-{% endcomment %} 
 {% block object-tools %}
 
     {% comment %} {% if request.path == "/lockadmin/djock_app/rfidkeycard/add/" and request.META.QUERY_STRING == "_popup=1"  %} {% endcomment %} 
-    {% if request.path == "/lockadmin/djock_app/rfidkeycard/add/"  %}
-            <center>
-            <h2>Go scan in a new card........</h2>
-            <h5>..................... waiting .....................</h3>
-            <h5>(Be the Arduino and go to</h5>
-            <p>http://192.168.x.x:8080/checkdoor/doorid/checkrfid/rfid/ (if ran ./manage.py runserver 192.168.x.x:8080)</p>
-            <h5> OK, got it. Click "Save" to finish creating new keycard.</h5>
-            </center>
 
         {% comment %} should indicate that we're adding a new keycard to an EXISTING lockuser/ got here from lockuser change page {% endcomment %}
     {% comment %} 
@@ -107,15 +94,15 @@ $(function() {
             </div>
 
         {% endif %}
-    {% endcomment %} 
 
-    {% endif %} {% comment %} end nk for this block {% endcomment %}
+    {% endif %} {% comment %} end nk for this block { endcomment }
     {% if change %}{% if not is_popup %}
         <ul class="object-tools">
             {% block object-tools-items %} {{block.super}} {% endblock %}
         </ul>
     {% endif %}{% endif %}
-{% endblock %} {% comment %}  end object-tools block  {% endcomment %}
+{% endblock %} {% comment %}  end object-tools block { endcomment }
+    {% endcomment %} 
 
 
 {% comment %}  Overriding inline form for RFIDkeycard on LockUser's change_form {% endcomment %}
@@ -140,6 +127,14 @@ $(function() {
 
 {% comment %}  submit row block {% endcomment %}
 {% block submit_buttons_bottom %}
+{% comment %} If this is the RFIDkeycard's change_form, show the deactivate-keycard link {%endcomment%}
+{% if change and original|get_object_type == "RFIDkeycard" %}<br>
+            <a href="/deactivate_keycard/{{object_id}}"> 
+                <img src="/static/admin/img/icon_deletelink.gif " width="10" height="10">
+                Deactivate current keycard 
+            </a>
+    
+    
     {% comment %} (start nk stuff)  This is the place for the "assign new keycard"/"deactivate current keycard" controls, if this is the LockUser change form {% endcomment %}
 
 
@@ -148,31 +143,21 @@ $(function() {
 {% comment %} testing hiding elements with javascript {% endcomment %}
 
         {% comment %} Check:  that we're modifying a model, rather than creating it (so not model/add/ but model/object_id); also check if we're dealing with LockUser  {% endcomment %}
-{% if change and original|get_object_type == "LockUser" %}<br>
+{% elif change and original|get_object_type == "LockUser" %}<br>
                 
     <div class="submit-row"> 
         {% comment %} using STATIC_URL for *my* static/ files; otherwise it's Django admin's originals {% endcomment %}
          {% if  not object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %} 
-            <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/>
             <input type="button" id="add_keycard_and_activate_user_button" value="Assign new keycard and activate user" />
-            </a>
-            <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif " width="10" height="10" readonly>
-            Deactivate current keycard
 
          {% elif  object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %}
-                <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/>
-                Assign new keycard 
-            </a>
-            <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif" width="10" height="10">
-            Deactivate current keycard
+            <input type="button" id="add_keycard_and_activate_user_button" value="Assign new keycard" />
 
+        {% comment %} No, don't show anything in this case: 
          {% elif  object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
             <img src="{{ STATIC_URL }}/admin/img/disabled_icon_addlink.gif" width="10" height="10" alt="Add Another"/> 
             Assign new keycard
-            <a href="/deactivate_keycard/{{object_id}}"> 
-                <img src="/static/admin/img/icon_deletelink.gif " width="10" height="10">
-                Deactivate current keycard 
-            </a>
+            {% endcomment %}
 
             {% comment %} Should not happen (LockUser can't be inactive but have an active keycard
          {% if  not object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
