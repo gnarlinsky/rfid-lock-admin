@@ -79,30 +79,21 @@ def finished_new_keycard_scan(request,new_scan_pk):
         response_data = {'success':False, 'error_mess':"No NewKeycardScan objects at all"}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
-    print colored("wtf 1","red")
-
     # Verify that the scan object is the one we need, not one initiated later by someone else, for example.
     new_scan_right_pk_qs = new_scan_queryset.filter(pk = new_scan_pk)  # make sure we have the newKeycardScan object we started with, not one that another staff user initiated *after* us. 
 
     if not new_scan_right_pk_qs:
         response_data = {'success':False, 'error_mess':"No NewKeycardScan obj with pk " + new_scan_pk}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-    print colored("wtf 2","red")
 
     new_scan = new_scan_right_pk_qs[0]
-    print colored("wtf 2.1","red")
     min_till_timeout = 2
-    print colored("wtf 2.2","red")
-    print colored("wtf 2.2.1 - new scan " + str(new_scan),"red")
-    print colored("wtf 2.2.2","red")
     timed_out, time_diff_minutes = new_scan.timed_out(minutes=min_till_timeout)
-    print colored("wtf 2.3","red")
     if timed_out:
     #if new_scan.timed_out(minutes=min_till_timeout):
         response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done'.... So don't take %f minutes next time, please." % (min_till_timeout,time_diff_minutes)}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
-    print colored("wtf 3","red")
     if not new_scan.rfid:  
         response_data = {'success':False, 'error_mess':"NewKeycardScan does not have rfid"}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
