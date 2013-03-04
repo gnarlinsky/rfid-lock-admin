@@ -230,6 +230,21 @@ class UserTests(TestCase):
         # #     - prettify get current rfid, get current rfid
         # #     - prettify get all rfid's, get all rfid's
 
+
+    No regular staff user should able to *add* Doors, for now. 
+
+    Staff users with can-add/del/change-Doors should be able to:
+        * See ALL Doors
+        * be able to add/del/change Doors
+
+    NOBODY (other than developers), not even special super staff users, should be able to edit RFIDkeycards directly. 
+
+
+    New keycard scan:  test timing, e.g.  
+     * someone else initiates a new keycard scan after you -- will you use your newKeycardScan object, or the one created later? 
+        
+
+
     ----------------- More on permissions ----------------------------------
     Custom user permissions for door management are dynamically created, based on the doors that are present in the
         system -- so load the door fixture as well as the staff user fixture if using fixtures, using natural keys

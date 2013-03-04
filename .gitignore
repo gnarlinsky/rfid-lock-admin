@@ -6,8 +6,6 @@
 
 ignore_me_for_readme
 NO
-#link: 
-admin_templates
 notes.txt
 .idea
 activate
@@ -20,6 +18,13 @@ django
 expanded_comments.txt
 expanded_comments_pdfs
 pydocs
+
+# Symbolic links #
+###################
+admin_templates
+orig_admin
+
+
 
 # Compiled source #
 ###################

@@ -6,6 +6,7 @@ from django.db import models
 from djock_app.models import LockUser, AccessTime, RFIDkeycard, Door, NewKeycardScan
 import random  #temp
 from termcolor import colored   #temp
+from django import forms
 
 
 
@@ -70,13 +71,12 @@ class DoorAdmin(admin.ModelAdmin):
             # permission codenames are named can_manage_door_x, where x is the pk num
         # else... return nothing and/or exception? 
 
-# playing with prepopulating stuff 
+"""
 class RFIDkeycardForm(ModelForm):
     #the_rfid = IntegerField(help_text="help text")
 
     # override __init__ to prepopulate the_rfid field with a random number, just to 
     #   simulate assigning a new card
-    """
     def __init__(self, *args, **kwargs):
         super(RFIDkeycardForm, self).__init__(*args, **kwargs)
         new_scan_queryset = NewKeycardScan.objects.all()
@@ -90,10 +90,22 @@ class RFIDkeycardForm(ModelForm):
             print colored("is newKeycardScan obj available? NOPE " ,"white","on_green")
             self.fields['the_rfid'] = IntegerField(help_text = "(This is a random number to simulate getting a new keycard number after it's scanned in.<br>Only superuser can actually see the number.)")
             self.fields['the_rfid'].initial = str(random.randint(0000000000,9999999999)) # rfid's should be 10 char long... just str'ing ints, because I don't want to mess with random crap anymore.
-        """
-
     class Meta:
         model = RFIDkeycard
+
+
+        
+    def save(self,*args,**kwargs):
+        print colored("2","white","on_red")
+        try:
+            super(RFIDkeycardForm,self).save(*args,**kwargs)
+        except IntegrityError:
+            print colored("3","red")
+            # form passed validation, so didn't error there 
+            errors = forms.util.ErrorList()
+            errors = forms._errors.setdefault(django.forms.forms.NON_FIELD_ERRORS, errors)
+            errors.append('Sorry, this RFID already exists.')
+
 
     # playing with# trying to override save
 #    def save(self, commit=True, force_insert=False, force_update=False, *args, **kwargs):
@@ -111,10 +123,13 @@ class RFIDkeycardForm(ModelForm):
 #        return rfcard
 #
 
-class RFIDkeycardAdmin(admin.ModelAdmin):
-    form = RFIDkeycardForm # prepopulating with random num
+"""
 
-    list_display = ["the_rfid","id", "date_created","date_revoked","is_active", "lockuser",
+# Only superuser/developers can access RFIDkeycard objects from outside LockUser
+class RFIDkeycardAdmin(admin.ModelAdmin):
+    #form = RFIDkeycardForm # prepopulating with random num
+
+    list_display = ["the_rfid","id", "date_created","date_revoked","is_active", "lockuser","deactivate_me",
                     "get_allowed_doors_html_links"]
 
     ####################################################################################################
@@ -122,60 +137,15 @@ class RFIDkeycardAdmin(admin.ModelAdmin):
     ####################################################################################################
     #prepopulated_fields = { 'the_rfid': ('id',)} 
     #fields = ("the_rfid","date_revoked","date_created","id")
-    fields = ("lockuser","date_created","date_revoked","is_active","get_allowed_doors")  # here showing fields wouldn't show to a staff user, since the real (not inline) RFIDkeycard change_form would only be visible to superuser.
-    readonly_fields = ("date_created","is_active","get_allowed_doors")
-    #   Should I check for that at other levels of the code
-    # lockuser should be editable after creation....  But it should show only one lockuser in the
-    # dropdown, so theoretically it's ok. 
+    fields = ("the_rfid","lockuser","date_created","date_revoked","get_allowed_doors","is_active","deactivate_me")  # here showing fields wouldn't show to a staff user, since the real (not inline) RFIDkeycard change_form would only be visible to superuser.
+    readonly_fields = ("the_rfid","deactivate","lockuser","date_created","date_revoked","is_active","get_allowed_doors")
 
 
-    #readonly_fields = ("the_rfid",)   # I only see None when readonly. Maybe need to save first in RFIDkeycardForm's __init__?
-                                        # But since regular staff users shouldn't see it at all... forget it. 
 
-
-   # fieldsets = ( (None, { 'fields': ("date_revoked" ),
-     #           'description': ('')
-      #     }), )
-      # WTF? It keeps saying field x doesn't exist, but "x" just picks up the first char of the field, like "field t doesn't
-      # exist" if I have "the_rfid" ????!!!
-
-
-#####################################################
-# NO MORE INLINE RFIDKEYCARD FORM
-#####################################################
-# class RFIDkeycardInline(admin.TabularInline):
-#     """ The inline form that staff users will see. """
-#     form = RFIDkeycardForm
-#     model = RFIDkeycard
-#     extra = 1  # how many inline objects to add a time/how many blank inlines to show
-# 
-#     can_delete = False # Specifies whether or not inline objects can be deleted in the inline.
-#     fields = ("lockuser","date_created","date_revoked","is_active")
-#     readonly_fields = ("date_created","date_revoked","is_active")   # TO DO:  show date_created, date_revoked (along with some other fields?) only on existing keycards, not at creation time. 
-#     #exclude = ("the_rfid",)
-# 
-#     # override __init__ to prepopulate the_rfid field with a random number, just to 
-#     #   simulate assigning a new card
-#     """
-#     def __init__(self, *args, **kwargs):
-#         super(RFIDkeycardInline, self).__init__(*args, **kwargs)
-#         self.fields['the_rfid'] = IntegerField(help_text = "(This is a random number to simulate getting a new keycard number after it's scanned in.<br>Only superuser can actually see the number.)")
-#         self.fields['the_rfid'].initial = str(random.randint(0000000000,9999999999)) # rfid's should be 10 char long... just str'ing ints, because I don't want to mess with random crap anymore.
-#     """
-#     #fields['the_rfid'] = IntegerField(help_text = "(This is a random number to simulate getting a new keycard number after it's scanned in.<br>Only superuser can actually see the number.)")
-#     #fields['the_rfid'].initial = str(random.randint(0000000000,9999999999)) # rfid's should be 10 char long... just str'ing ints, because I don't want to mess with random crap anymore.
-#     def queryset(self,request):
-#         """
-#         Limit the existing RFIDkeycard objects displayed inline on LockUser's change_form. Don't show any - 
-#            only the "+" should be there.
-#         """ 
-#         # temporarily show some keycards there, for debugging
-#         rfk_queryset = super(RFIDkeycardInline, self).queryset(request).none() # creates an EmptyQueryset  
-#         return rfk_queryset
-# 
 
 class LockUserAdmin(admin.ModelAdmin):
     #inlines = [RFIDkeycardInline]
+    #form = LockUserForm
 
 
 
@@ -334,11 +304,10 @@ class LockUserAdmin(admin.ModelAdmin):
 
         return super(LockUserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 
-    #Don't display save, etc. buttons on bottom (to do: the remaining "Save and continue editing" and "Save")
+    #Don't display save, delete buttons on bottom 
     def has_delete_permission(self, request, obj=None):
         """ Don't display "delete" button """
         return False
-
 
 
 class AccessTimeAdmin(admin.ModelAdmin):

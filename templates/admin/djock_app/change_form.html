@@ -15,23 +15,26 @@ $(function() {
             message_div = document.getElementById("keycard_assignment_scan_message"); 
             if (result.success == true) {
                 // NewKeycardScan object should be initiated and saved now
-                message_div.innerHTML = "OK, ready to read keycard"; 
+                message_div.innerHTML = "OK, ready to read keycard."; 
+                new_scan_pk = result.new_scan_pk; 
+                message_div.innerHTML += "the pk of OUR new_scan obj is "+new_scan_pk; 
 
             } else {
-                message_div.innerHTML = "Unable to read keycard (NewKeycardScan object not initiated/saved [?] ) ";             }
+                message_div.innerHTML = "Error - try again (NewKeycardScan object not initiated/saved [?] ) ";             }
         });
     };
 
     var done_get_rfid = function() {
         message_div = document.getElementById("keycard_assignment_scan_message"); 
-       $.getJSON("/done_scan/", function(result) {
+       $.getJSON("/done_scan/"+new_scan_pk+"/", function(result) {
             if (result.success == true) {
                // todo:  double check id (id comes from field.field }}
                $("#id_rfidkeycard_set-0-the_rfid").val(result.rfid); 
                 message_div.innerHTML = "Success! Save to complete keycard assignment. ("+result.rfid+")"; 
 
             } else {
-                message_div.innerHTML = "Didn't read new keycard... Try again."; 
+                //message_div.innerHTML = "Didn't read new keycard... Try again."; 
+                message_div.innerHTML = "ERROR (" + result.error_mess + ") Hit Save to save lock user without assigning keycard or try again."; 
               //setTimeout(done_get_rfid, 250); // wait 250 sec before trying done_get_rfid again
             }
         });

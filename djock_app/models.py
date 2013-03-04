@@ -10,6 +10,8 @@ from django.db.models import signals
 from django.utils.timezone import utc
 import datetime
 from termcolor import colored   # temp
+from django.db.utils import IntegrityError
+from django import forms
 
 
 
@@ -71,9 +73,15 @@ class NewKeycardScan(models.Model):
         """ Check whether specified number of minutes have passed since user indicated they were going to go scan in a card for assigning it.  Defaults to 2 minutes. """
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
         max_time = datetime.timedelta(minutes=minutes)
-        if now - self.time_initiated > max_time:
-            return True
-        return False
+        delta = now - self.time_initiated
+        print "delta:", delta
+        print "max time: ", max_time
+        print "delta > max_time ", delta>max_time
+        print "toal sec ", delta.total_seconds()/60
+        print "uhhhhhhhhhhhh wtf? delta and max time, is greater, total sec", delta, max_time, delta>max_time, delta.total_seconds(), delta.total_seconds()/60
+        time_diff_minutes = round( delta.total_seconds() / 60, 2)
+        # currently returning time diff only for sticking in an error message on interface on keycard assignment timeout
+        return (delta>max_time, time_diff_minutes)
 
 
 
@@ -91,13 +99,15 @@ class RFIDkeycard(models.Model):
          a separate is_active field here... just ask: is_active() --> can just check if there's a revoked date,
          OR if today's date is between assigned/revoked...
     """
-    the_rfid    = models.CharField(max_length=10,null=False,editable=False) # the radio-frequency id
+    the_rfid    = models.CharField(max_length=10,null=False,blank=False, editable=False,unique=True) # the radio-frequency id
     date_revoked = models.DateTimeField(null=True, blank=True) # note that blank=True is at form validation level,
     # while null=True is at db level
     # This should not be a field that staff users can fill in.  It should be created
     # automatically when the associated **LockUser** is deactivated
 
     date_created = models.DateTimeField(auto_now_add=True)
+
+    deactivate_me = models.BooleanField(default=False)
 
     ####################################################################
     # Switching to Foreign Key relationship for RFIDkeycard/LockUser
@@ -106,8 +116,6 @@ class RFIDkeycard(models.Model):
     #   can have multiple RFIDkeycards (though only one can be active
     #   at a time).
     #   - So now we have a ForeignKeyField in **RFIDkeycard** to LockUser,
-    #   - with unique=True, meaning that in the RFIDkeycard table, the
-    #     each LockUser field must be unique (i.e. no sharing of keycards)
     #
     # So now, to get a lockuser: rfidkeycard_object.lockuser
     #         to get a lockuser's field: rfidkeycard_object.lockuser.first_name,
@@ -170,8 +178,9 @@ class RFIDkeycard(models.Model):
 
 
     def save(self,*args,**kwargs):
-        """ Overriding save():  When assign new keycard, if the LockUser was inactive before, they will
-        automatically become active.  
+        """ Overriding save():  
+        - When assign new keycard, if the LockUser was inactive before, they will automatically become active.  
+        - Give user "sorry,duplicate" error 
         """
         print colored("SAVING-rfidkeycard", "magenta")
         # Check if the object is in the database yet. If no pk, means it hasn't
@@ -185,7 +194,17 @@ class RFIDkeycard(models.Model):
                 self.lockuser.save()
 
         # and now save the keycard itself
+        """
+        try:
+            super(RFIDkeycard,self).save(*args,**kwargs)
+        except IntegrityError:
+            # form passed validation, so didn't error there 
+            errors = forms.util.ErrorList()
+            errors = forms._errors.setdefault(django.forms.forms.NON_FIELD_ERRORS, errors)
+            errors.append('Sorry, this RFID already exists.')
+        """
         super(RFIDkeycard,self).save(*args,**kwargs)
+
 
         
 
@@ -207,31 +226,33 @@ class AccessTime(models.Model):
 
 class LockUser(models.Model):
     """ (Despite the misleading name, LockUsers are not subclassed Users, but subclassed Models.) """
-
-
-    ################################################################################
-    # doors should be limited to the Doors, and should show up as checkable items for a specific LockUser.
-    ################################################################################
-    # (Also, which specific doors are check-able/show up should depend on the permissions [or staff vs
-    # superuser, etc.] for the person doing the assigning. E.g. someone only involved with the Bike Project
-    # shouldn't be able to assign keycard access to the Makerspace door.
-    doors = models.ManyToManyField(Door,blank=True)
-
     ####################################################################
-    ####  contact infoz ######
+    #  Contact info 
     ####################################################################
     first_name      = models.CharField(max_length=50)
     middle_name     = models.CharField(max_length=50,blank=True)
     last_name       = models.CharField(max_length=50)
     address         = models.CharField(max_length=100,blank=True)
-    email           = models.EmailField(blank=True)  # blank okay for NOW, later - required
+    email           = models.EmailField(blank=True)  # blank okay for NOW, later - required, and unique=True
     phone_number    = models.IntegerField(max_length=30,null=True,blank=True) # later - required
     birthdate       = models.DateField(null=True)
+
+    ################################################################################
+    # Doors should be limited to the Doors, and should show up as checkable items for a specific LockUser.
+    ################################################################################
+    # (Also, which specific doors are check-able/show up should depend on the permissions [or staff vs
+    # superuser, etc.] for the person doing the assigning. E.g. someone only involved with the Bike Project
+    # shouldn't be able to assign keycard access to the Makerspace door.
+    doors = models.ManyToManyField(Door,blank=True)
+    # The default help text for ManyToManyFields is 'Hold down "Control", or "Command" on a Mac, to select
+    # more than one.' Need to change that.
+    doors.help_text = "Select at least one space."  # passing a help_text argument to ManyToManyField doesn't work, because in ManyToManyField's __init__:  msg="..."; self.help_text = self.help_text + msg
+
 
     # Is this person allowed access? (Non-superuser staff should not have the ability to delete models --
     # but rather to DEACTIVATE.)
     #   Note that a lockuser can be activated, but have no keycard. 
-    activate       =   models.BooleanField(default=False)   #i.e. defaults to deactivated
+    activate       =   models.BooleanField(default=False, help_text="Uncheck to deactivate user and revoke keycard access.")   #i.e. defaults to deactivated
 
     # "Deactivate keycard?" on LockUser, RFIDkeycard change_form:
     deactivate_current_keycard = models.BooleanField(default=False)    # So, upon creation, the RFIDkeycard is activated automatically
@@ -259,14 +280,18 @@ class LockUser(models.Model):
             # get last created NewKeycardScan object
             new_scan = new_scan_queryset.latest("time_initiated") # todo: see expanded_comments.txt, (2)
             print colored("\tnew_scan id "+str(new_scan.id)+" (pk="+str(new_scan.pk)+")","white","on_blue")
+            print colored("\t READY TO ASSIGN"+str(new_scan.ready_to_assign),"blue","on_green")
             if new_scan.ready_to_assign:
                 print colored("\tready_to_assign=True","white","on_green")
-                new_keycard = RFIDkeycard(lockuser=self, the_rfid=new_scan.rfid)
-                new_keycard.save()
-                new_scan.ready_to_assign = False
+                # save new_scan before saving new_keycard! 
+                new_scan.ready_to_assign = False   
+                print colored("\t here??????????????????????????????????????????????? ,", "white", "on_green")
                 new_scan.save()
+                new_keycard = RFIDkeycard(lockuser=self, the_rfid=new_scan.rfid)
+                print colored("\t here??????????????????????????????????????????????? ," ,"white", "on_red")
+                new_keycard.save()
                 print colored("\tso just saved this NewKeycardScan object","white","on_green")
-                
+                print colored("\tJUST CHANGED READY TO ASSIGN","blue","on_green")
                 
             # else ???
             #   .....
@@ -326,8 +351,6 @@ class LockUser(models.Model):
     #   can have multiple RFIDkeycards (though only one can be active
     #   at a time).
     #   - So now we have a ForeignKeyField in **RFIDkeycard** to LockUser,
-    #   - with unique=True, meaning that in the RFIDkeycard table, 
-    #     each LockUser field must be unique (i.e. no sharing of keycards)
     #
     #      - so rfids changes from a field to get_rfids()?  How to get
     # To get the RFIDkeycards assigned to this LockUser: lockuser_object.rfidkeycard_set.all()

@@ -5,30 +5,9 @@ import random
 from datetime import datetime
 from django.utils import simplejson
 from termcolor import colored   # temp
-#from django.contrib import messages
-
-
-def test_jquery(request):
-    response_data = {'success':True, 'rfid':"1111111111"}
-    return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-
-
-
-
-# pseudocoding how to  handle the incoming request to verify rfid
-# I think we discussed two ways of verifying: id 
-#   - primary: /door/<door_id>/check/<rfid_id>
-#   - secondary (if stuff is down): cached version on arduino -- but obv no code here for that
-
-
-# TO DO: tests for get_all_allowed (across doors); e.g. all_allowed/
-# tests for URLS with door id's as well, e.g. all_allowed/door/x
-
 
 # return list of rfid's allowed for all doors, or a particular door,
 #   as json list 
-#   (Should just do one method, with door defaulting to None/one urlconf? 
-#   Or just have an additional urlconf for get_allowed_one_door/doorid/ vs get_allowed_all_doors/
 def get_allowed_rfids(request, doorid=None):
     """ Returns list of allowed rfid's for the specified door, or 0 if none """
     # check that door id is valid. 
@@ -55,14 +34,13 @@ def check(request,doorid, rfid):
     # Is the request actually for new keycard assignment? 
     new_scan_queryset = NewKeycardScan.objects.all()
     if new_scan_queryset:
-        print colored("here we are .................", "green")
         new_scan = new_scan_queryset.latest("time_initiated")  # get the latest NewKeycardScan object, ordered by the field time_initiated (i.e. time the object was created) 
+        # TODO: Things might go awry if someone else initiated a scan later... Currently verifying pk's later,  in
+        # finished_keycard_scan, but do earlier. And pass pk info in a smarter way.
+
         if new_scan.waiting_for_scan == True:
             new_scan.doorid = doorid  # record the door the new scan request came from (not necessary so far) 
             new_scan.rfid = rfid
-            #messages.success(request,new_scan.rfid)
-            #print colored("messages.success "+ str(messages.success),"magenta")
-            print colored("the rfid? : "+ str(new_scan.rfid),"magenta")
             new_scan.save()  
     
     # or is the request actually for authenticating an existing keycard for this door? 
@@ -83,84 +61,69 @@ def check(request,doorid, rfid):
 def initiate_new_keycard_scan(request):
     n = NewKeycardScan()
     n.waiting_for_scan = True
-    print colored("n.waiting_for_scan: "+str(n.waiting_for_scan), "red")
     n.save()   
-
-    # back to the lockuser's (the one who we deactivated the card for) change_form
-    #back_to_lockuser = "/lockadmin/djock_app/lockuser/%s/" % lockuser_object_id
-    #return redirect(back_to_lockuser)
-    # todo: No refreshing, pls!   AJAX
-    response_data = {'success':True}
+    response_data = {'success':True, 'new_scan_pk':n.pk}
     return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
     
 #def finished_new_keycard_scan(request, lockuser_object_id):
-def finished_new_keycard_scan(request):
-    # todo: Does it make more sense to put this in RFIDkeycardForm, in admin.py? 
+def finished_new_keycard_scan(request,new_scan_pk):
+    """  Verify this is the NewKeycardScan object we initiated, that the rfid
+        is not the same as that of a currently active keycard, and that we 
+        haven't timed out. Then get the rfid from the newly-scanned card. 
+    """
+    # TODO:  raise exceptions.   
+    # TODO:  Error codes to aid developers. So Staff user sees "ERROR (code 2). Try again," not "ERROR (scary message
+    #           about the exact error). Try again." 
     new_scan_queryset = NewKeycardScan.objects.all()
-    if new_scan_queryset:
-        new_scan = new_scan_queryset.latest("time_initiated")  # get the latest NewKeycardScan object, ordered by the field time_initiated (i.e. time the object was created) 
-        print colored("waiting? "+ str(new_scan.waiting_for_scan),"blue")
-        print colored("time_initiated? "+ str(new_scan.time_initiated),"blue")
-        print colored("timed_out?, 2 min default: "+ str(new_scan.timed_out()),"blue")
-        print colored("the doorid? : "+ str(new_scan.doorid),"blue")
-        print colored("the rfid? : "+ str(new_scan.rfid),"blue")
-        print colored("the ready_toassign?? : "+ str(new_scan.ready_to_assign),"blue")
+    if not new_scan_queryset:
+        response_data = {'success':False, 'error_mess':"No NewKeycardScan objects at all"}
+        return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
+    print colored("wtf 1","red")
 
-        # if waiting for new keycard to be scanned, but timed out
-        if new_scan.timed_out(minutes=2):
-            pass
+    # Verify that the scan object is the one we need, not one initiated later by someone else, for example.
+    new_scan_right_pk_qs = new_scan_queryset.filter(pk = new_scan_pk)  # make sure we have the newKeycardScan object we started with, not one that another staff user initiated *after* us. 
 
-        # Set waiting status to False; set ready to assign status (for
-        # RFIDkeycard's save() to True); and save NewKeycardScan object
-        new_scan.waiting_for_scan = False
-        new_scan.ready_to_assign = True 
-        new_scan.save()
-        # todo: or should I delete the NewKeycardScan object when done with it?
+    if not new_scan_right_pk_qs:
+        response_data = {'success':False, 'error_mess':"No NewKeycardScan obj with pk " + new_scan_pk}
+        return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
+    print colored("wtf 2","red")
 
-    # Return message indicating whether we're good to go (so staff user can go ahead and hit "save" for
-    # this lockuser), or whether we timed out. 
-    #######################################
-    # Also can send back extra stuff in the redirect url, e.g. /blah/?var=5 -- You would then parse that
-    # variable with request.GET in the view code and show the appropriate text
-    #######################################
-    #print colored("here's messages.info: "+str(messages.success), "red")
+    new_scan = new_scan_right_pk_qs[0]
+    print colored("wtf 2.1","red")
+    min_till_timeout = 2
+    print colored("wtf 2.2","red")
+    print colored("wtf 2.2.1 - new scan " + str(new_scan),"red")
+    print colored("wtf 2.2.2","red")
+    timed_out, time_diff_minutes = new_scan.timed_out(minutes=min_till_timeout)
+    print colored("wtf 2.3","red")
+    if timed_out:
+    #if new_scan.timed_out(minutes=min_till_timeout):
+        response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done'.... So don't take %f minutes next time, please." % (min_till_timeout,time_diff_minutes)}
+        return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
-    # back to the lockuser's (the one who we deactivated the card for) change_form
-    #back_to_lockuser = "/lockadmin/djock_app/lockuser/%s/" % lockuser_object_id
-    #return redirect(back_to_lockuser)
-    # todo: No refreshing, pls!   AJAX
-    if new_scan.rfid:  # and if not timed out......
-        response_data = {'success':True, 'rfid':new_scan.rfid}
-    else:
-        #response_data = {'success':False, 'rfid':new_scan.rfid}
-        #response_data = {'success':False}
-        response_data = {'success':False, 'rfid':"NOPE!  (put this message in another div though)"}
+    print colored("wtf 3","red")
+    if not new_scan.rfid:  
+        response_data = {'success':False, 'error_mess':"NewKeycardScan does not have rfid"}
+        return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
+    # if waiting for new keycard to be scanned, but timed out
 
-    print colored("about to return response data","green")
+    # Verify that the rfid is not the same as that of another active keycard
+    keycards_with_same_rfid_qs = RFIDkeycard.objects.filter(the_rfid=new_scan.rfid)
+    for k in keycards_with_same_rfid_qs:
+        if k.is_active():
+            response_data = {'success':False, 'error_mess':"An active keycard with the same RFID is assigned to %s." % k.lockuser} # to do:  include actual link to this lockuser
+            return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
+            
+    # OK, so far so good.  Now: 
+    # Set waiting status to False; set ready to assign status (for
+    # RFIDkeycard's save() to True); and save NewKeycardScan object
+    new_scan.waiting_for_scan = False
+    new_scan.ready_to_assign = True 
+    new_scan.save()
+
+    response_data = {'success':True, 'rfid':new_scan.rfid}
     return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-
-
-
-
-
-
-
-
-"""def check(request, doorid, rfid):
-
-    return list_detail.object_list(
-        request,
-        queryset = RFIDkeycard.objects.all(), 
-        template_name = "basic.html",
-        #template_object_name = "rfidkeycard_list",  # So in template,  {% for rfidkeycard in rfidkeycard_list %} instead of   {% for rfidkeycard in object_list %} .....  although something isn't working.....
-        extra_context = {"params" :{'doorid': doorid, 'rfid':rfid}, \
-        "doors_list": Door.objects.all(), 
-                     }   
-                     )   
-
-"""
-
 
 def deactivate_keycard(request,object_id):
     """ object_id was in the url -- it contains the id of the lockuser that needs its
@@ -176,18 +139,11 @@ def deactivate_keycard(request,object_id):
     except:
         # raise exception?
         return render(request,'basic.html')
-    print "********* object_id is ", object_id
-    print "\ti.e. the lockuser is ", lu
-    print "\t and their keycard: ", rfk
-    print "\t keycard is active? ", rfk.is_active()
-    print "\t keycard's date revoked ", rfk.date_revoked
 
     #if rfk.is_active():
         #rfk.date_revoked = datetime.now()
         #rfk.save()
     rfk.deactivate()
-    print "\t AFTER - keycard's date revoked ", rfk.date_revoked
-    print "\t AFTER - is_active(): ", rfk.is_active()
     rfk.save()   # save RFIDkeycard object
 
     #return render(request, 'basic.html')
