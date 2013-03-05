@@ -107,7 +107,7 @@ class RFIDkeycard(models.Model):
 
     date_created = models.DateTimeField(auto_now_add=True)
 
-    deactivate_me = models.BooleanField(default=False)
+    deactivated = models.BooleanField(default=False)
 
     ####################################################################
     # Switching to Foreign Key relationship for RFIDkeycard/LockUser
@@ -188,9 +188,10 @@ class RFIDkeycard(models.Model):
         #   it. Note that at this point, other attributes *are* available, like
         #   lockuser, they just haven't been saved yet.
         if not self.pk and self.lockuser: 
-            if self.lockuser.activate == False: 
+            #if self.lockuser.activate == False: 
+            if self.lockuser.deactivated == True: 
                 # activate the keycard's lock user, and save
-                self.lockuser.activate = True
+                self.lockuser.deactivated == False
                 self.lockuser.save()
 
         # and now save the keycard itself
@@ -252,7 +253,7 @@ class LockUser(models.Model):
     # Is this person allowed access? (Non-superuser staff should not have the ability to delete models --
     # but rather to DEACTIVATE.)
     #   Note that a lockuser can be activated, but have no keycard. 
-    activate       =   models.BooleanField(default=False, help_text="Uncheck to deactivate user and revoke keycard access.")   #i.e. defaults to deactivated
+    deactivated       =   models.BooleanField(default=False, help_text="Uncheck to deactivate user and revoke keycard access.")   #i.e. defaults to deactivated
 
     # "Deactivate keycard?" on LockUser, RFIDkeycard change_form:
     deactivate_current_keycard = models.BooleanField(default=False)    # So, upon creation, the RFIDkeycard is activated automatically
@@ -311,7 +312,7 @@ class LockUser(models.Model):
         # automatically set user to be activated.  However, we can do that in the
         # RFIDkeycard's save(), since there we can check whether RFIDkeycard
         # object was just created
-        if current_keycard and self.activate == False:   
+        if current_keycard and self.deactivated == True:   
             #current_keycard.date_revoked = datetime.now()
             current_keycard.deactivate()
             current_keycard.save()# save keycard if you have changed it

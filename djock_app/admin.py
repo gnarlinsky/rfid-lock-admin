@@ -129,7 +129,7 @@ class RFIDkeycardForm(ModelForm):
 class RFIDkeycardAdmin(admin.ModelAdmin):
     #form = RFIDkeycardForm # prepopulating with random num
 
-    list_display = ["the_rfid","id", "date_created","date_revoked","is_active", "lockuser","deactivate_me",
+    list_display = ["the_rfid","id", "date_created","date_revoked","is_active", "lockuser","deactivated",
                     "get_allowed_doors_html_links"]
 
     ####################################################################################################
@@ -137,7 +137,7 @@ class RFIDkeycardAdmin(admin.ModelAdmin):
     ####################################################################################################
     #prepopulated_fields = { 'the_rfid': ('id',)} 
     #fields = ("the_rfid","date_revoked","date_created","id")
-    fields = ("the_rfid","lockuser","date_created","date_revoked","get_allowed_doors","is_active","deactivate_me")  # here showing fields wouldn't show to a staff user, since the real (not inline) RFIDkeycard change_form would only be visible to superuser.
+    fields = ("the_rfid","lockuser","date_created","date_revoked","get_allowed_doors","is_active","deactivated")  # here showing fields wouldn't show to a staff user, since the real (not inline) RFIDkeycard change_form would only be visible to superuser.
     readonly_fields = ("the_rfid","deactivate","lockuser","date_created","date_revoked","is_active","get_allowed_doors")
 
 
@@ -200,7 +200,7 @@ class LockUserAdmin(admin.ModelAdmin):
                     'get_allowed_doors_html_links',\
                     'prettify_get_last_access_time',
                  #  'is_active',
-                    'activate',
+                    'deactivated',
     )
 
     #list_filter = ('rfid','is_active')  # show filters by RFID and active/inactive on the right
@@ -225,8 +225,8 @@ class LockUserAdmin(admin.ModelAdmin):
                             'prettify_get_current_rfid','prettify_get_all_rfids',\
                             'prettify_get_last_access_time', 'prettify_get_all_access_times', \
                             #'is_active', \
-                            'activate', \
                             'doors',
+                            'deactivated', \
                             'deactivate_current_keycard',
                           #  'rfids',
                             ),

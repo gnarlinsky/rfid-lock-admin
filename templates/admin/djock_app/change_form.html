@@ -5,7 +5,9 @@
 
 {% block extrahead %}
     {{ block.super }}
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"/></script>
+    
+<!-- <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"/></script> -->
+<script type="text/javascript" src="static/admin/js/jquery.min.js"></script>
 <!-- <script> alert("Done button" + $("#done_button")); </script>  --> 
 <script> 
 
@@ -64,7 +66,33 @@ $(function() {
         new_keycard_div = document.getElementById("assign_new_keycard_buttons_and_instructions"); 
         new_keycard_div.style.display="inline"; 
     });
-    
+  
+
+    $("#id_deactivated").bind("click",function(e) {   // blah 
+        var deactivate_keycard= document.getElementById('id_deactivate_current_keycard')
+        var deactivate_lockuser = document.getElementById('id_deactivated')
+        if (deactivate_keycard.checked) {
+            deactivate_lockuser.checked = true;
+        }
+        else {
+            deactivate_lockuser.checked = false;
+        }
+    }); 
+
+    $("#id_deactivate_current_keycard").bind("click",function(e) {   // blah 
+        var deactivate_keycard= document.getElementById('id_deactivate_current_keycard')
+        var deactivate_lockuser = document.getElementById('id_deactivated')
+        if (deactivate_lockuser.checked) {
+            deactivate_keycard.checked = true;
+        }
+        else {
+            deactivate_keycard.checked = false;
+    //  how to have this just call same exact thing as above?
+    }
+    }); 
+
+
+
 
 });
 </script>
