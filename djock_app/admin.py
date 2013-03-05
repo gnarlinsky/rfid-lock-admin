@@ -195,12 +195,11 @@ class LockUserAdmin(admin.ModelAdmin):
     # Which fields to display
     #-------------------------
     # fields (i.e. column headings)
+    # to do:  show deactivated (i.e. no current keycard) in gray, or de-emphasize another way
     list_display = ('first_name','last_name','email',\
                     'prettify_get_current_rfid','prettify_get_all_rfids',\
                     'get_allowed_doors_html_links',\
                     'prettify_get_last_access_time',
-                 #  'is_active',
-                    'deactivated',
     )
 
     #list_filter = ('rfid','is_active')  # show filters by RFID and active/inactive on the right
@@ -214,6 +213,7 @@ class LockUserAdmin(admin.ModelAdmin):
     ####################################################
     # Which fields to show, and in what order
     # (parentheses group fields into a single line)
+    # to do:  show deactivated (i.e. no current keycard) in gray, or de-emphasize another way
     fieldsets = (
             (None, {
                 'fields': ( \
@@ -226,7 +226,6 @@ class LockUserAdmin(admin.ModelAdmin):
                             'prettify_get_last_access_time', 'prettify_get_all_access_times', \
                             #'is_active', \
                             'doors',
-                            'deactivated', \
                             'deactivate_current_keycard',
                           #  'rfids',
                             ),

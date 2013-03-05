@@ -70,7 +70,7 @@
             new_keycard_div.style.display="inline"; 
         });
       
-
+/* 
         $("#id_deactivated").bind("click",function(e) {  
             var deactivate_lockuser = document.getElementById('id_deactivated'); 
             var deactivate_keycard= document.getElementById('id_deactivate_current_keycard'); 
@@ -93,7 +93,9 @@
         //  how to have this just call same exact thing as above?
             }
         }); 
+        */
     });
+
     </script>
 {% endblock extrahead %}
     
@@ -177,10 +179,12 @@
                 
     <div class="submit-row"> 
         {% comment %} using STATIC_URL for *my* static/ files; otherwise it's Django admin's originals {% endcomment %}
-         {% if  not object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %} 
-            <input type="button" id="add_keycard_and_activate_user_button" value="Assign new keycard and activate user" />
 
-         {% elif  object_id|is_lockuser_active and not object_id|does_lockuser_have_active_keycard %}
+        {% comment %}  if lockuser is not active/does not have current keycard {% endcomment %}
+         {% if not object_id|does_lockuser_have_active_keycard %} 
+            <input type="button" id="add_keycard_and_activate_user_button" value="Assign new keycard and activate user" />
+        {% else %}
+        {% comment %}  if lockuser IS active/DOES have current keycard {% endcomment %}
             <input type="button" id="add_keycard_and_activate_user_button" value="Assign new keycard" />
 
         {% comment %} No, don't show anything in this case: 

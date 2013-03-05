@@ -116,6 +116,9 @@ def finished_new_keycard_scan(request,new_scan_pk):
     response_data = {'success':True, 'rfid':new_scan.rfid}
     return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
+
+
+# applies to RFID change form, not lock user
 def deactivate_keycard(request,object_id):
     """ object_id was in the url -- it contains the id of the lockuser that needs its
     current keycard deactivated. 
@@ -144,35 +147,3 @@ def deactivate_keycard(request,object_id):
     back_to_lockuser = "/lockadmin/djock_app/lockuser/%s/" % lu.id
     return redirect(back_to_lockuser)
     #return redirect(lu)
-    
-
-#generate a random number to simulate an actual keycard being scanned in and the num retrieved """
-"""
-def fake_assign(request):
-    fake_rfid = random.randint(1000000000,9999999999)
-    # template is change_form.html?  really?
-    return render_to_response('admin/djock_app/change_form.html', {'fake_rfid': fake_rfid} )
-"""
-# How about creating a custom template tag, like {{ fake_rfid }} ?
-
-
-###############  TO DO/ TO NOTE #####################################
-"""
-ON ASSIGNING NEW KEYCARD: 
-- When a card is scanned, the arduino will try to hit some url to 
-  verify if a certain rfid is ok.   like is_it_ok/bike_proj_door/<some_num>/.
-- The same view that is called by that urlconf ***should also check 
-  whether we're expecting a bad (i.e. not approved) key right now,
-  for the purposes of assigning it to some user.*** If yes, that's
-  the one to assign, instead of checking if it's approved.   
-
-  (See email thread 'The actual process of assigning a keycard?' for more infoz.
-
-  For now, though, blackbox away some of this..... So, what happens when want to assign a new keycard, if one has not been assigned already:  on an individual lock user's page:   
--  there should be a button:  "Activate keycard."  
--  Clicking that should show prompt like "Go scan in new card."  
-- But for now, right next to that: button, e.g. "OK, I fake-scanned it." 
-- Clicking on that button should  result in the same thing that scanning in a new card should result in.  
--  For now, just generate some random long number. 
-- Then create a new keycard with that number
-"""

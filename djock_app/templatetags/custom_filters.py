@@ -4,6 +4,9 @@ from djock_app.models import LockUser
 # All the tags and filters are registered in this variable
 register = template.Library()
 
+
+""" This is unnecessary, since the new concept is: 
+    lockuser is not active IFF no current keycard
 @register.filter
 def is_lockuser_active(object_id):
     try:
@@ -13,6 +16,8 @@ def is_lockuser_active(object_id):
     if this_lockuser:
         # return this_lockuser.activate 
         return not this_lockuser.deactivated  # so if deactivated, will return False 
+"""
+
 @register.filter
 def does_lockuser_have_active_keycard(object_id):
     try:

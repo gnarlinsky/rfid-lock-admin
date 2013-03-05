@@ -16,6 +16,8 @@ from django.contrib.contenttypes.models import ContentType
 #######################################################################################
 # TO DO: 
 #######################################################################################
+#  Note - update relevant to various test to-do's: getting rid of the concept of lockuser deactivation
+#######################################################################################
 # - Separate functional tests and unit tests into separate .py's? 
 # - check if rfid not exactly 10 digits long and reject right away
 # - If some aspect of an object is updated, does that change cascade through... 

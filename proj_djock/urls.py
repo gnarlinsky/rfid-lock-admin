@@ -86,6 +86,7 @@ urlpatterns = patterns('',
     url(r'door/(?P<doorid>\d+)/getallowed/$', views.get_allowed_rfids ), 
     url(r'^checkdoor/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'admin/we_are_ok.html' }    ),
 
+    # applies to RFID's change form
     url(r'deactivate_keycard/(?P<object_id>\d+)/$', views.deactivate_keycard),
 
     # testing stuff/temp
