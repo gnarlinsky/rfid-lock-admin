@@ -173,37 +173,6 @@ class RFIDkeycard(models.Model):
         self.date_revoked = now
 
 
-    """ no-lockuser-deactivation-change
-    def save(self,*args,**kwargs):
-#        Overriding save():  
-#        - When assign new keycard, if the LockUser was inactive before, they will automatically become active.  
-#        - Give user "sorry,duplicate" error 
-        print colored("SAVING-rfidkeycard", "magenta")
-        # Check if the object is in the database yet. If no pk, means it hasn't
-        #   been saved yet -- i.e. we're creating this RFIDkeycard, not updating
-        #   it. Note that at this point, other attributes *are* available, like
-        #   lockuser, they just haven't been saved yet.
-        if not self.pk and self.lockuser: 
-            #if self.lockuser.activate == False: 
-            if self.lockuser.deactivated == True: 
-                # activate the keycard's lock user, and save
-                self.lockuser.deactivated == False
-                self.lockuser.save()
-
-        # and now save the keycard itself
-#        try:
-#            super(RFIDkeycard,self).save(*args,**kwargs)
-#        except IntegrityError:
-#            # form passed validation, so didn't error there 
-#            errors = forms.util.ErrorList()
-#            errors = forms._errors.setdefault(django.forms.forms.NON_FIELD_ERRORS, errors)
-#            errors.append('Sorry, this RFID already exists.')
-        super(RFIDkeycard,self).save(*args,**kwargs)
-        """
-
-
-        
-
 
 class AccessTime(models.Model):
     the_rfid           = models.CharField(max_length=10,null=True) # the radio-frequency id, however represented....
@@ -244,12 +213,6 @@ class LockUser(models.Model):
     # more than one.' Need to change that.
     doors.help_text = "Select at least one space."  # passing a help_text argument to ManyToManyField doesn't work, because in ManyToManyField's __init__:  msg="..."; self.help_text = self.help_text + msg
 
-    """   no-lockuser-deactivation-change
-    # Is this person allowed access? (Non-superuser staff should not have the ability to delete models --
-    # but rather to DEACTIVATE.)
-    #   Note that a lockuser can be activated, but have no keycard. 
-    deactivated       =   models.BooleanField(default=False, help_text="Uncheck to deactivate user and revoke keycard access.")   #i.e. defaults to deactivated
-    """
 
     # "Deactivate keycard?" on LockUser, RFIDkeycard change_form:
     deactivate_current_keycard = models.BooleanField(default=False, help_text="Revoke keycard access and deactivate user.")    # So, upon creation, the RFIDkeycard is activated automatically
@@ -299,21 +262,6 @@ class LockUser(models.Model):
             current_keycard = self.get_current_rfid()[0]   # self or lu? 
         except:
             current_keycard = None
-
-        """ no-lockuser-deactivation-change
-        # If the Lockuser has been deactivated, its current keycard should be deactivated as well.
-        #if lu.activate == False:   # not self.activate?
-        # Note that it would seem that this conditional would actually also
-        # cover the case where just created a current keycard, and need to 
-        # automatically set user to be activated.  However, we can do that in the
-        # RFIDkeycard's save(), since there we can check whether RFIDkeycard
-        # object was just created
-        if current_keycard and self.deactivated == True:   
-            #current_keycard.date_revoked = datetime.now()
-            current_keycard.deactivate()
-            current_keycard.save()# save keycard if you have changed it
-        # to do:  the above check will happen every save() though... 
-        """
 
         # We'll deactivate a LockUser's current keycard here, if deactivate_current_keycard is checked on the LockUser's change_form. 
         if current_keycard and self.deactivate_current_keycard:
