@@ -129,7 +129,7 @@ def deactivate_keycard(request,object_id):
         rfk = lu.get_current_rfid()[0]
     except:
         # raise exception?
-        return render(request,'basic.html')
+        return render(request,'basic.html') # ??????????????????????
 
     #if rfk.is_active():
         #rfk.date_revoked = datetime.now()

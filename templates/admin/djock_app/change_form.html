@@ -5,97 +5,96 @@
 
 {% block extrahead %}
     {{ block.super }}
-    
-<!-- <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"/></script> -->
-<script type="text/javascript" src="static/admin/js/jquery.min.js"></script>
-<!-- <script> alert("Done button" + $("#done_button")); </script>  --> 
-<script> 
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"/></script>
 
-$(function() {
-    var start_get_rfid = function() {
-       $.getJSON("/start_scan/", function(result) {
+    <!-- local version of the above --> 
+    <!-- <script type="text/javascript" src="/static/admin/js/jquery-1.9.1.min.js"></script> -->
+
+
+    <!-- <script> alert("Done button" + $("#done_button")); </script>  --> 
+    <script> 
+
+    $(function() {
+        var start_get_rfid = function() {
+           $.getJSON("/start_scan/", function(result) {
+                message_div = document.getElementById("keycard_assignment_scan_message"); 
+                if (result.success == true) {
+                    // NewKeycardScan object should be initiated and saved now
+                    message_div.innerHTML = "OK, ready to read keycard."; 
+                    new_scan_pk = result.new_scan_pk; 
+                    message_div.innerHTML += "the pk of OUR new_scan obj is "+new_scan_pk; 
+
+                } else {
+                    message_div.innerHTML = "Error - try again (NewKeycardScan object not initiated/saved [?] ) ";             }
+            });
+        };
+
+        var done_get_rfid = function() {
             message_div = document.getElementById("keycard_assignment_scan_message"); 
-            if (result.success == true) {
-                // NewKeycardScan object should be initiated and saved now
-                message_div.innerHTML = "OK, ready to read keycard."; 
-                new_scan_pk = result.new_scan_pk; 
-                message_div.innerHTML += "the pk of OUR new_scan obj is "+new_scan_pk; 
+           $.getJSON("/done_scan/"+new_scan_pk+"/", function(result) {
+                if (result.success == true) {
+                   // todo:  double check id (id comes from field.field }}
+                   $("#id_rfidkeycard_set-0-the_rfid").val(result.rfid); 
+                    message_div.innerHTML = "Success! Save to complete keycard assignment. ("+result.rfid+")"; 
 
-            } else {
-                message_div.innerHTML = "Error - try again (NewKeycardScan object not initiated/saved [?] ) ";             }
+                } else {
+                    //message_div.innerHTML = "Didn't read new keycard... Try again."; 
+                    message_div.innerHTML = "ERROR (" + result.error_mess + ") Hit Save to save lock user without assigning keycard or try again."; 
+                  //setTimeout(done_get_rfid, 250); // wait 250 sec before trying done_get_rfid again
+                }
+            });
+        };
+
+
+        $("#start_button").bind("click", function(e) {
+            e.preventDefault();
+            start_get_rfid();
         });
-    };
 
-    var done_get_rfid = function() {
-        message_div = document.getElementById("keycard_assignment_scan_message"); 
-       $.getJSON("/done_scan/"+new_scan_pk+"/", function(result) {
-            if (result.success == true) {
-               // todo:  double check id (id comes from field.field }}
-               $("#id_rfidkeycard_set-0-the_rfid").val(result.rfid); 
-                message_div.innerHTML = "Success! Save to complete keycard assignment. ("+result.rfid+")"; 
+        $("#done_button").bind("click", function(e) {
+            e.preventDefault();
+            done_get_rfid();
+        });
 
-            } else {
-                //message_div.innerHTML = "Didn't read new keycard... Try again."; 
-                message_div.innerHTML = "ERROR (" + result.error_mess + ") Hit Save to save lock user without assigning keycard or try again."; 
-              //setTimeout(done_get_rfid, 250); // wait 250 sec before trying done_get_rfid again
+        $("#cancel_add_keycard_and_activate_user_button").bind("click", function(e) {
+            e.preventDefault();
+            new_keycard_div = document.getElementById("assign_new_keycard_buttons_and_instructions"); 
+            new_keycard_div.style.display="none"; 
+            // todo: do anything else to cancel? 
+        });
+
+        // don't show the keycard assignment instructions/buttons by default, but only when user clicks on 'assign new keycard'
+        $("#add_keycard_and_activate_user_button").bind("click", function(e) {
+            e.preventDefault();
+            new_keycard_div = document.getElementById("assign_new_keycard_buttons_and_instructions"); 
+            new_keycard_div.style.display="inline"; 
+        });
+      
+
+        $("#id_deactivated").bind("click",function(e) {  
+            var deactivate_lockuser = document.getElementById('id_deactivated'); 
+            var deactivate_keycard= document.getElementById('id_deactivate_current_keycard'); 
+            if (deactivate_lockuser.checked) {
+                deactivate_keycard.checked = true;
             }
-        });
-    };
+            else {
+                deactivate_keycard.checked = false;
+            }
+        }); 
 
-
-    $("#start_button").bind("click", function(e) {
-        e.preventDefault();
-        start_get_rfid();
+        $("#id_deactivate_current_keycard").bind("click",function(e) {   
+            var deactivate_lockuser = document.getElementById('id_deactivated')
+            var deactivate_keycard= document.getElementById('id_deactivate_current_keycard')
+            if (deactivate_keycard.checked) {
+                deactivate_lockuser.checked = true;
+            }
+            else {
+                deactivate_lockuser.checked = false;
+        //  how to have this just call same exact thing as above?
+            }
+        }); 
     });
-
-    $("#done_button").bind("click", function(e) {
-        e.preventDefault();
-        done_get_rfid();
-    });
-
-    $("#cancel_add_keycard_and_activate_user_button").bind("click", function(e) {
-        e.preventDefault();
-        new_keycard_div = document.getElementById("assign_new_keycard_buttons_and_instructions"); 
-        new_keycard_div.style.display="none"; 
-        // todo: do anything else to cancel? 
-    });
-
-    // don't show the keycard assignment instructions/buttons by default, but only when user clicks on 'assign new keycard'
-    $("#add_keycard_and_activate_user_button").bind("click", function(e) {
-        e.preventDefault();
-        new_keycard_div = document.getElementById("assign_new_keycard_buttons_and_instructions"); 
-        new_keycard_div.style.display="inline"; 
-    });
-  
-
-    $("#id_deactivated").bind("click",function(e) {   // blah 
-        var deactivate_keycard= document.getElementById('id_deactivate_current_keycard')
-        var deactivate_lockuser = document.getElementById('id_deactivated')
-        if (deactivate_keycard.checked) {
-            deactivate_lockuser.checked = true;
-        }
-        else {
-            deactivate_lockuser.checked = false;
-        }
-    }); 
-
-    $("#id_deactivate_current_keycard").bind("click",function(e) {   // blah 
-        var deactivate_keycard= document.getElementById('id_deactivate_current_keycard')
-        var deactivate_lockuser = document.getElementById('id_deactivated')
-        if (deactivate_lockuser.checked) {
-            deactivate_keycard.checked = true;
-        }
-        else {
-            deactivate_keycard.checked = false;
-    //  how to have this just call same exact thing as above?
-    }
-    }); 
-
-
-
-
-});
-</script>
+    </script>
 {% endblock extrahead %}
     
     {% comment %} 

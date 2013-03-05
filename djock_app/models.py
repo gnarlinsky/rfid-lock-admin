@@ -136,10 +136,6 @@ class RFIDkeycard(models.Model):
         #   blah, but it's a useful for showing on the page for a particular LockUser, for ex.
         return u'%s' % (self.the_rfid)
 
-    def get_date_assigned(self):
-        # get from __init__
-        pass
-
     def get_allowed_doors(self):
         """ Get the Doors this user is allowed access to. """
         if self.lockuser:
@@ -256,7 +252,7 @@ class LockUser(models.Model):
     deactivated       =   models.BooleanField(default=False, help_text="Uncheck to deactivate user and revoke keycard access.")   #i.e. defaults to deactivated
 
     # "Deactivate keycard?" on LockUser, RFIDkeycard change_form:
-    deactivate_current_keycard = models.BooleanField(default=False)    # So, upon creation, the RFIDkeycard is activated automatically
+    deactivate_current_keycard = models.BooleanField(default=False, help_text="Uncheck to revoke keycard access and deactivate user.")    # So, upon creation, the RFIDkeycard is activated automatically
 
     def save(self, *args, **kwargs):
         """ Why overriding save(): 
@@ -330,6 +326,13 @@ class LockUser(models.Model):
             #super(LockUser, self).save(*args, **kwargs)  # save again
             # ?
             self.save()
+
+        """ Below: no.  Do this when validating the *form.*  
+        # Active LockUsers must have access to at least one Door. 
+        if not self.deactivated and not self.doors.all():
+            # todo:  if the only Door(s) that a LockUser has access to are deleted or deactivated, that's the same as having access to no Door9s) at all. 
+            pass
+        """
 
 
         # or 
