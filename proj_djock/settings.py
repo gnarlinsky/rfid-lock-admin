@@ -146,6 +146,7 @@ INSTALLED_APPS = (
     'djock_app',
     'bootstrap_toolkit',
     'debug_toolbar',
+    'django_extensions',
 )
 
 
