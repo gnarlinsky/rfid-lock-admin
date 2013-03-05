@@ -2,7 +2,7 @@ import os
 # To access request variable in templates
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 
-SETTINGS_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+ONE_UP_SETTINGS_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -74,7 +74,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(SETTINGS_ROOT,'static'),
+    os.path.join(ONE_UP_SETTINGS_ROOT,'static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -115,7 +115,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(SETTINGS_ROOT,'templates')
+    os.path.join(ONE_UP_SETTINGS_ROOT,'templates')
 )
 
 INSTALLED_APPS = (
