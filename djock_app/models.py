@@ -12,7 +12,6 @@ import datetime
 from termcolor import colored   # temp
 from django.db.utils import IntegrityError
 from django import forms
-from django.contrib.admin.models import LogEntry,ADDITION
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_unicode
@@ -148,43 +147,6 @@ class RFIDkeycard(models.Model):
         # todo:  include date revoked and date assigned as well? include assigner's name? (instead of prettifying crap)  
 
 
-    """
-    def get_creator(self):
-       # Get the staff User that created this RFIDkeycard.
-        # There should only be two kinds of RFIDkeycard actions: assigning/creating (is_addition()) and
-        # deactivating (is_change()), so this filter, plus the is_addition()/is_change() conditional
-        # should get what we need.
-        # todo:   __exact?
-        log_entries = LogEntry.objects.filter(\
-                content_type__id__exact = ContentType.objects.get_for_model(self).id,\
-                object_id=self.id)
-        try:
-           # for l in LogEntry.objects.all():
-            log_entry = log_entries[0] #todo:  if not  length exactly 1........
-            if log_entry.is_addition():   
-                return User.objects.get(id=log_entry.user_id)
-                # todo - catch DoesNotExist: User matching query does not exist ? 
-        # todo - exception? 
-        except:
-            return None
-                
-    def get_revoker(self):
-        # Get the staff User that revoked this RFIDkeycard, if it was revoked.
-        # There should only be two kinds of RFIDkeycard actions: assigning/creating (is_addition()) and
-        # deactivating (is_change()), so this filter, plus the is_addition()/is_change() conditional
-        # should get what we need.
-        # todo:   __exact?
-        log_entries = LogEntry.objects.filter(content_type__id__exact = ContentType.objects.get_for_model(self).id,object_id=self.id)
-        try:
-            #log_entry = log_entries[0] #todo:  if not  length exactly 1........
-            #if log_entry.is_change():   
-                return User.objects.get(id=log_entry.user_id)
-                # todo - catch DoesNotExist: User matching query does not exist ? 
-        # todo - exception? 
-        except:
-            return None
-    """
-
 
     def get_allowed_doors(self):
         """ Get the Doors this user is allowed access to. """
@@ -308,19 +270,6 @@ class LockUser(models.Model):
                     new_scan.save()
                     new_keycard = RFIDkeycard(lockuser=self, the_rfid=new_scan.rfid, assigner=new_scan.assigner_user)
 
-                    # There are no LogEntry's for RFIDkeycard objects [since the User doesn't 
-                    # directly create RFIDkeycards
-                    # through the interface], so making our own here. 
-                    # todo:  or is this weird.....??
-                    """
-                    LogEntry.objects.log_action(
-                            user_id=new_scan.assigner_id,
-                            content_type_id=ContentType.objects.get_for_model(new_keycard).pk,
-                            object_id=new_keycard.id,
-                            object_repr=force_unicode(new_keycard),
-                            action_flag=ADDITION,
-                            change_message="Activated keycard") 
-                    """
 
                     new_keycard.save()
                     
@@ -413,8 +362,7 @@ class LockUser(models.Model):
             assigner = keycard.assigner
             #creator = keycard.get_creator()
             try:
-                date_revoked = keycard.date_revoked.ctime()   # todo:  get revoked time from LogEntry?  And just get rid of date_revoked() then? 
-                #revoker = keycard.get_revoker()
+                date_revoked = keycard.date_revoked.ctime()   
                 revoker = keycard.revoker
                 info_str = "RFID : %s (activated on %s by %s; revoked on %s by %s)" % (rf,date_assigned, assigner,date_revoked, revoker)
             except:

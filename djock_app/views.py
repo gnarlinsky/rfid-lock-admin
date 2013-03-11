@@ -5,7 +5,6 @@ import random
 from datetime import datetime
 from django.utils import simplejson
 from termcolor import colored   # temp
-from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_unicode
 from django.contrib.auth.models import User
@@ -133,57 +132,8 @@ def finished_new_keycard_scan(request,new_scan_pk):
     # grab the assigner, and save NewKeycardScan object
     new_scan.waiting_for_scan = False
     new_scan.ready_to_assign = True 
-    #new_scan.assigner_id = request.user.pk  # corresponding RFIDkeycard creation LogEntry needs the id of the logged-in user
     new_scan.assigner_user = request.user
     new_scan.save()
 
     response_data = {'success':True, 'rfid':new_scan.rfid}
     return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-
-
-"""
-# todo:  fix template stuff here. 
-def deactivate_keycard(request,object_id):
-
-    # object_id was in the url -- it contains the id of the lockuser that needs its
-    #current keycard deactivated. 
-    #    I.e. - get this lockuser's current keycard
-    #         - deactivate it (set this keycard's date_revoked to now)
-
-    # to do: exceptions
-    try:
-        lu = LockUser.objects.filter(id=object_id)[0]
-        rfk = lu.get_current_rfid()
-    except:
-        # raise exception?
-        return render(request,'basic.html') # ??????????????????????
-
-    #if rfk.is_active():
-        #rfk.date_revoked = datetime.now()
-        #rfk.save()
-    rfk.deactivate()
-
-
-    # There are no LogEntry's for RFIDkeycard objects [since the User doesn't directly create RFIDkeycards
-    # through the interface], so writing our own here. This will allow for RFIDkeycard.get_revoker() to
-    # parallel RFIDkeycard.get_creator(). 
-    # Todo:   ok to co-opt LogEntry here? Since 'deactivate keycard' is not actually a change on the
-    # *RFIDkeycard* object, but on LockUser? 
-    LogEntry.objects.log_action(
-            user_id=request.user.pk,
-            content_type_id=ContentType.objects.get_for_model(rfk).pk,
-            object_id=rfk.id,  
-            object_repr=force_unicode(rfk),
-            action_flag=CHANGE,
-            change_message="Deactivated keycard")  
-
-    rfk.save()   # save RFIDkeycard object
-
-    #return render(request, 'basic.html')
-    #return HttpResponse(request,
-
-    # back to the lockuser's (the one who we deactivated the card for) change_form
-    back_to_lockuser = "/lockadmin/djock_app/lockuser/%s/" % lu.id
-    return redirect(back_to_lockuser)
-    #return redirect(lu)
-"""
