@@ -16,7 +16,7 @@
 
     $(function() {
         var start_get_rfid = function() {
-           $.getJSON("/start_scan/", function(result) {
+           $.getJSON("/start_scan/"+{{object_id}}+"/", function(result) {
                 message_div = document.getElementById("keycard_assignment_scan_message"); 
                 if (result.success == true) {
                     // NewKeycardScan object should be initiated and saved now
@@ -25,7 +25,9 @@
                     message_div.innerHTML += "the pk of OUR new_scan obj is "+new_scan_pk; 
 
                 } else {
-                    message_div.innerHTML = "Error - try again (NewKeycardScan object not initiated/saved [?] ) ";             }
+                    message_div.innerHTML = "ERROR (" + result.error_mess + ") Hit Save to save lock user without assigning keycard or try again."; 
+                    //message_div.innerHTML = "Error - try again (NewKeycardScan object not initiated/saved [?] ) ";             
+                    }
             });
         };
 
@@ -183,20 +185,7 @@
         {% comment %}  if lockuser is not active/does not have current keycard {% endcomment %}
          {% if not object_id|does_lockuser_have_active_keycard %} 
             <input type="button" id="add_keycard_and_activate_user_button" value="Assign new keycard and activate user" />
-        {% else %}
-        {% comment %}  if lockuser IS active/DOES have current keycard {% endcomment %}
-            <input type="button" id="add_keycard_and_activate_user_button" value="Assign new keycard" />
-
-        {% comment %} No, don't show anything in this case: 
-         {% elif  object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
-            <img src="{{ STATIC_URL }}/admin/img/disabled_icon_addlink.gif" width="10" height="10" alt="Add Another"/> 
-            Assign new keycard
-            {% endcomment %}
-
-            {% comment %} Should not happen (LockUser can't be inactive but have an active keycard
-         {% if  not object_id|is_lockuser_active and object_id|does_lockuser_have_active_keycard %} 
-         {% endcomment %}
-    {%  endif  %}
+        {%  endif  %}
 
         {% comment %} If creating the current object rather than modifying (so model/add/, not  model/object_id); also check if we're dealing with LockUser  {% endcomment %}
 

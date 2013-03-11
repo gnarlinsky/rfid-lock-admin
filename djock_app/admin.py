@@ -82,12 +82,9 @@ class RFIDkeycardForm(ModelForm):
         new_scan_queryset = NewKeycardScan.objects.all()
         if new_scan_queryset: 
             new_scan = new_scan_queryset.latest("time_initiated")  # get the latest NewKeycardScan object, ordered by the field time_initiated (i.e. time the object was created) 
-            print colored("the rfid? : "+ str(new_scan.rfid),"white","on_green")
-            print colored("is newKeycardScan obj available? " + str(new_scan),"white","on_green")
             self.fields['the_rfid'] = IntegerField(help_text = "(Not a random number -- from door/rfid check request)")
             self.fields['the_rfid'].initial = new_scan.rfid
         else: 
-            print colored("is newKeycardScan obj available? NOPE " ,"white","on_green")
             self.fields['the_rfid'] = IntegerField(help_text = "(This is a random number to simulate getting a new keycard number after it's scanned in.<br>Only superuser can actually see the number.)")
             self.fields['the_rfid'].initial = str(random.randint(0000000000,9999999999)) # rfid's should be 10 char long... just str'ing ints, because I don't want to mess with random crap anymore.
     class Meta:
@@ -96,11 +93,9 @@ class RFIDkeycardForm(ModelForm):
 
         
     def save(self,*args,**kwargs):
-        print colored("2","white","on_red")
         try:
             super(RFIDkeycardForm,self).save(*args,**kwargs)
         except IntegrityError:
-            print colored("3","red")
             # form passed validation, so didn't error there 
             errors = forms.util.ErrorList()
             errors = forms._errors.setdefault(django.forms.forms.NON_FIELD_ERRORS, errors)
@@ -129,7 +124,7 @@ class RFIDkeycardForm(ModelForm):
 class RFIDkeycardAdmin(admin.ModelAdmin):
     #form = RFIDkeycardForm # prepopulating with random num
 
-    list_display = ["the_rfid","id", "date_created","date_revoked","is_active", "lockuser","deactivated",
+    list_display = ["the_rfid","id", "date_created","date_revoked","is_active", "lockuser",
                     "get_allowed_doors_html_links"]
 
     ####################################################################################################
@@ -137,15 +132,39 @@ class RFIDkeycardAdmin(admin.ModelAdmin):
     ####################################################################################################
     #prepopulated_fields = { 'the_rfid': ('id',)} 
     #fields = ("the_rfid","date_revoked","date_created","id")
-    fields = ("the_rfid","lockuser","date_created","date_revoked","get_allowed_doors","is_active","deactivated")  # here showing fields wouldn't show to a staff user, since the real (not inline) RFIDkeycard change_form would only be visible to superuser.
+    fields = ("the_rfid","lockuser","date_created","date_revoked","get_allowed_doors","is_active")  # here showing fields wouldn't show to a staff user, since the real (not inline) RFIDkeycard change_form would only be visible to superuser.
     readonly_fields = ("the_rfid","deactivate","lockuser","date_created","date_revoked","is_active","get_allowed_doors")
 
 
 
 
+class LockUserForm(ModelForm):
+    class Meta:
+        model = LockUser
+
+    def clean(self):
+        """ If no Door were selected -- if user is not permitted to access any door 
+            -- deactivate associated keycard. """
+        print colored("******** CLEANING - LOCKUSERFORM ********","white","on_blue")
+        super(forms.ModelForm, self).clean()
+        # grab the cleaned fields we need
+        cleaned_doors = self.cleaned_data.get("doors")
+        cleaned_deactivate_current_keycard = self.cleaned_data.get("deactivate_current_keycard")
+
+        # If the user is not permitted to access any door, set deactivate_current_keycard to True. Note that
+        # we're changing cleaned_data here, not calling deactivate() on the associated RFIDkeycard.
+        #if not cleaned_doors and not cleaned_deactivate_current_keycard:
+        if not cleaned_doors:
+            self.cleaned_data['deactivate_current_keycard'] = True
+
+        return self.cleaned_data
+
+    
+
+
 class LockUserAdmin(admin.ModelAdmin):
     #inlines = [RFIDkeycardInline]
-    #form = LockUserForm
+    form = LockUserForm
 
 
 
@@ -259,7 +278,7 @@ class LockUserAdmin(admin.ModelAdmin):
     ####################################################################
 
 
-     
+    # todo:  don't need ? 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         """ 'Like the formfield_for_foreignkey method, the formfield_for_manytomany method can be overridden to change the default formfield for a many to many field. '  - django docs;
         Here, need specific behavior for rfid keycards and Doors"""
@@ -308,6 +327,29 @@ class LockUserAdmin(admin.ModelAdmin):
         """ Don't display "delete" button """
         return False
 
+    def save_model(self,request,obj,form,change):
+        # if deactivate current keycard was checked, need to deactivate current keycard.  Doing this
+        # here rather than models.py because need to attach request.user to the RFIDkeycard object being
+        # deactivated, to record revoker
+        ## todo:  a better way to do this?
+        print "********* NOW SAVING LOCKUSER IN *ADMIN *  ........."
+        if obj.deactivate_current_keycard:
+            obj.current_keycard_revoker = request.user
+            #current_keycard = obj.get_current_rfid() 
+            #if current_keycard:
+            #    current_keycard.deactivate(request.user)
+            #    current_keycard.save()
+            # there may be no current keycard, so a new one should be prevented from being assigned
+        else:
+            obj.current_keycard_revoker = None
+
+
+            # Actually, don't do deactivation here.   just attach revoker like did assigner in views
+        obj.save()
+            
+            
+
+            
 
 class AccessTimeAdmin(admin.ModelAdmin):
     def __init__(self, *args, **kwargs):

@@ -26,8 +26,8 @@ def blah(request):
 
 
 urlpatterns = patterns('',
-    #url(r'start_scan/(?P<lockuser_object_id>\d+)/$',views.initiate_new_keycard_scan), 
-    url(r'start_scan/$',views.initiate_new_keycard_scan), 
+    url(r'start_scan/(?P<lockuser_object_id>\d+)/$',views.initiate_new_keycard_scan), 
+    #url(r'start_scan/$',views.initiate_new_keycard_scan), 
     #url(r'done_scan/$',views.finished_new_keycard_scan), 
     url(r'done_scan/(?P<new_scan_pk>\d+)/$',views.finished_new_keycard_scan), 
 

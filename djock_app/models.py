@@ -1,5 +1,5 @@
 from django.db import models
-from django.forms import ModelForm, IntegerField
+from django.forms import ModelForm 
 from django.contrib.auth.models import User
 from django.dispatch import dispatcher
 from django.db.models.signals import post_save
@@ -12,6 +12,10 @@ import datetime
 from termcolor import colored   # temp
 from django.db.utils import IntegrityError
 from django import forms
+from django.contrib.admin.models import LogEntry,ADDITION
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.utils.encoding import force_unicode
 
 
 
@@ -67,6 +71,9 @@ class NewKeycardScan(models.Model):
     doorid = models.CharField(max_length=50)   # doorid as in the requesting url
     rfid = models.CharField(max_length=10)   # rfid as in the requesting url
     ready_to_assign = models.BooleanField(default=False)
+    #assigner_id = models.IntegerField(max_length=10,null=True)
+    assigner_user = models.ForeignKey(User)
+
     # to do: additional parameters for door, rfid? 
 
     def timed_out(self,minutes=2):
@@ -74,11 +81,6 @@ class NewKeycardScan(models.Model):
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
         max_time = datetime.timedelta(minutes=minutes)
         delta = now - self.time_initiated
-        print "delta:", delta
-        print "max time: ", max_time
-        print "delta > max_time ", delta>max_time
-        print "toal sec ", delta.total_seconds()/60
-        print "uhhhhhhhhhhhh wtf? delta and max time, is greater, total sec", delta, max_time, delta>max_time, delta.total_seconds(), delta.total_seconds()/60
         time_diff_minutes = round( delta.total_seconds() / 60, 2)
         # currently returning time diff only for sticking in an error message on interface on keycard assignment timeout
         return (delta>max_time, time_diff_minutes)
@@ -99,7 +101,10 @@ class RFIDkeycard(models.Model):
          a separate is_active field here... just ask: is_active() --> can just check if there's a revoked date,
          OR if today's date is between assigned/revoked...
     """
-    the_rfid    = models.CharField(max_length=10,null=False,blank=False, editable=False,unique=True) # the radio-frequency id
+    # todo -- or should I assume no duplicate keycards ever?  I think duplicates are ok -- it's feasible that keycards could be reused. 
+    #the_rfid    = models.CharField(max_length=10,null=False,blank=False, editable=False,unique=True) # the radio-frequency id
+    the_rfid    = models.CharField(max_length=10,null=False,blank=False, editable=False) # the radio-frequency id
+
     date_revoked = models.DateTimeField(null=True, blank=True) # note that blank=True is at form validation level,
     # while null=True is at db level
     # This should not be a field that staff users can fill in.  It should be created
@@ -107,12 +112,11 @@ class RFIDkeycard(models.Model):
 
     date_created = models.DateTimeField(auto_now_add=True)
 
-    deactivated = models.BooleanField(default=False)
 
     ####################################################################
     # Switching to Foreign Key relationship for RFIDkeycard/LockUser
     ####################################################################
-    # An RFIDkeycard can only be connected to one LockUser; a LockUser
+    # An RFIDkeycard (not the RFID, necessarily) can only be connected to one LockUser; a LockUser
     #   can have multiple RFIDkeycards (though only one can be active
     #   at a time).
     #   - So now we have a ForeignKeyField in **RFIDkeycard** to LockUser,
@@ -125,6 +129,12 @@ class RFIDkeycard(models.Model):
     lockuser = models.ForeignKey("LockUser",null=False)
 
 
+    # If we don't specify a related_name, User would have two reverse relations to rfidkeycard_set, which
+    # is impossible. 
+    assigner =  models.ForeignKey(User, related_name='RFIDkeycard_assigners')
+    revoker =   models.ForeignKey(User, related_name='RFIDkeycard_revokers',null=True)
+
+
     # Nope.  Don't have to do the below; just use auto_now_add
     #def __init__(self,*args,**kwargs):   # i don't have to include args, kwargs, right?
     #    """ We want to automatically create the date this keycard was created/assigned. """
@@ -135,6 +145,46 @@ class RFIDkeycard(models.Model):
         # Represent keycard object with the rfid number (which may not be unique, blah blah
         #   blah, but it's a useful for showing on the page for a particular LockUser, for ex.
         return u'%s' % (self.the_rfid)
+        # todo:  include date revoked and date assigned as well? include assigner's name? (instead of prettifying crap)  
+
+
+    """
+    def get_creator(self):
+       # Get the staff User that created this RFIDkeycard.
+        # There should only be two kinds of RFIDkeycard actions: assigning/creating (is_addition()) and
+        # deactivating (is_change()), so this filter, plus the is_addition()/is_change() conditional
+        # should get what we need.
+        # todo:   __exact?
+        log_entries = LogEntry.objects.filter(\
+                content_type__id__exact = ContentType.objects.get_for_model(self).id,\
+                object_id=self.id)
+        try:
+           # for l in LogEntry.objects.all():
+            log_entry = log_entries[0] #todo:  if not  length exactly 1........
+            if log_entry.is_addition():   
+                return User.objects.get(id=log_entry.user_id)
+                # todo - catch DoesNotExist: User matching query does not exist ? 
+        # todo - exception? 
+        except:
+            return None
+                
+    def get_revoker(self):
+        # Get the staff User that revoked this RFIDkeycard, if it was revoked.
+        # There should only be two kinds of RFIDkeycard actions: assigning/creating (is_addition()) and
+        # deactivating (is_change()), so this filter, plus the is_addition()/is_change() conditional
+        # should get what we need.
+        # todo:   __exact?
+        log_entries = LogEntry.objects.filter(content_type__id__exact = ContentType.objects.get_for_model(self).id,object_id=self.id)
+        try:
+            #log_entry = log_entries[0] #todo:  if not  length exactly 1........
+            #if log_entry.is_change():   
+                return User.objects.get(id=log_entry.user_id)
+                # todo - catch DoesNotExist: User matching query does not exist ? 
+        # todo - exception? 
+        except:
+            return None
+    """
+
 
     def get_allowed_doors(self):
         """ Get the Doors this user is allowed access to. """
@@ -164,14 +214,18 @@ class RFIDkeycard(models.Model):
         else:
             return True
 
-    def deactivate(self):
+    #def deactivate(self):
+    def deactivate(self,user):
         # When time zone support is enabled, Django uses time-zone-aware 
         # datetime objects. If your code creates datetime objects, they should
         # be aware too.
         #now = datetime.datetime.now()
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
         self.date_revoked = now
+        self.revoker = user
 
+
+        ############# log entry here? ########################
 
 
 class AccessTime(models.Model):
@@ -207,7 +261,7 @@ class LockUser(models.Model):
     ################################################################################
     # (Also, which specific doors are check-able/show up should depend on the permissions [or staff vs
     # superuser, etc.] for the person doing the assigning. E.g. someone only involved with the Bike Project
-    # shouldn't be able to assign keycard access to the Makerspace door.
+    # shouldn not be able to assign keycard access to the Makerspace door.
     doors = models.ManyToManyField(Door,blank=True)
     # The default help text for ManyToManyFields is 'Hold down "Control", or "Command" on a Mac, to select
     # more than one.' Need to change that.
@@ -217,6 +271,8 @@ class LockUser(models.Model):
     # "Deactivate keycard?" on LockUser, RFIDkeycard change_form:
     deactivate_current_keycard = models.BooleanField(default=False, help_text="Revoke keycard access and deactivate user.")    # So, upon creation, the RFIDkeycard is activated automatically
 
+    current_keycard_revoker = models.ForeignKey(User,null=True)
+
     def save(self, *args, **kwargs):
         """ Why overriding save(): 
             - We'll deactivate a LockUser's current keycard here, if deactivate_current_keycard is checked
@@ -224,52 +280,70 @@ class LockUser(models.Model):
             - If we're assigning a new keycard, the keycard is created and saved here. 
         """
         print colored("SAVING-lockuser", "magenta")
-        print colored("**** first creating the new keycard", "magenta")
-
         
         # Since djock_app_rfidkeycard.lockuser_id may not be NULL when saving RFIDkeycard object, we need
         # to save the LockUser object first, so we can get self.id (which is also necessary before any work
         # with FK's and M2M). 
         super(LockUser, self).save(*args, **kwargs)
 
-        # assign the rfid from the keycard that was just scanned
-        print colored("assign the rfid from the keycard that was just scanned","white","on_blue")
-        new_scan_queryset = NewKeycardScan.objects.all()
-        if new_scan_queryset:
-            # get last created NewKeycardScan object
-            new_scan = new_scan_queryset.latest("time_initiated") # todo: see expanded_comments.txt, (2)
-            print colored("\tnew_scan id "+str(new_scan.id)+" (pk="+str(new_scan.pk)+")","white","on_blue")
-            print colored("\t READY TO ASSIGN"+str(new_scan.ready_to_assign),"blue","on_green")
-            if new_scan.ready_to_assign:
-                print colored("\tready_to_assign=True","white","on_green")
-                # save new_scan before saving new_keycard! 
-                new_scan.ready_to_assign = False   
-                print colored("\t here??????????????????????????????????????????????? ,", "white", "on_green")
-                new_scan.save()
-                new_keycard = RFIDkeycard(lockuser=self, the_rfid=new_scan.rfid)
-                print colored("\t here??????????????????????????????????????????????? ," ,"white", "on_red")
-                new_keycard.save()
-                print colored("\tso just saved this NewKeycardScan object","white","on_green")
-                print colored("\tJUST CHANGED READY TO ASSIGN","blue","on_green")
-                
+
+        # If we have a current_keycard_revoker but no actual current_keycard, this means that
+        # deactivate_current_keycard was was set because something was not satisfied when assigning a new
+        # keycard, e.g. zero Doors were selected for this LockUser. In other words, don't make a new
+        # keycard. 
+#         current_keycard = self.get_current_rfid()
+#         if not self.current_keycard_revoker and not current_keycard:
+        if not self.deactivate_current_keycard:
+
+            # assign the rfid from the keycard that was just scanned
+            print colored("Assigning keycard that was just scanned","blue")
+            new_scan_queryset = NewKeycardScan.objects.all()
+            if new_scan_queryset:
+                # get last created NewKeycardScan object
+                new_scan = new_scan_queryset.latest("time_initiated") # todo: see expanded_comments.txt, (2) (basically -- this may not be the new scan obj we need....
+
+                if new_scan.ready_to_assign:
+                    # save new_scan before saving new_keycard! 
+                    new_scan.ready_to_assign = False   
+                    new_scan.save()
+                    new_keycard = RFIDkeycard(lockuser=self, the_rfid=new_scan.rfid, assigner=new_scan.assigner_user)
+
+                    # There are no LogEntry's for RFIDkeycard objects [since the User doesn't 
+                    # directly create RFIDkeycards
+                    # through the interface], so making our own here. 
+                    # todo:  or is this weird.....??
+                    """
+                    LogEntry.objects.log_action(
+                            user_id=new_scan.assigner_id,
+                            content_type_id=ContentType.objects.get_for_model(new_keycard).pk,
+                            object_id=new_keycard.id,
+                            object_repr=force_unicode(new_keycard),
+                            action_flag=ADDITION,
+                            change_message="Activated keycard") 
+                    """
+
+                    new_keycard.save()
+                    
+                # else ???
+                #   .....
             # else ???
             #   .....
-        # else ???
-        #   .....
         
         try:
             # there should be at most one... for now just get the first one (todo)
-            current_keycard = self.get_current_rfid()[0]   # self or lu? 
+            current_keycard = self.get_current_rfid()   # self or lu? 
         except:
             current_keycard = None
 
         # We'll deactivate a LockUser's current keycard here, if deactivate_current_keycard is checked on the LockUser's change_form. 
         if current_keycard and self.deactivate_current_keycard:
             #current_keycard.date_revoked = datetime.now()
-            current_keycard.deactivate()
+            current_keycard.deactivate(self.current_keycard_revoker)
+            ############# todo: log entry here as well. ######################
             current_keycard.save()# save keycard since have changed it
 
             self.deactivate_current_keycard = False   # because no current keycard to deactivate anymore
+            self.current_keycard_revoker = None
 
             # or 
             #super(LockUser, self).save(*args, **kwargs)  # save again
@@ -308,15 +382,48 @@ class LockUser(models.Model):
     #      - so rfids changes from a field to get_rfids()?  How to get
     # To get the RFIDkeycards assigned to this LockUser: lockuser_object.rfidkeycard_set.all()
     ####################################################################
+
+
+    # todo:  rethink all these
     def get_all_rfids(self):
         """ Get all RFID's associated with this Lock User (i.e. not just the current one, which is just the rfid field) """
         return self.rfidkeycard_set.all()
 
+
+    # todo:  prettify_get_all_rfids not parallel to other prettify methods....actually returns all but
+    # current, includes HTML.
+    # Todo:  would it make more sense to just tweak the __unicode__ method of RFIDkeycard? 
+    ##  Actually this should be all rfid's but the current one???
     def prettify_get_all_rfids(self):
-        """ Or... if get_all_rfids() return self.rfids, do I need this? Or any other prettify method? """
-        _rfid_keycards = self.get_all_rfids()
-        _rfid_nums_list = [str(r.the_rfid) for r in _rfid_keycards]
-        return ", ".join(_rfid_nums_list)
+        """ Returns results of get_all_rfids(), but as a nice pretty string.
+        Also display date assigned and date revoked, if any, as well as rfid number on LockUser change form and list display
+        """
+        all_rfid_keycards = self.get_all_rfids()
+        current_keycard = self.get_current_rfid()
+        all_keycards_except_current = list(set(all_rfid_keycards).difference([current_keycard]))
+
+        #rfid_keycards_info_list = [str(r.the_rfid) for r in _rfid_keycards]
+        #rfid_keycards_info_list = ["RFID: %s (activated %s; revoked %s)" % (keycard.the_rfid,keycard.date_created.ctime(), keycard.date_revoked.ctime()) for keycard in rfid_keycards]
+        rfid_keycards_info_list = []
+        for keycard in all_keycards_except_current:
+            rf = keycard.the_rfid
+            date_assigned = keycard.date_created.ctime()
+            assigner = keycard.assigner
+            #creator = keycard.get_creator()
+            try:
+                date_revoked = keycard.date_revoked.ctime()   # todo:  get revoked time from LogEntry?  And just get rid of date_revoked() then? 
+                #revoker = keycard.get_revoker()
+                revoker = keycard.revoker
+                info_str = "RFID : %s (activated on %s by %s; revoked on %s by %s)" % (rf,date_assigned, assigner,date_revoked, revoker)
+            except:
+                info_str = "RFID : %s (activated on %s by %s [couldn't get revoker] )" % (rf,assigned,assigner)
+            rfid_keycards_info_list.append(info_str)
+
+        #return ", ".join("RFID: %s (activated %s; revoked %s)" % (curr,curr_rfid.date_created, curr_rfid.date_revoked))
+        #_rfid_nums_list = [str(r.the_rfid) for r in _rfid_keycards]
+       # return ", ".join(_rfid_nums_list)
+        return ",<br>".join(rfid_keycards_info_list)
+    prettify_get_all_rfids.allow_tags = True
 
     def get_current_rfid(self):
         """ Get the currently active RFID
@@ -325,22 +432,26 @@ class LockUser(models.Model):
         #_rfid_keycards = self.rfids.all()   # or call get_all_rfids for consistency
         _rfid_keycards = self.get_all_rfids()
         _curr_rfid = _rfid_keycards.filter(date_revoked=None)  
-        return _curr_rfid
+        # todo: consistency with the underscores
+        # todo:  there should only be one, so just doing [0] for now
+        try:
+            return _curr_rfid[0]  
+        except:
+            return None
        
     def prettify_get_current_rfid(self):
         """ Returns results of get_current_rfid(), but as a nice pretty string.
-        There is probly a better way to do this.... 
-        ******* Well, you could just return curr_rfid.the_rfid !!!!!!!!!
-        And for multiple vals/queryset, maybe there's a get or something like that?
+        Also display date assigned as well as rfid number on LockUser change form and list display
         """
         curr_rfid = self.get_current_rfid()
-        _curr = [str(c.the_rfid) for c in curr_rfid]  # again! yes, stupid, but i haven't coded anythign yet 
+        #curr = [str(c.the_rfid) for c in curr_rfid]  # todo - again! haven't coded anythign yet 
             #to account for there only being one current per person!/my fake data forces me to do this...  
-        return ", ".join(_curr)
+        curr_keycard_info = "RFID: %s (activated on %s by %s)" % (curr_rfid.the_rfid, curr_rfid.date_created.ctime(), curr_rfid.assigner)
+        return curr_keycard_info
 
     def get_allowed_doors(self):
         """ Get the Doors this user is allowed access to. """
-        return self.doors.all()            # don't have to prettify if just return self.doors?
+        return self.doors.all()            
 
     def prettify_get_allowed_doors(self):
         _doors = self.get_allowed_doors()
@@ -378,7 +489,7 @@ class LockUser(models.Model):
             # if it exists. Although we're in the process of deciding whether there should only be
             # one keycard/RFID per person. see the comment for RFIDkeycard.get_allowed_doors()
             if self.get_current_rfid():
-                curr_rfid_keycard = self.get_current_rfid()[0]
+                curr_rfid_keycard = self.get_current_rfid()
 
                 # Get QuerySet of all AccessTime objects whose RFID matches this LockUser's current RFID:
                 at_query_set = AccessTime.objects.all().filter(the_rfid__exact=curr_rfid_keycard.the_rfid)
@@ -457,12 +568,12 @@ def create_testuser(app, created_models, verbosity, **kwargs):
   if not settings.DEBUG:
     return
   try:
-    auth_models.User.objects.get(username='test')
+    auth_models.User.objects.get(username='superuser')
   except auth_models.User.DoesNotExist:
     print '*' * 80
-    print 'Creating test user -- login: test, password: test'
+    print 'Creating test user -- login: superuser, password: superuser'
     print '*' * 80
-    assert auth_models.User.objects.create_superuser('test', 'x@x.com', 'test')
+    assert auth_models.User.objects.create_superuser('superuser', 'x@x.com', 'superuser')
   else:
     print 'Test user already exists.'
 
