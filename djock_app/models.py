@@ -131,8 +131,8 @@ class RFIDkeycard(models.Model):
 
     # If we don't specify a related_name, User would have two reverse relations to rfidkeycard_set, which
     # is impossible. 
-    assigner =  models.ForeignKey(User, related_name='RFIDkeycard_assigners')
-    revoker =   models.ForeignKey(User, related_name='RFIDkeycard_revokers',null=True)
+    assigner =  models.ForeignKey(User, related_name='RFIDkeycard_assigned')
+    revoker =   models.ForeignKey(User, related_name='RFIDkeycard_revoked',null=True)
 
 
     # Nope.  Don't have to do the below; just use auto_now_add
@@ -265,7 +265,7 @@ class LockUser(models.Model):
     doors = models.ManyToManyField(Door,blank=True)
     # The default help text for ManyToManyFields is 'Hold down "Control", or "Command" on a Mac, to select
     # more than one.' Need to change that.
-    doors.help_text = "Select at least one space."  # passing a help_text argument to ManyToManyField doesn't work, because in ManyToManyField's __init__:  msg="..."; self.help_text = self.help_text + msg
+    doors.help_text = "Select at least one space to activate keycard."  # passing a help_text argument to ManyToManyField doesn't work, because in ManyToManyField's __init__:  msg="..."; self.help_text = self.help_text + msg
 
 
     # "Deactivate keycard?" on LockUser, RFIDkeycard change_form:
@@ -342,7 +342,9 @@ class LockUser(models.Model):
             ############# todo: log entry here as well. ######################
             current_keycard.save()# save keycard since have changed it
 
+            # should the following two statements actually go into deactivate() ?
             self.deactivate_current_keycard = False   # because no current keycard to deactivate anymore
+            print colored("UMMMM.... ok, just deactivated, so fucking self.deactivate_current_keycard was set to False, but then why does it keep coming up True when next go to change form????????????? "+str(self.deactivate_current_keycard),"magenta")
             self.current_keycard_revoker = None
 
             # or 

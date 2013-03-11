@@ -240,7 +240,7 @@ class LockUserAdmin(admin.ModelAdmin):
                             #'email',\
                             'phone_number','address', \
                             # will error if the below are not set as read_only...  which makes sense; these are methods and
-                            # things I can't edit from the form.. right?
+                            # things I can't edit from the form.. 
                             'prettify_get_current_rfid','prettify_get_all_rfids',\
                             'prettify_get_last_access_time', 'prettify_get_all_access_times', \
                             #'is_active', \
@@ -460,6 +460,7 @@ for door in door_objects:
 #####################################################################
 # Customize User list display, change form fields
 #####################################################################
+# todo:  show keycards assigned/revoked (User.RFIDkeycard_assigned.all(); User.RFIDkeycard_revoked.all())
 UserAdmin.list_display = ('username','first_name', 'last_name', 'email', 'is_superuser','is_active', 'is_staff','get_all_permissions')
 #UserAdmin.fields = ('email', 'first_name', 'last_name', 'is_active', 'is_staff')
 #UserAdmin.fieldsets = (

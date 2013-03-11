@@ -141,14 +141,14 @@ def finished_new_keycard_scan(request,new_scan_pk):
     return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
 
-
+"""
 # todo:  fix template stuff here. 
 def deactivate_keycard(request,object_id):
-    """ object_id was in the url -- it contains the id of the lockuser that needs its
-    current keycard deactivated. 
-        I.e. - get this lockuser's current keycard
-             - deactivate it (set this keycard's date_revoked to now)
-    """
+
+    # object_id was in the url -- it contains the id of the lockuser that needs its
+    #current keycard deactivated. 
+    #    I.e. - get this lockuser's current keycard
+    #         - deactivate it (set this keycard's date_revoked to now)
 
     # to do: exceptions
     try:
@@ -186,3 +186,4 @@ def deactivate_keycard(request,object_id):
     back_to_lockuser = "/lockadmin/djock_app/lockuser/%s/" % lu.id
     return redirect(back_to_lockuser)
     #return redirect(lu)
+"""
