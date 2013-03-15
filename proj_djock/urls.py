@@ -10,22 +10,18 @@ from django.shortcuts import redirect
 from django.contrib import admin
 admin.autodiscover()
 
-# This is a view, but putting it in here to "test" stuff
-#def blah(request, doorid, rfid):
-def blah(request):
-
-    return list_detail.object_list(
-        request,
-        queryset = RFIDkeycard.objects.all(), 
-       # template_name = "basic.html",
-        #template_object_name = "rfidkeycard_list",  # So in template,  {% for rfidkeycard in rfidkeycard_list %} instead of   {% for rfidkeycard in object_list %} .....  although something isn't working.....
-        #extra_context = {"params" :{'doorid': doorid, 'rfid':rfid}, \
-        #                "doors_list": Door.objects.all(), 
-        #                 }
-    )
-
 
 urlpatterns = patterns('',
+    # Password-reset: add "Forgotten your password?" link on log-in page
+    url(r'^admin/password_reset/$', 'django.contrib.auth.views.password_reset', name='admin_password_reset'),
+    (r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done'),
+    (r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm'),
+    (r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete'),
+
+    url(r'^lockadmin/', include(admin.site.urls)),
+    # go directly to the admin page for the *application*
+    url(r'^lock/$',redirect_to, {'url': '/lockadmin/djock_app/'}),
+
     url(r'start_scan/(?P<lockuser_object_id>\d+)/$',views.initiate_new_keycard_scan), 
     #url(r'start_scan/$',views.initiate_new_keycard_scan), 
     #url(r'done_scan/$',views.finished_new_keycard_scan), 
@@ -42,27 +38,6 @@ urlpatterns = patterns('',
     ),
 
 
-
-
-
- #   url(r'door/(?P<doorid>\d+)/checkrfid/(?P<rfid>\w{10})/$',\
- #                       blah, \
-                        #list_detail.object_list, \
-                        #rfidkeycard_info
-                        #direct_to_template, {'template': 'basic.html' }, \
-
-  #  ),
-
-
-
-
-
-
-    # Uncomment the next line to enable the admin:
-    url(r'^lockadmin/', include(admin.site.urls)),
-
-    # go directly to the admin page for the *application*
-    url(r'^lock/$',redirect_to, {'url': '/lockadmin/djock_app/'}),
 
     # is this rfid allowed to access this door
     # (keeping door identifier just numerical for now)
@@ -95,7 +70,4 @@ urlpatterns = patterns('',
 
     # Uncomment the admin/doc line below to enable admin documentation:
     #url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
 )
-
-
