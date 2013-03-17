@@ -3,42 +3,48 @@
     "pk": 1, 
     "model": "djock_app.door", 
     "fields": {
-      "name": "Makerspace 2"
+      "name": "Makerspace 2", 
+      "description": "Description for Makerspace 2................. Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
     }
   }, 
   {
     "pk": 2, 
     "model": "djock_app.door", 
     "fields": {
-      "name": "Door X"
+      "name": "Door X", 
+      "description": "Description for Makerspace 2................. Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
     }
   }, 
   {
     "pk": 3, 
     "model": "djock_app.door", 
     "fields": {
-      "name": "Narnia"
+      "name": "Narnia", 
+      "description": "Description for Makerspace 2................. Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
     }
   }, 
   {
     "pk": 4, 
     "model": "djock_app.door", 
     "fields": {
-      "name": "Music Room"
+      "name": "Music Room", 
+      "description": "Description for Makerspace 2................. Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
     }
   }, 
   {
     "pk": 5, 
     "model": "djock_app.door", 
     "fields": {
-      "name": "Makerspace"
+      "name": "Makerspace",
+      "description": "Description for Makerspace 2................. Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
     }
   }, 
   {
     "pk": 6, 
     "model": "djock_app.door", 
     "fields": {
-      "name": "Bike Project"
+      "name": "Bike Project", 
+      "description": "Description for Makerspace 2................. Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
     }
   } 
 ]
