@@ -4,7 +4,7 @@
     "model": "djock_app.door", 
     "fields": {
       "name": "Makerspace 2", 
-      "description": "Description for Makerspace 2................. Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
+      "description": "Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
     }
   }, 
   {
@@ -12,7 +12,7 @@
     "model": "djock_app.door", 
     "fields": {
       "name": "Door X", 
-      "description": "Description for Makerspace 2................. Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
+      "description": "Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
     }
   }, 
   {
@@ -20,7 +20,7 @@
     "model": "djock_app.door", 
     "fields": {
       "name": "Narnia", 
-      "description": "Description for Makerspace 2................. Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
+      "description": "Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
     }
   }, 
   {
@@ -28,7 +28,7 @@
     "model": "djock_app.door", 
     "fields": {
       "name": "Music Room", 
-      "description": "Description for Makerspace 2................. Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
+      "description": "Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
     }
   }, 
   {
@@ -36,7 +36,7 @@
     "model": "djock_app.door", 
     "fields": {
       "name": "Makerspace",
-      "description": "Description for Makerspace 2................. Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
+      "description": "Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
     }
   }, 
   {
@@ -44,7 +44,7 @@
     "model": "djock_app.door", 
     "fields": {
       "name": "Bike Project", 
-      "description": "Description for Makerspace 2................. Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
+      "description": "Nunc leo velit, sollicitudin non auctor in, aliquam eu lectus. Vivamus accumsan metus vitae nibh semper rutrum. Curabitur non fermentum augue. Praesent mattis metus nec ipsum tempus egestas. Maecenas non mi vel nibh tempor imperdiet."
     }
   } 
 ]
