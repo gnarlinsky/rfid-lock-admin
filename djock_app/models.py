@@ -26,11 +26,34 @@ from django.utils.encoding import force_unicode
 
 class Door(models.Model):
     """ Doors with RFID locks installed. """
-    name    = models.CharField(max_length=50)  # e.g. "Makerspace," "Bike Project," etc.
+    name    = models.CharField(max_length=50, unique=True)  # e.g. "Makerspace," "Bike Project," etc.
+    description = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
         """ Represent Door objects with their name fields """
         return u'%s' % (self.name)
+
+
+    def save(self,*args,**kwargs):
+        """ When a new Door is added, create a corresponding Permission """
+
+        print colored("SAVING-Door", "magenta")
+        super(Door,self).save(*args,**kwargs)
+
+        from django.contrib.contenttypes.models import ContentType
+        content_type = ContentType.objects.get(app_label='djock_app',model='door')
+
+        from django.contrib.auth.models import Permission
+        # todo:  IntegrityError: columns content_type_id, codename are not unique
+        print colored("SAVING-Permission", "magenta")
+        # create() saves as well
+        Permission.objects.create( \
+                codename='can_manage_door_%d' % self.pk, \
+                name = 'Can manage door to %s' % self.name,\
+                content_type = content_type)   
+        
+
+
 
     def get_allowed_rfids(self):
         """ Return the RFIDs allowed to access this Door """
@@ -198,6 +221,8 @@ class AccessTime(models.Model):
         """ Return the user's name associated with the RFID for this access time """
         # Get RFIDkeycard (there should only be one!) with the rfid associated with this access time;
         # get the lock user names associated with those RFIDkeycards
+
+        # to do:  RFID nums may be reused, so also check who had RFIDkeycard with given rfid num during the *specified time period* 
         _rfid_keycard = RFIDkeycard.objects.all().filter(the_rfid__exact=self.the_rfid)
         if _rfid_keycard:
             return _rfid_keycard[0].get_this_lockuser()
@@ -249,8 +274,14 @@ class LockUser(models.Model):
         super(LockUser, self).save(*args, **kwargs)
 
 
+
+        # TODO: refactor to not have this sort-of-superfluous hoop of checking deactivate_current_keycard. E.g. just don't assign if no doors have been selected. 
+        if not self.doors.all():  # todo: all? .exists()  ? 
+            self.deactivate_current_keycard = True
+
+
         # If we have a current_keycard_revoker but no actual current_keycard, this means that
-        # deactivate_current_keycard was was set because something was not satisfied when assigning a new
+        # deactivate_current_keycard was set because something was not satisfied when assigning a new
         # keycard, e.g. zero Doors were selected for this LockUser. In other words, don't make a new
         # keycard. 
 #         current_keycard = self.get_current_rfid()
@@ -262,14 +293,13 @@ class LockUser(models.Model):
             new_scan_queryset = NewKeycardScan.objects.all()
             if new_scan_queryset:
                 # get last created NewKeycardScan object
-                new_scan = new_scan_queryset.latest("time_initiated") # todo: see expanded_comments.txt, (2) (basically -- this may not be the new scan obj we need....
+                new_scan = new_scan_queryset.latest("time_initiated") # todo: see expanded_comments.txt, (2) (basically -- this may not be the new scan obj we need...)
 
                 if new_scan.ready_to_assign:
                     # save new_scan before saving new_keycard! 
                     new_scan.ready_to_assign = False   
                     new_scan.save()
                     new_keycard = RFIDkeycard(lockuser=self, the_rfid=new_scan.rfid, assigner=new_scan.assigner_user)
-
 
                     new_keycard.save()
                     
@@ -293,7 +323,6 @@ class LockUser(models.Model):
 
             # should the following two statements actually go into deactivate() ?
             self.deactivate_current_keycard = False   # because no current keycard to deactivate anymore
-            print colored("UMMMM.... ok, just deactivated, so fucking self.deactivate_current_keycard was set to False, but then why does it keep coming up True when next go to change form????????????? "+str(self.deactivate_current_keycard),"magenta")
             self.current_keycard_revoker = None
 
             # or 
