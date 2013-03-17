@@ -28,15 +28,22 @@ No breadcrumbs, please
 
 {% comment %}  temp buttons just for dev {% endcomment %}
 <div style="width:700px">
-<div style="background-color:lightgray;">
+<div style="background-color:lightgray;"> (Just for dev)
     <div class="row-fluid">
-        <div class="span6 offset3">
+        <div class="span3">
             <a href="/lockadmin/djock_app/rfidkeycard/" 
                 class="btn btn-danger btn-large" style="padding:auto;margin:10px;
                 color:#fff;text-shadow:0 -1.5px 0 rgba(0,0,0,0.25); width:75%; height:75px; vertical-align:middle;">
             <h4>RFIDkeycards</h4>
-            <p>(Just for dev)</p>
             </a>
+        </div>
+        <div class="span4 offset3">
+        <form action="/generate_random_access_times/" method="post">    
+        {% csrf_token %}
+            Generate between <input type="text" size="35px" value="0" name="min_num_times"> and 
+            <input type="text" name="max_num_times" value="20"> random access times for each keycard in the system. 
+            <input type="submit" name="generate_access_times">
+        </form>
         </div>
     </div>
     </div>
