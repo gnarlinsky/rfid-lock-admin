@@ -13,28 +13,54 @@
                 <div{% if not line.fields|length_is:'1' %} class="field-box{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% if not field.is_readonly and field.errors %} errors{% endif %}"{% endif %}>
 
 
-                {% comment %} If this is an RFIDkeycard popup (indicating that we're adding a new keycard to an EXISTING lockuser/ got here from lockuser change page -- so
-                we don't want the circular confusion of having the lockusers field show up there {% endcomment %}
-                {% if field.field.name == "lockuser" and is_popup %}
-                    <select name="lockuser" id="id_lockuser" style="display:none;">   {% comment %}  display:none because want this hidden {% endcomment %}
-                        <option value="{{ request.META.HTTP_REFERER|get_original_id }}" selected="selected">{{ request.META.HTTP_REFERER|get_original_id }}</option>
-                    </select>
-                {% else %} {% comment %} end nk if {% endcomment %}
-                    {% if not line.fields|length_is:'1' and not field.is_readonly %}{{ field.errors }}{% endif %}
-                    {% if field.is_checkbox %}
-                        {{ field.field }}{{ field.label_tag }}
+        {% comment %}  To do -- even superuser won't have ability to edit RFIDkeycards, so get rid of this, yes? {% endcomment %}
+            {% comment %}nk  If this is an RFIDkeycard popup (indicating that we're adding a new keycard to an EXISTING lockuser/ got here from lockuser change page -- so
+            we don't want the circular confusion of having the lockusers field show up there {% endcomment %}
+
+
+            {% if field.field.name == "lockuser" and is_popup %}
+                <select name="lockuser" id="id_lockuser" style="display:none;">   {% comment %}  display:none because want this hidden {% endcomment %}
+                    <option value="{{ request.META.HTTP_REFERER|get_original_id }}" selected="selected">{{ request.META.HTTP_REFERER|get_original_id }}</option>
+                </select>
+
+
+            {% else %} {% comment %} end nk RFIDkeycard thing {% endcomment %}
+                
+
+                {% if not line.fields|length_is:'1' and not field.is_readonly %}{{ field.errors }}{% endif %}
+                {% if field.is_checkbox %}
+                    {{ field.field }}{{ field.label_tag }}
+                {% else %}
+                    {{ field.label_tag }}
+                    {% if field.is_readonly %}
+                        <p>{{ field.contents }}</p>
                     {% else %}
-                        {{ field.label_tag }}
-                        {% if field.is_readonly %}
-                            <p>{{ field.contents }}</p>
-                        {% else %}
-                            {{ field.field }}
-                        {% endif %}
+                        {{ field.field }}
                     {% endif %}
-                    {% if field.field.help_text %}
-                        <p class="help">{{ field.field.help_text|safe }}</p>
-                    {% endif %}
-                {% endif %} 
+                {% endif %}
+                {% if field.field.help_text %}
+                    <p class="help">{{ field.field.help_text|safe }}</p>
+                {% endif %}
+
+                {% comment %} nk - if this is the Doors row, we need to display some extra info {% endcomment %} 
+                {% if field.field.name == "doors" %}
+                    <div style="color:red;">
+                       {% comment %} Extra context: {{doors_not_permitted_to_this_staff_user}} {% endcomment %}
+                        Note: this lockuser also has permission to access the following doors, that you, the staff user, do not have permission to manage:
+                       <div id="other_doors"> 
+                           {% for another_door in doors_not_permitted_to_this_staff_user %}
+                                {% if  another_door.lockuser_set.all  %}
+                                    {{ another_door }}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+
+                {% endif %}{% comment %} end nk Doors thing {% endcomment %}
+
+
+            {% endif %} 
 
 
 
