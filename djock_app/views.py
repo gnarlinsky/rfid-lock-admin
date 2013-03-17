@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, render, redirect
 from djock_app.models import Door, LockUser, RFIDkeycard, AccessTime, NewKeycardScan
 import random
@@ -8,6 +8,40 @@ from termcolor import colored   # temp
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_unicode
 from django.contrib.auth.models import User
+
+def generate_random_access_times(request):
+    """ just for dev - generate random access times in a specified range """
+    min_num_times = int(request.POST.get('min_num_times'))
+    max_num_times = int(request.POST.get('max_num_times'))
+    print colored(" (1) "+ str(min_num_times) + ", " + str(max_num_times),"white","on_blue")
+
+    # for each keycard in the system, generate a random number of access times, in the range specified in the form
+    for keycard in RFIDkeycard.objects.all():
+        print colored(" (3) ","white","on_blue")
+        for i in range(random.randint(min_num_times,max_num_times)):
+            print colored(" @@@@@@@@@@@@@@@@@@ ","white","on_blue")
+            AccessTime(the_rfid=keycard.the_rfid, access_time=get_random_time()).save()
+    return HttpResponseRedirect("/lockadmin/")
+
+
+from random import randrange
+from datetime import timedelta, datetime
+d1 = datetime.strptime('1/1/2008 1:30 PM', '%m/%d/%Y %I:%M %p')
+d2 = datetime.strptime('1/1/2009 4:50 AM', '%m/%d/%Y %I:%M %p')
+def get_random_time():
+    """ This function will return a random datetime between two datetime objects.  """
+    print colored(" (2) ","white","on_blue")
+    end = datetime.now()
+    start = end - timedelta(days=365)   # one year
+    delta = end - start
+    int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
+    random_second = randrange(int_delta)
+    return (start + timedelta(seconds=random_second))
+
+
+
+    
+
 
 # return list of rfid's allowed for all doors, or a particular door,
 #   as json list 
@@ -120,13 +154,8 @@ def finished_new_keycard_scan(request,new_scan_pk):
     keycards_with_same_rfid_qs = RFIDkeycard.objects.filter(the_rfid=new_scan.rfid)
     for k in keycards_with_same_rfid_qs:
         if k.is_active():
-            response_data = {'success':False, 'error_mess':"An active keycard with the same RFID is assigned to %s." % k.lockuser} # to do:  include actual link to this lockuser
+            response_data = {'success':False, 'error_mess':"A keycard with the same RFID is already assigned to %s." % k.lockuser} # to do:  include actual link to this lockuser
             return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-
-
-    # Verify that the lock user is associated with at least one door -- i.e. that at least one Door
-    # checkbox is checked on the LockUser change_form
-     
             
     # OK, so far so good. Set waiting and ready-to-assign status,
     # grab the assigner, and save NewKeycardScan object
