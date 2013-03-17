@@ -16,8 +16,7 @@ from django import forms
 # - (maybe?): When a user is modified or added (in terms of being active at all or more/fewer doors access), e-mail all the staff. 
 # - search bar for lockusers/accesstimes/doors change lists
 # -  # the field labeled "rfids" should not be required.  
-####################################################################################################
-
+###################################################################################################
 
 class DoorAdmin(admin.ModelAdmin):
     ####################################################################################################
