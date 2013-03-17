@@ -560,7 +560,7 @@ signals.post_syncdb.connect(create_testuser,
     sender=auth_models, dispatch_uid='common.models.create_testuser')
 
 
-######################### notes ######################################
+########################## notes ######################################
 # Note - no need to do explicit memoization, I think. From the docs: 
 # "In a newly created QuerySet, the cache is empty. The first
 #  time a QuerySet is evaluated -- and, hence, a database query happens -- Django 
