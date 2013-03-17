@@ -149,6 +149,7 @@ class LockUserForm(ModelForm):
         super(forms.ModelForm, self).clean()
         # grab the cleaned fields we need
         cleaned_doors = self.cleaned_data.get("doors")
+
         cleaned_deactivate_current_keycard = self.cleaned_data.get("deactivate_current_keycard")
 
         # If the user is not permitted to access any door, set deactivate_current_keycard to True. Note that
@@ -158,8 +159,6 @@ class LockUserForm(ModelForm):
             self.cleaned_data['deactivate_current_keycard'] = True
 
         return self.cleaned_data
-
-    
 
 
 class LockUserAdmin(admin.ModelAdmin):
@@ -294,33 +293,65 @@ class LockUserAdmin(admin.ModelAdmin):
             #kwargs["queryset"] = RFIDkeycard.objects.none()  # creates an EmptyQueryset  
             # temporarily show some keycards there, for debugging
             kwargs["queryset"] = RFIDkeycard.objects.all()  
-        
 
+
+    # TO DO: refactor these func....
+    def get_doors_to_show(self,request):
+        # superuser will always see all doors (doors_to_show)
+        if request.user.is_superuser: 
+            return Door.objects.all()
+        # otherwise filter on permissions
+        doors_to_show = Door.objects.none()  # creates an EmptyQuerySet
+        for door in Door.objects.all():
+            perm = "djock_app.can_manage_door_%d" % door.pk   # put in proper format for has_perm
+            if request.user.has_perm(perm):
+                doors_to_show = doors_to_show | Door.objects.filter(pk=door.pk)  # concatenating QuerySets
+        return doors_to_show
+
+    # todo: refactor in terms of this template/admin divide? 
+    def get_other_doors(self,request):
+        """ Doors that the staff User is not allowed to administer. In
+        change_form template, will get a set of these Door objects from context,
+        then check the lockuser_set of each to see if the current lockuser has
+        access to it.  """
+        # superuser will always see all doors (doors_to_show)
+        if request.user.is_superuser: 
+            return None 
+        # otherwise filter on permissions
+        doors_not_permitted_to_this_staff_user = Door.objects.none()  # creates an EmptyQuerySet
+        for door in Door.objects.all():
+            perm = "djock_app.can_manage_door_%d" % door.pk   # put in proper format for has_perm
+            if not request.user.has_perm(perm):
+                doors_not_permitted_to_this_staff_user = doors_not_permitted_to_this_staff_user | Door.objects.filter(pk=door.pk)  # concatenating QuerySets
+        return doors_not_permitted_to_this_staff_user
+
+
+    # The queryset() method in DoorAdmin restricts a staff user's ability to 
+    #   view/change Doors that they do not have permission for (individual objects and change list).
+    # But on the listdisplay and changeform for LockUsers, staff users can still see Doors 
+    #   -- and assign them -- that they don't have permission for.  So here, we need to limit the 
+    #   ManyToMany Door field output for the LockUser.  
+    #
+    # TO DO: maybe it makes more sense for non-permitted doors to be viewable 
+    # (Door changelist, LockUser displaylist, LockUser changeform), but be grayed out/readonly
+    #
+    # TO DO: refactor!
     def formfield_for_manytomany(self, db_field, request, **kwargs):
-        ################
-        #  doors
-        ################
-        # The queryset() method in DoorAdmin restricts a staff user's ability to 
-        #   view/change Doors that they do not have permission for (individual objects and change list).
-        # But on the listdisplay and changeform for LockUsers, staff users can still see Doors 
-        #   -- and assign them -- that they don't have permission for.  So here, we need to limit the 
-        #   ManyToMany Door field output for the LockUser.  
-        #
-        # TO DO: maybe it makes more sense for non-permitted doors to be viewable 
-        # (Door changelist, LockUser displaylist, LockUser changeform), but be grayed out/readonly
         if db_field.name == "doors":
-            doors_to_show = Door.objects.none()  # creates an EmptyQuerySet
-            for door in Door.objects.all():
-                perm = "djock_app.can_manage_door_%d" % door.pk   # put in proper format for has_perm
-                #if request.user.has_perm(perm):
-                # if staff user has permission for a certain door, or if user is superuser,  put door on the list
-                if request.user.is_superuser or request.user.has_perm(perm):
-                    doors_to_show = doors_to_show | Door.objects.filter(pk=door.pk)  # concatenating QuerySets
-                    # Doing door instead of the filter, as below, results in Error: 'Door' object has no attribute '_clone'...???
-                    #doors_to_show = doors_to_show | door   # concatenating QuerySets
-            kwargs["queryset"] = doors_to_show
-
+            kwargs["queryset"] = self.get_doors_to_show(request)
+            #kwargs["other_doors_non-permitted"] = doors_to_show
+            #kwargs["other_doors_permitted"] = doors_to_show
         return super(LockUserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+        
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        """  LockUser may have access to Doors that the staff user cannot admin;
+        this must be accounted for when determining (Javascript) whether to
+        disable "Assign keycard" button or select "Deactivate keycard" because
+        all Doors have been unchecked.  In change_form template, will get a set
+        of these Door objects from context, then check the lockuser_set of each
+        to see if the current lockuser has access to it.  """
+        extra_context={"doors_not_permitted_to_this_staff_user":self.get_other_doors(request)}
+        return super(LockUserAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
 
     #Don't display save, delete buttons on bottom 
     def has_delete_permission(self, request, obj=None):
@@ -332,7 +363,7 @@ class LockUserAdmin(admin.ModelAdmin):
         # here rather than models.py because need to attach request.user to the RFIDkeycard object being
         # deactivated, to record revoker
         ## todo:  a better way to do this?
-        print "********* NOW SAVING LOCKUSER IN *ADMIN *  ........."
+        print "********* SAVING LOCKUSER IN *ADMIN * ***************" 
         if obj.deactivate_current_keycard:
             obj.current_keycard_revoker = request.user
             #current_keycard = obj.get_current_rfid() 
@@ -425,43 +456,17 @@ class StaffUserAdmin(UserAdmin):
 
 
 #####################################################################
-# Custom user permissions
-#####################################################################
-
-#  should this stuff go in __init__.py? 
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
-
-
-# Django's athentication framework uses the contenttypes framework (INSTALLED_APPS)
-# to tie user permissions to specific models.
-content_type = ContentType.objects.get(app_label='djock_app', model='lockuser')
-
-"""
-permission = Permission.objects.get_or_create(codename='can_manage_door_1',  \
-               name='Can Manage Door 1',\
-              #content_type=content_type)
-              content_type=content_type)
-"""
-
-# Making door permissions based on how many door there are right now, not hardcoding it in
-door_objects = Door.objects.all()
-for door in door_objects:
-# or just get(.../create?   ??  vs get_or_create ??
-    perms, created = Permission.objects.get_or_create(\
-                    codename='can_manage_door_%d' % door.pk, \
-
-                    # TO DO: make sure door names are unique!
-                    name = 'Can manage door to %s' % door.name,\
-
-                    content_type = content_type)   
-                                                
-
-#####################################################################
 # Customize User list display, change form fields
 #####################################################################
 # todo:  show keycards assigned/revoked (User.RFIDkeycard_assigned.all(); User.RFIDkeycard_revoked.all())
-UserAdmin.list_display = ('username','first_name', 'last_name', 'email', 'is_superuser','is_active', 'is_staff','get_all_permissions')
+# def whom_assigned_keycards_to():
+#     # e.g. user_object.RFIDkeycard_assigned.all()[0].lockuser
+#     pass
+# def whom_revoked_keycards_from():
+#     # e.g. user_object.RFIDkeycard_assigned.all()[0].lockuser
+#     pass
+    
+UserAdmin.list_display = ('username','first_name', 'last_name', 'email', 'is_superuser','is_active', 'date_joined','last_login','get_all_permissions')
 #UserAdmin.fields = ('email', 'first_name', 'last_name', 'is_active', 'is_staff')
 #UserAdmin.fieldsets = (
     #fieldsets = (
@@ -497,8 +502,6 @@ admin.site.register(Door, DoorAdmin)
 #admin.site.register(User)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-
-
 
 # Globally disable deletion of selected objects (i.e this will not be an available action in the Actions dropdown of
 # all ModelAdmins/change_list pages.
