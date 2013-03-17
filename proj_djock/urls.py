@@ -68,6 +68,8 @@ urlpatterns = patterns('',
     url(r'^t/$', direct_to_template, {'template': 'test/index.html' }    ),
     #url(r'fake/$', 'djock_app.views.fake_assign' ), 
 
+    url(r'^generate_random_access_times/$',views.generate_random_access_times), 
+
     # Uncomment the admin/doc line below to enable admin documentation:
     #url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 )
