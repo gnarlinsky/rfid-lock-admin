@@ -8,35 +8,33 @@ from termcolor import colored   # temp
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_unicode
 from django.contrib.auth.models import User
+from django.utils.timezone import utc
 
 def generate_random_access_times(request):
     """ just for dev - generate random access times in a specified range """
     min_num_times = int(request.POST.get('min_num_times'))
     max_num_times = int(request.POST.get('max_num_times'))
-    print colored(" (1) "+ str(min_num_times) + ", " + str(max_num_times),"white","on_blue")
 
     # for each keycard in the system, generate a random number of access times, in the range specified in the form
     for keycard in RFIDkeycard.objects.all():
-        print colored(" (3) ","white","on_blue")
         for i in range(random.randint(min_num_times,max_num_times)):
-            print colored(" @@@@@@@@@@@@@@@@@@ ","white","on_blue")
             AccessTime(the_rfid=keycard.the_rfid, access_time=get_random_time()).save()
     return HttpResponseRedirect("/lockadmin/")
 
 
 from random import randrange
 from datetime import timedelta, datetime
-d1 = datetime.strptime('1/1/2008 1:30 PM', '%m/%d/%Y %I:%M %p')
-d2 = datetime.strptime('1/1/2009 4:50 AM', '%m/%d/%Y %I:%M %p')
 def get_random_time():
     """ This function will return a random datetime between two datetime objects.  """
-    print colored(" (2) ","white","on_blue")
-    end = datetime.now()
+    # between now and a year ago
+    end = datetime.utcnow().replace(tzinfo=utc)
     start = end - timedelta(days=365)   # one year
     delta = end - start
     int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
+
     random_second = randrange(int_delta)
     return (start + timedelta(seconds=random_second))
+
 
 
 
