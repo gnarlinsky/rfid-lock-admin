@@ -4,260 +4,184 @@
 
 
 {% block extrahead %}
-    {{ block.super }}
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"/></script>
+{{ block.super }}
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"/></script>
 
-    <!-- local version of the above --> 
-    <!-- <script type="text/javascript" src="/static/admin/js/jquery-1.9.1.min.js"></script> -->
+<!-- local version of the above --> 
+<!-- <script type="text/javascript" src="/static/admin/js/jquery-1.9.1.min.js"></script> -->
 
 
-    <!-- <script> alert("Done button" + $("#done_button")); </script>  --> 
-    <script> 
+<!-- <script> alert("Done button" + $("#done_button")); </script>  --> 
+<script> 
 
-    /* TODO:   
-        - Fix variables (http://stackoverflow.com/questions/2485423/javascript-is-using-var-to-declare-variables-optional). 
-        - Div for messages concerning the no-doors==no-assign-keycard issues, not alerts!
-                - hovering over disabled "Assign keycard" button - additional message, e.g. "you can't assign a keycard because you suck and also because no doors are selected"  or "keycard already assigned"
-        - "No keycard assigned" means that the current keycard field is either empty or has "(None"). Go with one or the other.  
-        - the assigning staff user could be None for some stupid reason, so this check should be smart, or need to indicate no keycard in another way (i.e. not "(None)")
-        !!!!  Use template filters?  {% if object_id|does_lockuser_have_active_keycard %}  ? 
-        - note id and class names are subject to change!  
-        - if user with keycard checks a Door after unchecking all, 'deactivate current keycard' will NOT be unchecked.  Does this make sense, or should I abandon changing state of 'deactivate current keycard'? 
-        - Doublecheck the sanity of all the button disabling
-        - Error messages/form validation vs (actually in addition to) disabling Save button? 
-
+/* TODO:   
+    - Grok namespace stuff/ variable stuff
+    - hovering over disabled "Assign keycard" button - additional message, e.g. "you can't assign a keycard because you suck and also because no doors are selected"  or "keycard already assigned"
+    - "No keycard assigned" means that the current keycard field is either empty or has "(None"). Go with one or the other.  
+    - the assigning staff user could be None for some stupid reason, so this check should be smart, or need to indicate no keycard in another way (i.e. not "(None)")
+    !!!!  Use template filters?  { if object_id|does_lockuser_have_active_keycard }  ? 
+    - Refactor -- template filters instead/get rid of get_other_doors in admin? Using template tags in JS -  http://stackoverflow.com/a/4046217. How to make request available to filters -- http://stackoverflow.com/a/1511457
+    - note id and class names are subject to change!  
+    - if user with keycard checks a Door after unchecking all, 'deactivate current keycard' will NOT be unchecked.  Does this make sense, or should I abandon changing state of 'deactivate current keycard'? 
+    - Doublecheck the sanity of all the button disabling
+    - Error messages/form validation vs (actually in addition to) disabling Save button? 
 */
 
-
-    $(function() {
-        var start_get_rfid = function() {
-           $.getJSON("/start_scan/"+{{object_id}}+"/", function(result) {
-                message_div = document.getElementById("keycard_assignment_scan_message"); 
-                if (result.success == true) {
-                    // NewKeycardScan object should be initiated and saved now
-                    message_div.innerHTML = "OK, ready to read keycard."; 
-                    new_scan_pk = result.new_scan_pk; 
-                    message_div.innerHTML += "the pk of OUR new_scan obj is "+new_scan_pk; 
-
-                } else {
-                    message_div.innerHTML = "ERROR (" + result.error_mess + ") Hit Save to save lock user without assigning keycard or try again."; 
-                    //message_div.innerHTML = "Error - try again (NewKeycardScan object not initiated/saved [?] ) ";             
-                    }
-            });
-        };
-
-        var done_get_rfid = function() {
-            message_div = document.getElementById("keycard_assignment_scan_message"); 
-           $.getJSON("/done_scan/"+new_scan_pk+"/", function(result) {
-                if (result.success == true) {
-                   // todo:  double check id (id comes from field.field }}
-                   $("#id_rfidkeycard_set-0-the_rfid").val(result.rfid); 
-                    message_div.innerHTML = "Success! Save to complete keycard assignment. ("+result.rfid+")"; 
-
-                } else {
-                    //message_div.innerHTML = "Didn't read new keycard... Try again."; 
-                    message_div.innerHTML = "ERROR (" + result.error_mess + ") Hit Save to save lock user without assigning keycard or try again."; 
-                  //setTimeout(done_get_rfid, 250); // wait 250 sec before trying done_get_rfid again
+/*******************************************************************************
+* Scan/assign new keycard 
+*******************************************************************************/
+$(function() {
+    var start_get_rfid = function() {
+       $.getJSON("/start_scan/{{object_id}}/", function(result) {
+            if (result.success == true) {
+                // NewKeycardScan object should be initiated and saved now
+                new_scan_pk = result.new_scan_pk; 
+                $("#keycard_assignment_scan_message").html("Ready to read keycard. (The pk of new_scan obj is "+new_scan_pk+".)");  
+            } else {
+                $("#keycard_assignment_scan_message").html("ERROR (" + result.error_mess + ") Hit Save to save lock user without assigning keycard or try again."); 
                 }
-            });
-        };
-
-
-        $("#start_button").bind("click", function(e) {
-            e.preventDefault();
-            start_get_rfid();
         });
+    };
 
-        $("#done_button").bind("click", function(e) {
-            e.preventDefault();
-            done_get_rfid();
-        });
+    var done_get_rfid = function() {
+       $.getJSON("/done_scan/"+new_scan_pk+"/", function(result) {
+            if (result.success == true) {
+                // todo:  double check id (id comes from field.field }}
+                $("#id_rfidkeycard_set-0-the_rfid").val(result.rfid); 
+                $("#keycard_assignment_scan_message").html("Success! Save to complete keycard assignment. ("+result.rfid+")"); 
 
-        $("#cancel_add_keycard_button").bind("click", function(e) {
-            e.preventDefault();
-            new_keycard_div = document.getElementById("assign_new_keycard_buttons_and_instructions"); 
-            new_keycard_div.style.display="none"; 
-            // todo: do anything else to cancel? 
-        });
-
-        // don't show the keycard assignment instructions/buttons by default, but only when user clicks on 'assign new keycard'
-        $("#add_keycard_button").bind("click", function(e) {
-            e.preventDefault();
-            new_keycard_div = document.getElementById("assign_new_keycard_buttons_and_instructions"); 
-            new_keycard_div.style.display="inline"; 
-        });
-
-            
-            // Select all input elements whose id's start with "id_door_" (i.e. all the Door checkboxes)
-            $('input[id^="id_doors_"]').bind("click",function(e) { 
-            var all_door_checkboxes = $('input[id^="id_doors_"]') ; 
-            // check whether at least one Door is checked
-            if (all_door_checkboxes.not(":checked").length === all_door_checkboxes.length) {
-                var curr_keycard =  $('div.field-prettify_get_current_rfid p').text()
-                // !!!!  Use template filters instead?  {% if object_id|does_lockuser_have_active_keycard %}  ? 
-                if (curr_keycard=="(None)") {   // if  no assigned keycard, warn and disable "Assign keycard" button
-                    alert("they are all unchecked -- Warning! Select at least one door to assign keycard.")
-                    add_keycard_button = document.getElementById("add_keycard_button");
-                    add_keycard_button.disabled=true
-                    //$("#add_keycard_button").disabled=true; 
-                }
-                else {  // if there is an assigned keycard
-                    alert("they are all unchecked -- Warning! If no door is selected, this user's keycard will be deactivated!  To uncheck 'Deactivate current keycard,' pick a freaking door!") 
-                    // Check 'Deactivate current keycard' to emphasize that unchecking all doors will deactivate user's keycard
-                    deactivate_keycard_checkbox = document.getElementById("id_deactivate_current_keycard");
-                    deactivate_keycard_checkbox.checked = true; 
-                }
-               
+            } else {
+                $("#keycard_assignment_scan_message").html( "ERROR (" + result.error_mess + ") Hit Save to save lock user without assigning keycard or try again."); 
+              //setTimeout(done_get_rfid, 250); // wait 250 sec before trying done_get_rfid again
             }
-            else {    // at least one Door is checked, so don't disable "Assign Keycard" button. (If there's a current keycard already, the button should already be disabled via the template... but this interferes, so doublecheck..)
-                    curr_keycard =  $('div.field-prettify_get_current_rfid p').text()
-                    add_keycard_button = document.getElementById("add_keycard_button");
-                    if (curr_keycard!="(None)") {   
-                        add_keycard_button.disabled=true; 
-                    } 
-                    else { 
-                        add_keycard_button.disabled=false;  
-                        }
-                        
-            } 
-            }); 
+        });
+    };
 
-        $("#id_deactivate_current_keycard").bind("click",function(e) {   
-            var deactivate_keycard= document.getElementById('id_deactivate_current_keycard')
 
-            // if user trying to uncheck deactivate current keycard.... 
-            if (deactivate_keycard.checked == false) {
-                // .... but no doors are selected
-                var all_door_checkboxes = $('input[id^="id_doors_"]') ; 
-                if (all_door_checkboxes.not(":checked").length === all_door_checkboxes.length) {
-                    // if there's a  keycard
+    $("#start_button").bind("click", function(e) {
+        e.preventDefault();
+        start_get_rfid();
+    });
+
+    $("#done_button").bind("click", function(e) {
+        e.preventDefault();
+        done_get_rfid();
+    });
+
+    $("#cancel_add_keycard_button").bind("click", function(e) {
+        e.preventDefault();
+        var new_keycard_div = document.getElementById("assign_new_keycard_buttons_and_instructions"); 
+        new_keycard_div.style.display="none"; 
+        // todo: do anything else to cancel? 
+    });
+
+    // don't show the keycard assignment instructions/buttons by default, but only when user clicks on 'assign new keycard'
+    $("#add_keycard_button").bind("click", function(e) {
+        e.preventDefault();
+        var new_keycard_div = document.getElementById("assign_new_keycard_buttons_and_instructions"); 
+        new_keycard_div.style.display="inline"; 
+    });
+
+  
+
+
+/*******************************************************************************
+* Behavior/state of "Assign keycard" button & selected Doors/"Deactivate current keycard" checkbox 
+*******************************************************************************/
+$(document).ready( function () { 
+    var all_door_checkboxes = $('input[id^="id_doors_"]') ; 
+    if (all_door_checkboxes.not(":checked").length === all_door_checkboxes.length) { // if no doors are checked
+        var add_keycard_button = document.getElementById("add_keycard_button");
+        add_keycard_button.disabled=true; 
+    }
+}); 
+
+// Are there doors that this lockuser can access but this staff user cannot manage: 
+var other_doors_lockuser_can_access = document.getElementById("other_doors").innerHTML.replace(/\s/g,"");
+
+// When any input elements whose id's start with "id_door_" (i.e. all the Door checkboxes) is clicked: 
+$('input[id^="id_doors_"]').bind("click",function(e) { 
+    var all_door_checkboxes = $('input[id^="id_doors_"]') ; 
+    // check whether at least one Door is checked
+    if (all_door_checkboxes.not(":checked").length === all_door_checkboxes.length) { // no doors are checked
+
+        // Make sure that this LockUser is permitted access to doors that the *staff* user is not permitted to manage. 
+        if ( !other_doors_lockuser_can_access) {  
+            var curr_keycard =  $('div.field-prettify_get_current_rfid p').text(); 
+            if (curr_keycard=="(None)") {   // if  no assigned keycard, warn and disable "Assign keycard" button
+                $("#door_keycard_deactivation_warning").html( "Warning: Select at least one door to assign keycard."); 
+                var add_keycard_button = document.getElementById("add_keycard_button");
+                add_keycard_button.disabled=true; 
+                //$("#add_keycard_button").disabled=true; 
+            } else {  // if there is an assigned keycard
+                $("#door_keycard_deactivation_warning").html("Warning: If no door is selected, this user's keycard will be deactivated!  To uncheck 'Deactivate current keycard,' pick a freaking door!"); 
+                // Check 'Deactivate current keycard' to emphasize that unchecking all doors will deactivate user's keycard
+                var deactivate_keycard_checkbox = document.getElementById("id_deactivate_current_keycard");
+                deactivate_keycard_checkbox.checked = true; 
+            }
+        } 
+
+    }
+    else {    // at least one Door is checked, so don't disable "Assign Keycard" button -- unless the LockUser has already been assigned a keycard. (If there's a current keycard already, the button should already be disabled via the template... but this interferes, so doublecheck..). 
+        if ("{{add}}" == "True") { // Also, if we're only adding, not changing, can't actually assign keycard until save lockuser, so accounting for that. 
+                $("#door_keycard_deactivation_warning").html("Please save to assign keycard"); 
+        } else {  // change, not add
+            var curr_keycard =  $('div.field-prettify_get_current_rfid p').text()
+            var add_keycard_button = document.getElementById("add_keycard_button");
+            if (curr_keycard!="(None)") {   
+                add_keycard_button.disabled=true; 
+            } else { 
+                add_keycard_button.disabled=false;  
+            }
+        } 
+    } 
+}); 
+
+
+    // todo:  simplify logic
+    $("#id_deactivate_current_keycard").bind("click",function(e) {   
+
+        // if user trying to uncheck deactivate current keycard.... 
+        if (deactivate_keycard_checkbox.checked == false) {
+            // .... but no doors are selected .....
+            var all_door_checkboxes = $('input[id^="id_doors_"]') ; 
+            if (all_door_checkboxes.not(":checked").length === all_door_checkboxes.length) {
+                //  .... and lockuser doesn't have access to doors that this staff user is not permitted to manage... 
+                if ( !other_doors_lockuser_can_access) {   
+                    // ... and if there's a  keycard
                     var curr_keycard =  $('div.field-prettify_get_current_rfid p').text()
                     if (curr_keycard!="(None)") {   
-                        alert("Uh, you don't want to deactivate the keycard, but you don't want to pick any doors either? Get it together. To uncheck 'Deactivate current keycard,' pick a freaking door!") 
-                        deactivate_keycard.checked = true;
+                        $("#door_keycard_deactivation_warning").html("Uh, you don't want to deactivate the keycard, but you don't want to pick any doors either? Get it together. To uncheck 'Deactivate current keycard,' pick a freaking door!"); 
+                        deactivate_keycard_checkbox.checked = true;
                     } 
                 }
-            } 
-        }); 
-        
-    });
+            }
+        } 
+    }); 
+    
+});
 
     </script>
 {% endblock extrahead %}
     
-    {% comment %} 
-    If this is an RFIDkeycard inline/popup (http://localhost:8080/lockadmin/djock_app/rfidkeycard/add/?_popup=1), insert some extra temporary text 
-{% block object-tools %}
-
-    {% comment %} {% if request.path == "/lockadmin/djock_app/rfidkeycard/add/" and request.META.QUERY_STRING == "_popup=1"  %} {% endcomment %} 
-
-        {% comment %} should indicate that we're adding a new keycard to an EXISTING lockuser/ got here from lockuser change page {% endcomment %}
-    {% comment %} 
-        {% if is_popup %}   
-            <h1>!!!!!!</h1>
-            {{ object_id }}
-            <h1>!!!!!!</h1>
-            <h1>Here's original object's id: 
-            <p> {{ request.META.HTTP_REFERER|get_original_id }}
-            </h1>
-            <hr> <h1> so we'd need, instead of the whole form-row field-lockuser (have to go back into
-            fieldset? ).......  if yeah... can I get object_id there??????
-            
-            </h1>
-            <div>
-                    <label for="id_lockuser" class="required">Lockuser:</label>
-                        <select name="lockuser" id="id_lockuser">
-<option value="{{ request.META.HTTP_REFERER|get_original_id }}" selected="selected">{{ request.META.HTTP_REFERER|get_original_id }}</option>
-</select>
-            </div>
-
-        {% endif %}
-
-    {% endif %} {% comment %} end nk for this block { endcomment }
-    {% if change %}{% if not is_popup %}
-        <ul class="object-tools">
-            {% block object-tools-items %} {{block.super}} {% endblock %}
-        </ul>
-    {% endif %}{% endif %}
-{% endblock %} {% comment %}  end object-tools block { endcomment }
-    {% endcomment %} 
-
-
-{% comment %}  Overriding inline form for RFIDkeycard on LockUser's change_form {% endcomment %}
-{% comment %}
-{% block inline_field_sets %}
-{% for inline_admin_formset in inline_admin_formsets %}
-    <!-- 
-        admin/edit_inline/tabular.html  or admin/edit_inline/stacked.html. 
-        So, since I need similar behavior to that of my fieldset.html (for keycard activation) , 
-        going to create a modified template based on tabular.html. 
-        UPDATE: nope, no more inline form.
-        --> 
-    {% include "admin/edit_inline/tabular_with_rfidkeycard_special.html" %}
-{% endfor %}
-{% endblock %}
-{% endcomment %}
-
-
-
-
 
 
 {% comment %}  submit row block {% endcomment %}
 {% block submit_buttons_bottom %}
-{% comment %} If this is the RFIDkeycard's change_form, show the deactivate-keycard link {%endcomment%}
 
-
-        {% comment %}
-{% if change and original|get_object_type == "RFIDkeycard" %}<br>
-            <a href="/deactivate_keycard/{{object_id}}"> 
-                <img src="/static/admin/img/icon_deletelink.gif " width="10" height="10">
-                Deactivate current keycard 
-            </a>
-        {% endcomment %}
-    
-    
-    {% comment %} (start nk stuff)  This is the place for the "assign new keycard"/"deactivate current keycard" controls, if this is the LockUser change form {% endcomment %}
-
-
-
-
-{% comment %} testing hiding elements with javascript {% endcomment %}
-
-        {% comment %} Check:  that we're modifying a model, rather than creating it (so not model/add/ but model/object_id); also check if we're dealing with LockUser  {% endcomment %}
-        {% comment %}
-{% elif change and original|get_object_type == "LockUser" %}<br>
-        {% endcomment %}
-                
     <div class="submit-row"> 
-        {% comment %} using STATIC_URL for *my* static/ files; otherwise it's Django admin's originals {% endcomment %}
-
-        {% comment %}  if this is the change form for LockUser, and the LockUser already has a keycard,
-        disable the Assign Keycard button. 
-        {% if  change and original|get_object_type == "LockUser" %}<br>
-        Actually can get rid of  change form check because won't be dealing with LockUsers as inlines. {% endcomment %}
-
-        {% if original|get_object_type == "LockUser" %}<br>
-            <input type="button" id="add_keycard_button" value="Assign keycard" 
-         {% if object_id|does_lockuser_have_active_keycard %} 
-         disabled 
-        {%  endif  %}
-            />
+        {% comment %}  todo:  see #3, todo.rtfd  {% endcomment %}
+        {% comment %}{% if original|get_object_type == "LockUser" %}{% endcomment %}
+        {% comment %} original is not set if we're *adding*! {% endcomment %} 
+        {% if content_type_id|get_object_type == "lockuser" %}
+              <input type="button" id="add_keycard_button" value="Assign keycard" 
+              {% comment %} todo:  see #4, todo.rtfd {%endcomment %}
+             {% if object_id|does_lockuser_have_active_keycard or add %} 
+                 disabled 
+             {%  endif  %}
+        />
         {%  endif  %}
 
-
-
-        {% comment %} If creating the current object rather than modifying (so model/add/, not  model/object_id); also check if we're dealing with LockUser  {% endcomment %}
-
-        {% comment %} Don't have "original" in add_view, so verify that we're dealing with the right object with opts.module_name {% endcomment %}
-        {% comment %}
-{% elif not change and opts.module_name == "lockuser" %}<br>
-            <img src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="Add Another"/>
-            <input type="button" id="add_keycard_and_activate_user_button" value="Assign new keycard and activate user" />
-            <img src="{{ STATIC_URL }}/admin/img/disabled_icon_deletelink.gif " width="10" height="10" readonly>
-            Deactivate current keycard
-    {%  endif  %}
-        {% endcomment %}
 
     <div id="assign_new_keycard" style="border:2px solid green;font-color:green;text-align:center; color:green;">
         <div id="assign_new_keycard_buttons_and_instructions" style="display:none">
@@ -269,27 +193,14 @@
         </div>
     </div>
 
-     {{ block.super }}
+ {{ block.super }}
 {% endblock %}   {% comment %}  end submit row block {% endcomment %}
 
 
 
-{% comment %} overriding this block in order to show the controls for assigning new keycards/deactivating existing ones in the form row {% endcomment %} 
-
-{% comment %}
-    {% block field_sets %}
-        {% for fieldset in adminform %}
-            overriding this block.. unless i can actually get fieldset into the right dir....
-            {% include "admin/includes/fieldset.html" %}
-        {% endfor %}
-    {% endblock %}
-{% endcomment %}
-
-
 
 
 {% comment %}
-;
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
 <div style="text-align:center;">
@@ -309,9 +220,6 @@
 
 
 {% comment %}
-MORE OR LESS DEPRECATED BRAINVOMIT:
-
-The best thing would be to override the block with the save, etc. buttons at the bottom... But, that's harder than it sounds (solutions involve hacky stuff with javascript!).  Or that's what people on the internet think.  But here's what you can do, I think: submit_row is a template tag.  Look at the code for that, and create your own custom template tag that's similar but includes the extra behavior. 
 {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
 
 
@@ -319,4 +227,5 @@ The best thing would be to override the block with the save, etc. buttons at the
 Or move in here? 
      {{block.super}}
 {% endblock %}
+
 {% endcomment %}
