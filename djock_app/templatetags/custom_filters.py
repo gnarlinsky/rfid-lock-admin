@@ -1,5 +1,6 @@
 from django import template
 from djock_app.models import LockUser
+from django.contrib.contenttypes.models import ContentType
 
 # All the tags and filters are registered in this variable
 register = template.Library()
@@ -31,9 +32,15 @@ def does_lockuser_have_active_keycard(object_id):
             return False
 
 @register.filter
-def get_object_type(the_object):
-    """ get class of object """
-    return the_object.__class__.__name__
+#def get_object_type(the_object):
+def get_object_type(content_type_id):
+    """ get class of object, based on the content type id """
+    #return the_object.__class__.__name__
+    try:
+        ct = ContentType.objects.get(id=content_type_id)
+        return ct.model
+    except:
+        return None
     
 @register.filter
 def get_original_id(referrer_path):
@@ -46,3 +53,5 @@ def get_original_id(referrer_path):
         return split_path[-2]
     else: 
         return None
+
+
