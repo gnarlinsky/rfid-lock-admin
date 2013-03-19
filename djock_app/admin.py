@@ -23,7 +23,9 @@ class DoorAdmin(admin.ModelAdmin):
     # Page listing all Doors:
     ####################################################################################################
     # # field names to display, as columns
-    list_display = ('name','id', 'get_allowed_lockusers_html_links','get_all_access_times','prettify_get_allowed_rfids')
+    list_display = ('name','id', 'description', 'get_allowed_lockusers_html_links','get_all_access_times',\
+        #'prettify_get_allowed_rfids' \
+        )
     actions=None  # don't provide the actions dropdown
     
     ####################################################################################################
@@ -235,7 +237,7 @@ class LockUserAdmin(admin.ModelAdmin):
             (None, {
                 'fields': ( \
                             ('first_name', 'last_name'), \
-                            #'email',\
+                            'email',\
                             'phone_number','address', \
                             # will error if the below are not set as read_only...  which makes sense; these are methods and
                             # things I can't edit from the form.. 
@@ -358,12 +360,16 @@ class LockUserAdmin(admin.ModelAdmin):
         return False
 
     def save_model(self,request,obj,form,change):
-        # if deactivate current keycard was checked, need to deactivate current keycard.  Doing this
+        # if deactivate current keycard was checked (which may have actually happened in clean, if  no Doors were selected) 
+        # need to deactivate current keycard.  Doing this
         # here rather than models.py because need to attach request.user to the RFIDkeycard object being
         # deactivated, to record revoker
         ## todo:  a better way to do this?
-        print "********* SAVING LOCKUSER IN *ADMIN * ***************" 
-        if obj.deactivate_current_keycard:
+        print colored("********* SAVING LOCKUSER IN *ADMIN * ***************", "white", "on_blue")
+
+
+       # if obj.deactivate_current_keycard or not obj.doors.exists():  # although deactivate_current_keycard should have been set to true in clean, if no doors
+        if obj.deactivate_current_keycard: 
             obj.current_keycard_revoker = request.user
             #current_keycard = obj.get_current_rfid() 
             #if current_keycard:
@@ -373,10 +379,7 @@ class LockUserAdmin(admin.ModelAdmin):
         else:
             obj.current_keycard_revoker = None
 
-
-            # Actually, don't do deactivation here.   just attach revoker like did assigner in views
-        obj.save()
-            
+        super(LockUserAdmin, self).save_model(request, obj, form, change)
             
 
             
