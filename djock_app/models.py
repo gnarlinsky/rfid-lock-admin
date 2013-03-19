@@ -239,8 +239,8 @@ class LockUser(models.Model):
     middle_name     = models.CharField(max_length=50,blank=True)
     last_name       = models.CharField(max_length=50)
     address         = models.CharField(max_length=100,blank=True)
-    email           = models.EmailField(blank=True)  # blank okay for NOW, later - required, and unique=True
-    phone_number    = models.IntegerField(max_length=30,null=True,blank=True) # later - required
+    email           = models.EmailField(blank=True,unique=True)  # todo: blank okay for NOW, later - required
+    phone_number    = models.IntegerField(max_length=30,null=True,blank=True) # todo: later - required
     birthdate       = models.DateField(null=True)
 
     ################################################################################
@@ -273,52 +273,40 @@ class LockUser(models.Model):
         # with FK's and M2M). 
         super(LockUser, self).save(*args, **kwargs)
 
+        # If we're assigning a new keycard, at least one Door should have been selected for LockUser. 
+        # (todo: user should have been warned about this with an "are you sure" page/alert and text on change_form)
+        # not checking if deactivate_current_keycard was checked. deactivate_current_keycard could still have been checked, though it should have been disabled. We'll ignore it if it was checked, so *for now* that's the desired behavior.  (todo) 
 
 
-        # TODO: refactor to not have this sort-of-superfluous hoop of checking deactivate_current_keycard. E.g. just don't assign if no doors have been selected. 
-        if not self.doors.all():  # todo: all? .exists()  ? 
-            self.deactivate_current_keycard = True
+        # not doing a check for door existence here. At this point, deactivate_current_keycard is set to true if there were no doors (see admin.py), but doors may not have been saved yet, so checking self.doors.exists() would be misleading. 
+        #if self.doors.exists(): 
+        new_scan_queryset = NewKeycardScan.objects.all()
+        if new_scan_queryset:
+            # get last created NewKeycardScan object
+            # todo: see expanded_comments.txt, (2) (basically -- this may not be the new scan obj we need...)
+            new_scan = new_scan_queryset.latest("time_initiated")  
+            if new_scan.ready_to_assign:
+                print colored("Assigning keycard that was just scanned","blue")
+                # save new_scan before saving new_keycard! 
+                new_scan.ready_to_assign = False   
+                new_scan.save()
+                # assign the rfid from the keycard that was just scanned
+                new_keycard = RFIDkeycard(lockuser=self, the_rfid=new_scan.rfid, assigner=new_scan.assigner_user)
 
-
-        # If we have a current_keycard_revoker but no actual current_keycard, this means that
-        # deactivate_current_keycard was set because something was not satisfied when assigning a new
-        # keycard, e.g. zero Doors were selected for this LockUser. In other words, don't make a new
-        # keycard. 
-#         current_keycard = self.get_current_rfid()
-#         if not self.current_keycard_revoker and not current_keycard:
-        if not self.deactivate_current_keycard:
-
-            # assign the rfid from the keycard that was just scanned
-            print colored("Assigning keycard that was just scanned","blue")
-            new_scan_queryset = NewKeycardScan.objects.all()
-            if new_scan_queryset:
-                # get last created NewKeycardScan object
-                new_scan = new_scan_queryset.latest("time_initiated") # todo: see expanded_comments.txt, (2) (basically -- this may not be the new scan obj we need...)
-
-                if new_scan.ready_to_assign:
-                    # save new_scan before saving new_keycard! 
-                    new_scan.ready_to_assign = False   
-                    new_scan.save()
-                    new_keycard = RFIDkeycard(lockuser=self, the_rfid=new_scan.rfid, assigner=new_scan.assigner_user)
-
-                    new_keycard.save()
-                    
-                # else ???
-                #   .....
-            # else ???
-            #   .....
-        
+                new_keycard.save()
+                        
         try:
             # there should be at most one... for now just get the first one (todo)
             current_keycard = self.get_current_rfid()   # self or lu? 
         except:
             current_keycard = None
 
-        # We'll deactivate a LockUser's current keycard here, if deactivate_current_keycard is checked on the LockUser's change_form. 
-        if current_keycard and self.deactivate_current_keycard:
+        # We'll deactivate a LockUser's current keycard here, if deactivate_current_keycard is checked on the LockUser's change_form, or if no doors were selected. 
+        # not doing a check for door existence here. At this point, deactivate_current_keycard is set to true if there were no doors (see admin.py), but doors may not have been saved yet, so checking self.doors.exists() would be misleading. 
+        #if current_keycard and (self.deactivate_current_keycard or not self.doors.exists()): 
+        if current_keycard and self.deactivate_current_keycard: 
             #current_keycard.date_revoked = datetime.now()
             current_keycard.deactivate(self.current_keycard_revoker)
-            ############# todo: log entry here as well. ######################
             current_keycard.save()# save keycard since have changed it
 
             # should the following two statements actually go into deactivate() ?
@@ -329,13 +317,6 @@ class LockUser(models.Model):
             #super(LockUser, self).save(*args, **kwargs)  # save again
             # ?
             self.save()
-
-        """ Below: no.  Do this when validating the *form.*  
-        # Active LockUsers must have access to at least one Door. 
-        if not self.deactivated and not self.doors.all():
-            # todo:  if the only Door(s) that a LockUser has access to are deleted or deactivated, that's the same as having access to no Door9s) at all. 
-            pass
-        """
 
 
         # or 
