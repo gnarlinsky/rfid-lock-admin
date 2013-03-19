@@ -59,7 +59,14 @@ class Door(models.Model):
         """ Return the RFIDs allowed to access this Door """
         #return ", ".join([str(lu.the_rfid) for lu in self.lockuser_set.all()])
         #return self.lockuser_set.all().values_list("rfids")
-        return [lu.prettify_get_current_rfid() for lu in self.lockuser_set.all()]
+        #return [lu.prettify_get_current_rfid() for lu in self.lockuser_set.all()]
+
+        return_list = []
+        for lu in self.lockuser_set.all():
+            if lu.get_current_rfid():
+                return_list.append(lu.get_current_rfid())
+        return return_list 
+        #return [lu.get_current_rfid() for lu in self.lockuser_set.all()]
 
     def prettify_get_allowed_rfids(self):
         return ", ".join(self.get_allowed_rfids())
@@ -398,6 +405,13 @@ class LockUser(models.Model):
             return _curr_rfid[0]  
         except:
             return None
+
+    def is_active(self):
+        """ Useful in LockUser's list display """
+        if self.get_current_rfid(): 
+            return True
+        else:
+            return False
        
     def prettify_get_current_rfid(self):
         """ Returns results of get_current_rfid(), but as a nice pretty string.
@@ -406,8 +420,11 @@ class LockUser(models.Model):
         curr_rfid = self.get_current_rfid()
         #curr = [str(c.the_rfid) for c in curr_rfid]  # todo - again! haven't coded anythign yet 
             #to account for there only being one current per person!/my fake data forces me to do this...  
-        curr_keycard_info = "RFID: %s (activated on %s by %s)" % (curr_rfid.the_rfid, curr_rfid.date_created.ctime(), curr_rfid.assigner)
-        return curr_keycard_info
+        try:
+            curr_keycard_info = "RFID: %s (activated on %s by %s)" % (curr_rfid.the_rfid, curr_rfid.date_created.ctime(), curr_rfid.assigner)
+            return curr_keycard_info
+        except:
+            return None
 
     def get_allowed_doors(self):
         """ Get the Doors this user is allowed access to. """

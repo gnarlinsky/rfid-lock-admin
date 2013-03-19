@@ -49,9 +49,11 @@ def get_allowed_rfids(request, doorid=None):
     #   Int of a certain length: taken care of in the urlconf
     #   Check that there even is a such 
     # if door id not valid, return ""
-    doors = Door.objects.filter(pk=doorid)    # doorid should not be pk; note, get returns an rror if no such door; filter returns an empty list
-    if doors:
-        response = ",".join(doors[0].get_allowed_rfids())
+    # todo:  return JSON
+    door = Door.objects.filter(pk=doorid)    # doorid should not be pk; note, get returns an rror if no such door; filter returns an empty list
+    if door:
+        allowed_rfids = door[0].get_allowed_rfids()  # list of Keycard objects
+        response = ",".join([keycard_obj.the_rfid for keycard_obj in allowed_rfids])
     if not response: 
         response = 0  # make sure not going to return empty set
     return HttpResponse(response)
@@ -62,7 +64,7 @@ def get_allowed_rfids(request, doorid=None):
 def check(request,doorid, rfid): 
     """ In addition to checking whether the given rfid is valid for the given door, 
     also check whether we're actually trying to assign a new keycard rather than 
-    authenticating. """
+    authenticating. If not doing a new keycard scan, create and save an AccessTime """
     response = 0
     # if door id not valid or rfid not valid, return ""
 
@@ -78,20 +80,25 @@ def check(request,doorid, rfid):
             new_scan.rfid = rfid
             new_scan.save()  
     
-    # or is the request actually for authenticating an existing keycard for this door? 
-    else: 
-        rfidkeycard_list =  RFIDkeycard.objects.all()
-        for rfidkeycard in rfidkeycard_list:
-            allowed_doors = rfidkeycard.get_allowed_doors()
-            if allowed_doors:
-                for door in rfidkeycard.get_allowed_doors():
-                    if rfidkeycard.is_active():
-                        if rfidkeycard.the_rfid == rfid:
-                            if int(door.id) == int(doorid):
-                                response = 1
+        # or is the request actually for authenticating an existing keycard for this door? 
+        else: 
+            rfidkeycard_list =  RFIDkeycard.objects.all()
+            for rfidkeycard in rfidkeycard_list:
+                allowed_doors = rfidkeycard.get_allowed_doors()
+                if allowed_doors:
+                    for door in rfidkeycard.get_allowed_doors():
+                        if rfidkeycard.is_active():
+                            if rfidkeycard.the_rfid == rfid:
+                                if int(door.id) == int(doorid):
+                                    response = 1
+                                    print colored("**** creating and saving accesstime *****","red","on_white")
+                                    at = AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc))  # todo: access time is going to be a bit later...
+                                    at.save()
 
     return HttpResponse(response)
 
+
+    
 def initiate_new_keycard_scan(request,lockuser_object_id):
 #def initiate_new_keycard_scan(request):
 
