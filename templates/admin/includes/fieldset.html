@@ -26,6 +26,18 @@
 
             {% else %} {% comment %} end nk RFIDkeycard thing {% endcomment %}
                 
+                {% comment %} nk - if this is the Doors row, we need to display some extra info {% endcomment %}                {% if field.field.name == "doors" %}
+                    <div id="door_keycard_deactivation_warning"> </div>
+                    <div id="other_doors"> 
+                        {% if doors_not_permitted_to_this_staff_user %} Note: this lockuser also has permission to access the following door(s), that you, the staff user, do not have permission to manage: {% endif %}
+                       {% for another_door in doors_not_permitted_to_this_staff_user %}
+                            {% if  another_door.lockuser_set.all  %}
+                                {{ another_door }}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}{% comment %} end nk Doors thing {% endcomment %}
+
 
                 {% if not line.fields|length_is:'1' and not field.is_readonly %}{{ field.errors }}{% endif %}
                 {% if field.is_checkbox %}
@@ -41,21 +53,6 @@
                 {% if field.field.help_text %}
                     <p class="help">{{ field.field.help_text|safe }}</p>
                 {% endif %}
-
-                {% comment %} nk - if this is the Doors row, we need to display some extra info {% endcomment %} 
-                {% if field.field.name == "doors" %}
-                    <div id="door_keycard_deactivation_warning"> </div>
-                    <div id="other_doors"> 
-                        {% if doors_not_permitted_to_this_staff_user %} Note: this lockuser also has permission to access the following door(s), that you, the staff user, do not have permission to manage: {% endif %}
-                       {% for another_door in doors_not_permitted_to_this_staff_user %}
-                            {% if  another_door.lockuser_set.all  %}
-                                {{ another_door }}
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-
-
-                {% endif %}{% comment %} end nk Doors thing {% endcomment %}
 
 
             {% endif %} 
