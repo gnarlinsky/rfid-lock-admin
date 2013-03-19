@@ -259,7 +259,7 @@ class UserTests(TestCase):
                (c) which is a separate test from just assigning regular permissions to staff users!
 
             (a) 
-            * CREATE door objects (or load fixture)
+            * Note: if you load door *fixtures*, permissions won't be created programmatically -- so create Door objects here 
             * check that there are now custom permissions with the right door names, codenames, etc. 
             
             (b) 
