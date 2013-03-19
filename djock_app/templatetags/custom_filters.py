@@ -24,7 +24,7 @@ def does_lockuser_have_active_keycard(object_id):
     try:
         this_lockuser = LockUser.objects.filter(id=object_id)[0]
     except:
-        this_lockuser = None
+        return False # No lockuser, so no keycard (so can still get the behavior we want on add, when there is no lockuser yet) 
     if this_lockuser:
         if this_lockuser.get_current_rfid():
             return True
