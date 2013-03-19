@@ -44,16 +44,14 @@
 
                 {% comment %} nk - if this is the Doors row, we need to display some extra info {% endcomment %} 
                 {% if field.field.name == "doors" %}
-                    <div style="color:red;">
-                       {% comment %} Extra context: {{doors_not_permitted_to_this_staff_user}} {% endcomment %}
-                        Note: this lockuser also has permission to access the following doors, that you, the staff user, do not have permission to manage:
-                       <div id="other_doors"> 
-                           {% for another_door in doors_not_permitted_to_this_staff_user %}
-                                {% if  another_door.lockuser_set.all  %}
-                                    {{ another_door }}
-                                {% endif %}
-                            {% endfor %}
-                        </div>
+                    <div id="other_doors_message"> </div>
+                    <div id="other_doors"> 
+                        {% if doors_not_permitted_to_this_staff_user %} Note: this lockuser also has permission to access the following door(s), that you, the staff user, do not have permission to manage: {% endif %}
+                       {% for another_door in doors_not_permitted_to_this_staff_user %}
+                            {% if  another_door.lockuser_set.all  %}
+                                {{ another_door }}
+                            {% endif %}
+                        {% endfor %}
                     </div>
 
 
