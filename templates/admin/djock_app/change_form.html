@@ -6,26 +6,11 @@
 {% block extrahead %}
 {{ block.super }}
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"/></script>
-
 <!-- local version of the above --> 
 <!-- <script type="text/javascript" src="/static/admin/js/jquery-1.9.1.min.js"></script> -->
 
-
-<!-- <script> alert("Done button" + $("#done_button")); </script>  --> 
 <script> 
-
-/* TODO:   
-    - Grok namespace stuff/ variable stuff
-    - hovering over disabled "Assign keycard" button - additional message, e.g. "you can't assign a keycard because you suck and also because no doors are selected"  or "keycard already assigned"
-    - "No keycard assigned" means that the current keycard field is either empty or has "(None"). Go with one or the other.  
-    - the assigning staff user could be None for some stupid reason, so this check should be smart, or need to indicate no keycard in another way (i.e. not "(None)")
-    !!!!  Use template filters?  { if object_id|does_lockuser_have_active_keycard }  ? 
-    - Refactor -- template filters instead/get rid of get_other_doors in admin? Using template tags in JS -  http://stackoverflow.com/a/4046217. How to make request available to filters -- http://stackoverflow.com/a/1511457
-    - note id and class names are subject to change!  
-    - if user with keycard checks a Door after unchecking all, 'deactivate current keycard' will NOT be unchecked.  Does this make sense, or should I abandon changing state of 'deactivate current keycard'? 
-    - Doublecheck the sanity of all the button disabling
-    - Error messages/form validation vs (actually in addition to) disabling Save button? 
-*/
+// TODO: 5-8 in todo.rtfd (refactoring, checkboxes, etc)
 
 /*******************************************************************************
 * Scan/assign new keycard 
@@ -93,11 +78,10 @@ $(document).ready( function () {
     if (all_door_checkboxes.not(":checked").length === all_door_checkboxes.length) { // if no doors are checked
         var add_keycard_button = document.getElementById("add_keycard_button");
         add_keycard_button.disabled=true; 
+        // $("#add_keycard_button").attr("disabled","disabled"); 
     }
 }); 
 
-// Are there doors that this lockuser can access but this staff user cannot manage: 
-var other_doors_lockuser_can_access = document.getElementById("other_doors").innerHTML.replace(/\s/g,"");
 
 // When any input elements whose id's start with "id_door_" (i.e. all the Door checkboxes) is clicked: 
 $('input[id^="id_doors_"]').bind("click",function(e) { 
@@ -106,17 +90,20 @@ $('input[id^="id_doors_"]').bind("click",function(e) {
     if (all_door_checkboxes.not(":checked").length === all_door_checkboxes.length) { // no doors are checked
 
         // Make sure that this LockUser is permitted access to doors that the *staff* user is not permitted to manage. 
-        if ( !other_doors_lockuser_can_access) {  
+        // Are there doors that this lockuser can access but this staff user cannot manage: 
+        var add_keycard_button = document.getElementById("add_keycard_button");
+        var deactivate_keycard_checkbox = document.getElementById("id_deactivate_current_keycard");
+        var other_doors_lockuser_can_access = document.getElementById("other_doors").innerHTML.replace(/\s/g,"");
+
+        if ( !other_doors_lockuser_can_access) {  // no doors, so disable "assign keycard" button
+            add_keycard_button.disabled=true; 
             var curr_keycard =  $('div.field-prettify_get_current_rfid p').text(); 
-            if (curr_keycard=="(None)") {   // if  no assigned keycard, warn and disable "Assign keycard" button
+            if (curr_keycard=="(None)") {   // if  no assigned keycard, warn that won't be able to assign
                 $("#door_keycard_deactivation_warning").html( "Warning: Select at least one door to assign keycard."); 
-                var add_keycard_button = document.getElementById("add_keycard_button");
-                add_keycard_button.disabled=true; 
                 //$("#add_keycard_button").disabled=true; 
-            } else {  // if there is an assigned keycard
+            } else {  // if there is an assigned keycard, a different warning
                 $("#door_keycard_deactivation_warning").html("Warning: If no door is selected, this user's keycard will be deactivated!  To uncheck 'Deactivate current keycard,' pick a freaking door!"); 
                 // Check 'Deactivate current keycard' to emphasize that unchecking all doors will deactivate user's keycard
-                var deactivate_keycard_checkbox = document.getElementById("id_deactivate_current_keycard");
                 deactivate_keycard_checkbox.checked = true; 
             }
         } 
@@ -128,7 +115,7 @@ $('input[id^="id_doors_"]').bind("click",function(e) {
         } else {  // change, not add
             var curr_keycard =  $('div.field-prettify_get_current_rfid p').text()
             var add_keycard_button = document.getElementById("add_keycard_button");
-            if (curr_keycard!="(None)") {   
+            if (curr_keycard!="None") {   
                 add_keycard_button.disabled=true; 
             } else { 
                 add_keycard_button.disabled=false;  
@@ -141,6 +128,7 @@ $('input[id^="id_doors_"]').bind("click",function(e) {
     // todo:  simplify logic
     $("#id_deactivate_current_keycard").bind("click",function(e) {   
 
+        var deactivate_keycard_checkbox = document.getElementById("id_deactivate_current_keycard");
         // if user trying to uncheck deactivate current keycard.... 
         if (deactivate_keycard_checkbox.checked == false) {
             // .... but no doors are selected .....
@@ -150,7 +138,7 @@ $('input[id^="id_doors_"]').bind("click",function(e) {
                 if ( !other_doors_lockuser_can_access) {   
                     // ... and if there's a  keycard
                     var curr_keycard =  $('div.field-prettify_get_current_rfid p').text()
-                    if (curr_keycard!="(None)") {   
+                    if (curr_keycard!="None") {   
                         $("#door_keycard_deactivation_warning").html("Uh, you don't want to deactivate the keycard, but you don't want to pick any doors either? Get it together. To uncheck 'Deactivate current keycard,' pick a freaking door!"); 
                         deactivate_keycard_checkbox.checked = true;
                     } 

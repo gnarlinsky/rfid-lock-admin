@@ -1,12 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from django.forms import CheckboxSelectMultiple, IntegerField, ModelForm
+from django.forms import CheckboxSelectMultiple, IntegerField, ModelForm, ModelMultipleChoiceField
 from django.db import models
 from djock_app.models import LockUser, AccessTime, RFIDkeycard, Door, NewKeycardScan
 import random  #temp
 from termcolor import colored   #temp
 from django import forms
+from django.contrib.auth.models import Permission
 
 
 
@@ -58,6 +59,13 @@ class DoorAdmin(admin.ModelAdmin):
         return doors_to_return
 
 
+    def has_delete_permission(self, request, obj=None):
+        """ Don't display "delete" button """
+        return False
+
+#    def has_add_permission(self, request, obj=None):
+#        """Don't display Save And Add button """
+#        return False
 
 
 
@@ -217,6 +225,7 @@ class LockUserAdmin(admin.ModelAdmin):
     # to do:  show deactivated (i.e. no current keycard) in gray, or de-emphasize another way
     list_display = ('first_name','last_name','email',\
                     'prettify_get_current_rfid','prettify_get_all_rfids',\
+                    'is_active',\
                     'get_allowed_doors_html_links',\
                     'prettify_get_last_access_time',
     )
@@ -354,7 +363,6 @@ class LockUserAdmin(admin.ModelAdmin):
         extra_context={"doors_not_permitted_to_this_staff_user":self.get_other_doors(request)}
         return super(LockUserAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
 
-    #Don't display save, delete buttons on bottom 
     def has_delete_permission(self, request, obj=None):
         """ Don't display "delete" button """
         return False
@@ -371,6 +379,10 @@ class LockUserAdmin(admin.ModelAdmin):
        # if obj.deactivate_current_keycard or not obj.doors.exists():  # although deactivate_current_keycard should have been set to true in clean, if no doors
         if obj.deactivate_current_keycard: 
             obj.current_keycard_revoker = request.user
+            from django.contrib import messages
+            msg = "%s's keycard was deactivated successfully." % obj
+            messages.add_message(request, messages.INFO, msg)
+
             #current_keycard = obj.get_current_rfid() 
             #if current_keycard:
             #    current_keycard.deactivate(request.user)
@@ -380,9 +392,7 @@ class LockUserAdmin(admin.ModelAdmin):
             obj.current_keycard_revoker = None
 
         super(LockUserAdmin, self).save_model(request, obj, form, change)
-            
 
-            
 
 class AccessTimeAdmin(admin.ModelAdmin):
     def __init__(self, *args, **kwargs):
@@ -410,7 +420,6 @@ class AccessTimeAdmin(admin.ModelAdmin):
     ####################################################################################################
    # readonly_fields = ('access_time','rfid')   # because obviously these shouldn't be editable.   (but commenting out if want to create some objects from admin just for fun)
 
-    #Don't display save, etc. buttons on bottom (to do: the remaining "Save and continue editing" and "Save")
     def has_delete_permission(self, request, obj=None):
         """ Don't display "delete" button """
         return False
@@ -419,71 +428,50 @@ class AccessTimeAdmin(admin.ModelAdmin):
         return False
 
 
-
+# To do, if staff users are able to manage other staff users (not a current use case)
+"""
 #####################################################################
 # Customize User list display, change form fields
 #####################################################################
-"""
 class StaffUserAdmin(UserAdmin):
-    list_display = ('email', 'first_name', 'last_name', 'is_active', 'is_staff')
-    #fields = ('additional_attribute',)
-    #fields += ('email','first_name',)
-    fieldsets = (
-            (None, {
-                'fields': ( \
-                            ('first_name', 'last_name'), 'email', 'additional_attribute',\
-                            ),
+    list_display = ('username','first_name', 'last_name', 'email', 'is_superuser','is_active', 'is_staff', 'date_joined','last_login','get_all_permissions')
+    fieldsets = ( 
+        (None           { 'fields': (('username', 'email'), 'password') }),
+        (None,          { 'fields': (('first_name', 'last_name'))       }),
+        (None,          { 'fields': ('last_login', 'date_joined')       }),
+        ('Permissions', { 'fields': ('is_active', 'is_staff', 'is_superuser',
+                                    'user_permissions') }),
+    )   
+    add_fieldsets = ( 
+        (None, { 'classes': ('wide',),
+                 'fields': ('username', 'password1', 'password2')}),  
+    )   
+    readonly_fields = ('date_joined','last_login')   
 
-            }),
-        )
-    #add_fieldsets = (
-    #fieldsets = (
-    #        (None, {
-                #'classes': ('wide',),
-                #'fields': ('additional_attribute') }
-   #             'fields': ('username', 'first_name','additional_attribute') 
-   #             } ),
-   #     )
+    # Limit permissions shown to *staff* users to: 
+    # The min perms a non-superuser staff user should have:
+    # - lockuser: add, change
+    # - manage zero doors
+    # - *staff* users: only change own info
+    # - access times: *view* only (i.e. change, but can't *edit* anything on change form... right?)
+    # 
+    # The max perms a non-superuser staff user can have, in addition to above:
+    # - doors: add
+    # - *staff* users: add, change others
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(StaffUserAdmin,self).get_form(request, obj, **kwargs)
 
-    #readonly_fields = ('additional_attributes',)   
-    #fields = ('username', )
+        # only on change, not add (todo)
+        permissions = form.base_fields['user_permissions']
+
+        # maximum permissions
+        staff_permissions = permissions.queryset.filter(codename__regex=r'add_lockuser|change_lockuser|add_user|change_user|add_door|change_door')
+        staff_permissions = staff_permissions | permissions.queryset.filter(codename__regex = 'can_manage_door')
+        # All door management permissions, except deletion (using reqex because door permissions are created dynamically)
+        permissions.queryset = staff_permissions
+        return form
 """
 
-
-
-
-
-
-
-
-
-#####################################################################
-# Customize User list display, change form fields
-#####################################################################
-# todo:  show keycards assigned/revoked (User.RFIDkeycard_assigned.all(); User.RFIDkeycard_revoked.all())
-# def whom_assigned_keycards_to():
-#     # e.g. user_object.RFIDkeycard_assigned.all()[0].lockuser
-#     pass
-# def whom_revoked_keycards_from():
-#     # e.g. user_object.RFIDkeycard_assigned.all()[0].lockuser
-#     pass
-    
-UserAdmin.list_display = ('username','first_name', 'last_name', 'email', 'is_superuser','is_active', 'date_joined','last_login','get_all_permissions')
-#UserAdmin.fields = ('email', 'first_name', 'last_name', 'is_active', 'is_staff')
-#UserAdmin.fieldsets = (
-    #fieldsets = (
-#            (None, {
-                #'classes': ('wide',),
-                #'fields': ('username','password1','password2','email', 'first_name', 'last_name', 'is_active', 'is_staff','user_permissions')
- #               'fields': ( \
- #                           ('username'),\
- #                           ('first_name', 'last_name'), \
- #                           'username','email','is_active', 'is_staff','user_permissions',\
- #                           'email',\
- #                           ),
- #               } ),
- #       )
-    #readonly_fields = ('additional_attributes',)   
 
 #####################################################################
 # Register models
@@ -500,13 +488,11 @@ admin.site.register(Door, DoorAdmin)
 #   we un-register it here, then we re-register with our own ModelAdmin -
 #   User Admin. (If the ordering is wrong, will get error like "The model
 #   User is already registered.")
+#admin.site.register(User, UserAdmin)
+#admin.site.unregister(User)
 #admin.site.register(User, StaffUserAdmin)
-#admin.site.register(User)
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
 
 # Globally disable deletion of selected objects (i.e this will not be an available action in the Actions dropdown of
 # all ModelAdmins/change_list pages.
 admin.site.disable_action('delete_selected')
 # Although might want to be able to delete Doors
-

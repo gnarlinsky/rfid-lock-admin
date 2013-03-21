@@ -46,10 +46,10 @@ urlpatterns = patterns('',
     # [ But since all I have to send back is a 1 or 0, maybe I don't have to write a template at all?])
     # direct_to_template passes the dictionary 'params' to the template, so to
     #   access 'doorid,' for example, you have to do {{ params.doorid }} )
-    url(r'/door/(?P<doorid>\d+)/checkrfid/(?P<rfid>\d+)/$',\
-                        direct_to_template, {'template': 'basic.html' }, \
+    #url(r'/door/(?P<doorid>\d+)/checkrfid/(?P<rfid>\d+)/$',\
+    #                    direct_to_template, {'template': 'basic.html' }, \
 
-    ),
+    #),
 
     # get list of rfid's allowed to open this door
     # direct_to_template right now, just a quick demo of displaying arguments in the url,
@@ -59,7 +59,7 @@ urlpatterns = patterns('',
     #url(r'^door/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'we_are_ok.html' }    ),
     #url(r'checkdoor/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'admin/we_are_ok.html' }    ),
     url(r'door/(?P<doorid>\d+)/getallowed/$', views.get_allowed_rfids ), 
-    url(r'^checkdoor/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'admin/we_are_ok.html' }    ),
+    #url(r'^checkdoor/(?P<doorid>\d+)/getallowed/$', direct_to_template, {'template': 'admin/we_are_ok.html' }    ),
 
     # applies to RFID's change form
     #url(r'deactivate_keycard/(?P<object_id>\d+)/$', views.deactivate_keycard),

@@ -15,6 +15,8 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_unicode
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 
 
 
@@ -40,10 +42,8 @@ class Door(models.Model):
         print colored("SAVING-Door", "magenta")
         super(Door,self).save(*args,**kwargs)
 
-        from django.contrib.contenttypes.models import ContentType
         content_type = ContentType.objects.get(app_label='djock_app',model='door')
 
-        from django.contrib.auth.models import Permission
         # todo:  IntegrityError: columns content_type_id, codename are not unique
         print colored("SAVING-Permission", "magenta")
         # create() saves as well
@@ -90,7 +90,8 @@ class Door(models.Model):
 
     # to do:
     def get_all_access_times(self):
-        pass
+        door_access_times = AccessTime.objects.filter(id=self.id)
+        return door_access_times
 
 
 class NewKeycardScan(models.Model):
@@ -224,17 +225,26 @@ class AccessTime(models.Model):
     the_rfid           = models.CharField(max_length=10,null=True) # the radio-frequency id, however represented....
     access_time    = models.DateTimeField(null=True)    # the time the rfid was used
 
+    lockuser = models.ForeignKey("LockUser",null=False)
+
+    def __unicode__(self):
+        return u'%s' % self.access_time
+
     def get_this_lockuser(self):
         """ Return the user's name associated with the RFID for this access time """
         # Get RFIDkeycard (there should only be one!) with the rfid associated with this access time;
         # get the lock user names associated with those RFIDkeycards
 
-        # to do:  RFID nums may be reused, so also check who had RFIDkeycard with given rfid num during the *specified time period* 
+        # todo...:   If we reuse keycards/keycard nums, this may be incorrect, since lockuser is the CURRENT owner, so this would not be valid for access times of the PREVIOUS owner. It's probably best to associate AccessTimes with lockusers at creation time. I.e. determine the current lockuser in *views.py* (check() ) and assign there. Here will have a FK, and this function will return it. 
+        # todo:  test for this
+        """
         _rfid_keycard = RFIDkeycard.objects.all().filter(the_rfid__exact=self.the_rfid)
         if _rfid_keycard:
-            return _rfid_keycard[0].get_this_lockuser()
+            return _rfid_keycard[0].lockuser  
         else:
             return None
+        """
+        return self.lockuser
 
 
 class LockUser(models.Model):

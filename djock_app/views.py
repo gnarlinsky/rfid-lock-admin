@@ -18,7 +18,9 @@ def generate_random_access_times(request):
     # for each keycard in the system, generate a random number of access times, in the range specified in the form
     for keycard in RFIDkeycard.objects.all():
         for i in range(random.randint(min_num_times,max_num_times)):
-            AccessTime(the_rfid=keycard.the_rfid, access_time=get_random_time()).save()
+            #AccessTime(the_rfid=keycard.the_rfid, access_time=get_random_time()).save()
+            # todo:  also get keycard's lockuser and pass it
+            AccessTime(the_rfid=keycard.the_rfid, access_time=get_random_time(), lockuser=keycard.lockuser).save()
     return HttpResponseRedirect("/lockadmin/")
 
 
@@ -53,11 +55,10 @@ def get_allowed_rfids(request, doorid=None):
     door = Door.objects.filter(pk=doorid)    # doorid should not be pk; note, get returns an rror if no such door; filter returns an empty list
     if door:
         allowed_rfids = door[0].get_allowed_rfids()  # list of Keycard objects
-        response = ",".join([keycard_obj.the_rfid for keycard_obj in allowed_rfids])
-    if not response: 
-        response = 0  # make sure not going to return empty set
-    return HttpResponse(response)
-
+        #alloweds = ",".join([keycard_obj.the_rfid for keycard_obj in allowed_rfids])
+        alloweds = [int(keycard_obj.the_rfid) for keycard_obj in allowed_rfids]
+    to_json = {"doorid": int(doorid), "allowed_rfids": alloweds}
+    return HttpResponse(simplejson.dumps(to_json), content_type="application/json")
 
 # TO DO: refactor below.. to return more immediately; 
 #           clean up the conditional logic
@@ -92,8 +93,14 @@ def check(request,doorid, rfid):
                                 if int(door.id) == int(doorid):
                                     response = 1
                                     print colored("**** creating and saving accesstime *****","red","on_white")
-                                    at = AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc))  # todo: access time is going to be a bit later...
+                                    at = AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=rfidkeycard.lockuser)  # todo: access time is going to be a bit later...
                                     at.save()
+                                    # TODO: If we reuse keycards/keycard nums, AccessTime objects'
+                                    # lockusers -- as seen on AccessTimes change_list, for ex -- will be
+                                    # incorrect, since lockuser is the CURRENT owner, so this would not 
+                                    # be valid for access times of the PREVIOUS owner. It's probably best to
+                                    # associate AccessTimes with lockusers at creation time. I.e. determine
+                                    # the current lockuser in *views.py* (check() ) and assign there.
 
     return HttpResponse(response)
 
