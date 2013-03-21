@@ -134,32 +134,6 @@ disabling the bootstrap dropdown library because of javascript exceptions on som
 </div>
 <!-- END Container -->
 
-    {% comment %}  temp perms listing block {% endcomment %}
-    <div style="border:1px dashed gray;width:500px; margin-left:20px; padding:10px;  ">
-        <div style="float: left; border:1px dotted blue;width:50%">
-            <p>Here are all available djock_app perms for {{user}}: {{perms.djock_app}}</p>
-        </div>
-        <div style="float:right; border:1px dotted green;width:49%">
-            <p> (The min perms a non-superuser staff user should have: 
-            <ul>
-                <li> lockuser: add, change</li>
-                <li> doors: *view* doors only (i.e. change, but can't *edit* anything on change form... right?)  </li>
-                <li> manage zero doors</li>
-                <li> *staff* users: only change own info
-                <li> access times: *view* only (i.e. change, but can't *edit* anything on change form... right?)  </li>
-            </ul>
-            </p>
-            <p> (The max perms a non-superuser staff user can have, in addition to above: 
-            <ul>
-                <li> doors: add, change</li>
-                <li> manage all  doors</li>
-                <li> *staff* users: add, change others (except can't change superuser!!!!) </li>
-            </ul>
-            </p>
-        </div>
-        <div style="clear:both;"></div>
-    </div>
-
 </div>
 </body>
 </html>
