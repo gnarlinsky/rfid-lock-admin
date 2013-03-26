@@ -1,43 +1,37 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
-from django.forms import CheckboxSelectMultiple, IntegerField, ModelForm, ModelMultipleChoiceField
+from django.forms import CheckboxSelectMultiple, ModelForm
 from django.db import models
-from djock_app.models import LockUser, AccessTime, RFIDkeycard, Door, NewKeycardScan
-import random  #temp
-from termcolor import colored   #temp
+from djock_app.models import LockUser, AccessTime, RFIDkeycard, Door
+from termcolor import colored
 from django import forms
-from django.contrib.auth.models import Permission
+from chartit import DataPool, Chart
 
 
-
-
-#########################  TO DO ########################################################################
+#########################  TO DO ##########################################
 #  - Get rid of "delete" action for all except superuser, including not showing the button on change_list
 # - (maybe?): When a user is modified or added (in terms of being active at all or more/fewer doors access), e-mail all the staff. 
 # - search bar for lockusers/accesstimes/doors change lists
 # -  # the field labeled "rfids" should not be required.  
-###################################################################################################
+###########################################################################
 
 class DoorAdmin(admin.ModelAdmin):
-    ####################################################################################################
+    ###########################################################################
     # Page listing all Doors:
-    ####################################################################################################
+    ###########################################################################
     # # field names to display, as columns
     list_display = ('name','id', 'description', 'get_allowed_lockusers_html_links','get_all_access_times',\
         #'prettify_get_allowed_rfids' \
         )
     actions=None  # don't provide the actions dropdown
     
-    ####################################################################################################
+    ###########################################################################
     # Individual Door page
-    ####################################################################################################
+    ###########################################################################
     readonly_fields = ('get_allowed_lockusers','get_all_access_times')   # because obviously these shouldn't be editable.  
     #(but commenting out if want to create some objects from admin vs shell just for fun)
 
 
     # Staff users should only be able to manage doors that they have permissions for
-
 
     # This works when the user is looking at the list of Doors (the change list page), 
     # but not when they're displayed on the lock user's change_form, and the user is 
@@ -145,8 +139,6 @@ class RFIDkeycardAdmin(admin.ModelAdmin):
     readonly_fields = ("the_rfid","deactivate","lockuser","date_created","date_revoked","is_active","get_allowed_doors")
 
 
-
-
 class LockUserForm(ModelForm):
     class Meta:
         model = LockUser
@@ -174,38 +166,25 @@ class LockUserAdmin(admin.ModelAdmin):
     #inlines = [RFIDkeycardInline]
     form = LockUserForm
 
-
-
     ####################################################
     # Page listing all LockUsers ("change list" page):
     ####################################################
-
-
     #-------------------
     # Actions dropdown
     #------------------
-    def make_active(self, request, queryset):
-        """ Staff should not have the ability to delete LockUsers, only to DEACTIVATE them.  """
-        queryset.update(activate=True)
-        # Must save after update(), since update()  doesn't run any save() methods on your models, or emit the pre_save
-        # or post_save signals (which are a consequence of calling save()).
-        for obj in queryset:
-            obj.save()    
-    make_active.short_description = "Activate selected lock users"
-
-    def make_inactive(self, request, queryset):
+    def deactivate(self, request, queryset):
         """ Staff should not have the ability to delete LockUsers, only to DEACTIVATE them. """
         queryset.update(activate=False)
         for obj in queryset:
             obj.save()    #otherwise associated keycard won't become deactivated
-    make_inactive.short_description = "Deactivate selected lock users"
+    deactivate.short_description = "Deactivate selected lock users/keycards"
 
-    def deactivate_keycard(self, request, queryset):
-        """ Deactivate associated keycard """
-        queryset.update(deactivate_current_keycard=True)
-        for obj in queryset:
-            obj.save()    
-    deactivate_keycard.short_description = "Deactivate selected lock users' keycards"
+#    def deactivate_keycard(self, request, queryset):
+#        """ Deactivate associated keycard """
+#        queryset.update(deactivate_current_keycard=True)
+#        for obj in queryset:
+#            obj.save()    
+#    deactivate_keycard.short_description = "Deactivate selected lock users' keycards"
 
     def email_selected(self, request, queryset):
         """ Upon choosing this action, get new screen with field for entering body of email, etc. """
@@ -214,10 +193,9 @@ class LockUserAdmin(admin.ModelAdmin):
 
     # Only the following actions will be shown in the dropdown
     #actions = (activate_keycard, deactivate_keycard, reactivate_keycard, make_active, make_inactive,email_selected)
-    actions = (make_active, make_inactive, deactivate_keycard, email_selected)
+    actions = (deactivate, email_selected)
 
 
-    
     #-------------------------
     # Which fields to display
     #-------------------------
@@ -291,7 +269,6 @@ class LockUserAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         """ 'Like the formfield_for_foreignkey method, the formfield_for_manytomany method can be overridden to change the default formfield for a many to many field. '  - django docs;
         Here, need specific behavior for rfid keycards and Doors"""
-
         ################
         #  rfids
         ################
@@ -319,7 +296,7 @@ class LockUserAdmin(admin.ModelAdmin):
         return doors_to_show
 
     # todo: refactor in terms of this template/admin divide? 
-    def get_other_doors(self,request):
+    def get_other_doors(self, request):
         """ Doors that the staff User is not allowed to administer. In
         change_form template, will get a set of these Door objects from context,
         then check the lockuser_set of each to see if the current lockuser has
@@ -334,7 +311,6 @@ class LockUserAdmin(admin.ModelAdmin):
             if not request.user.has_perm(perm):
                 doors_not_permitted_to_this_staff_user = doors_not_permitted_to_this_staff_user | Door.objects.filter(pk=door.pk)  # concatenating QuerySets
         return doors_not_permitted_to_this_staff_user
-
 
     # The queryset() method in DoorAdmin restricts a staff user's ability to 
     #   view/change Doors that they do not have permission for (individual objects and change list).
@@ -395,12 +371,82 @@ class LockUserAdmin(admin.ModelAdmin):
 
 
 class AccessTimeAdmin(admin.ModelAdmin):
+    # todo: 
     def __init__(self, *args, **kwargs):
         """ Only defining here because simply including
                 list_display_links = []
             above does not work; it defaults to linking from items in AccessTime col
         """
-        super(AccessTimeAdmin, self).__init__(*args, **kwargs)
+        super(AccessTimeAdmin, self).__init__(*args, **kwargs) # todo: is this appropriate here? 
+    #def changelist_view(self, request, extra_context=None):
+        """ Show the Highchart of access times """
+        """
+        # todo: should this be happening here or elsewhere? 
+        
+        ##################################
+        # create chart object 
+        ##################################
+        #Step 1: Create a DataPool with the data we want to retrieve.
+        access_time_data = \
+            DataPool(
+               series=
+                [{'options': {
+                   #'source': MonthlyWeatherByCity.objects.all()},
+                   'source': AccessTime.objects.all()},
+                  'terms': [
+                  #  'month',
+                  #  'houston_temp',
+                  #  'boston_temp']}
+                    'access_time',
+                    'the_rfid',
+                    'the_rfid']}
+                 ])
+
+        print colored("creating the Chart object","red","on_white")
+
+        #Step 2: Create the Chart object
+        cht = Chart(
+                datasource = access_time_data,
+                series_options =
+                  [{'options':{
+                      'type': 'scatter',
+                      'stacking': False},
+                    'terms':{
+                     # 'month': [
+                     #   'boston_temp',
+                     #   'houston_temp']
+                      'access_time': [
+                        'the_rfid',
+                        'the_rfid']
+                      }}],
+                chart_options = {
+                    'title':    {'text': 'Door Access Times'},
+                    'subtitle': {'text': '(subtitle)'},
+                    'xAxis':    {'title': { 'text': 'Date'} },
+                    'yAxis':    {'title': { 'text': 'Time of Day'} },
+                    #'tooltip':  {'formatter': 'function() { return "" + this.x + ", " + this.y + "";'},
+                    #'tooltip': { 'formatter': 'function() { return "Price is " + this.x };'},
+                    #'tooltip':  {'formatter': 'function() { return this.x;}'},
+                    #'tooltip': {'pointFormat': '{series.name}: <b>{point.y} !!!!!!</b><br/>'},
+                    'legend':   {   'layout':'vertical', 
+                                    'align':'left',
+                                    'verticalAlign':'top',
+                                    'x':100,
+                                    'y':70,
+                                    'floating':False,
+                                    'backgroundColor': '#FFFFFF',
+                                    'borderWidth':2         } 
+
+                   }
+                    )
+
+        ##################################
+        # add chart object to context, so change_list can load_charts it
+        ##################################
+        extra_context={'weatherchart':cht}
+        return super(AccessTimeAdmin, self).changelist_view(request, extra_context=extra_context)
+        """
+
         # There's no need to show the page for an individual AccessTime, so no field should link to it.
         self.list_display_links = (None, )
 
@@ -408,11 +454,12 @@ class AccessTimeAdmin(admin.ModelAdmin):
     # Page listing all AccessTimes ("change list" page):
     ####################################################################################################
     # # field names to display, as columns
-    list_display = ('access_time','the_rfid','get_this_lockuser')
+    list_display = ('access_time','get_this_lockuser','get_this_door')
     actions=None  # don't provide the actions dropdown
     date_hierarchy = 'access_time' # Set date_hierarchy to the name of a DateField or DateTimeField in model, and the
         # change list page will include a date-based drilldown navigation by that field. (i.e. shows months or days or
         # years or whatever at the top)
+    list_filter = ('lockuser','door')  # show filters by RFID and active/inactive on the right
     
     ####################################################################################################
     # Individual TimeAccess page
