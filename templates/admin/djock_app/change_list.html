@@ -1,0 +1,210 @@
+{% extends "admin/change_list.html" %}
+{% comment %}
+{% load i18n admin_static admin_list %}
+{% load url from future %}
+{% load admin_urls %}
+{% endcomment %}
+
+{% block extrahead %} 
+    {{ block.super }}
+    {% if module_name == "access times" %}
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"    /></script>
+        <script type="text/javascript" src="/static/Highcharts-3.0.0/js/highcharts.js"></script>
+        <script>
+
+
+        // todo:  tooltip for all series, not within each
+$(function () {
+
+
+    //var myTestArray = {{ my_test_array|safe }}; 
+    //var myTestArray = [['asdfasfsd asdfasfd', 1111135121, 2012, 8, 8, 8, 1, 38, 27], ['asdfasfsd asdfasfd', 1111135121, 2012, 21, 8, 21, 18, 53, 22], ['bob loblah', 1111135121, 2013, 23, 1, 23, 1, 40, 33] ]; 
+    var accessTimesData = {{ access_times_data|safe }}; 
+
+
+
+
+
+
+    var chart;
+    $(document).ready(function() {
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'access_times_chart',
+                type: 'scatter',
+                zoomType: 'xy', 
+                plotBorderWidth: 1, 
+            },
+            title: {
+                align: 'center', 
+                text: 'Access Times for All Doors'
+            },
+            subtitle: {
+                text: 'Click on a door in the legend to toggle its points on/off.<br>Select a region to zoom in.'
+            },
+            xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                    day: '%b %d,%Y'
+                },
+                title: {
+                    enabled: true,
+                    text: 'Date'
+                },
+                startOnTick: false,
+                endOnTick: true,
+                showLastLabel: true
+            },
+            yAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                    day: '%b %d,%Y'
+                },
+                title: {
+                    text: 'Time'
+                }
+            },
+            tooltip: {
+                   /* 
+                    formatter: function() {
+                            return ''+
+                            this.x +' , '+ this.y +{series.name} ';
+                    },
+                    formatter: function() {
+                        var s = '<b>'+ this.x +'</b>';
+
+                        $.each(this.points, function(i, point) {
+                            s += '<br/>'+ point.series.name +': '+
+                            point.y +'m';
+                        });
+
+                        return s;
+                    },*/
+                    followPointer: false, 
+                    hideDelay: 0 // todo: tooltip stuff/hide delay stuff. something is interfering with something else? 
+                    
+                    },
+            legend: {
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: 'top',
+                x: 0,
+                y: 60,
+                floating: false,
+                backgroundColor: '#FFFFFF',
+                borderWidth: 1
+            },
+            plotOptions: {
+                scatter: {
+                    marker: {
+                        radius: 5,
+                        states: {
+                            hover: {
+                                enabled: true,
+                                lineColor: 'rgb(100,100,100)'
+                            }
+                        }
+                    },
+                    states: {
+                        hover: {
+                            marker: {
+                                enabled: false
+                            }
+                        }
+                    }
+                }
+            },
+
+            /*******************************************************
+            Here's where we will
+            *******************************************************/
+            series: [
+                {
+                name: 'Makerspace',
+                color: 'rgba(223, 83, 83, .5)',
+                /*data: [  
+                    [156.2, 60.0], [149.9, 46.8], [169.5, 57.3], [160.0, 64.1], [175.3, 63.6]   
+                ]*/
+                data: [ 
+                {
+                    x: Date.UTC(2011,0,1), 
+                    y: 20,
+                    'user': 'Billie Bob',
+                    'rfid': 234234324
+                }, { 
+                    x: Date.UTC(2011,0,1), 
+                    y: 50,
+                    'user': 'sally joe',
+                    'rfid': 11111111
+                } ], 
+                tooltip: {
+                        followPointer: false, 
+                        pointFormat: '{point.x}, {point.y}:<br/>{point.user}<br/>',  
+                        },
+
+                }, 
+                
+                {
+                name: 'Narnia',
+                color: 'rgba(83, 223, 83, .5)',
+                data: [ 
+                {
+                    x: Date.UTC(2010,0,3), 
+                    y: Date.UTC(2010,0,3),
+                    'user': 'Billie Bob',
+                    'rfid': 234234324
+                }, { 
+                    x: Date.UTC(2010,0,5), 
+                    y: 25,
+                    'user': 'sally joe',
+                    'rfid': 11111111
+                } ],
+
+                tooltip: {
+                        followPointer: false, 
+                        pointFormat: '{point.x}, {point.y}:<br/>{point.user}<br/>',  
+                        },
+    
+            }, 
+                     {
+                name: 'Bike Project',
+                   composition: {
+                       'User': 'Billy Bob',
+                       'RFID': '1231231232313',
+                       },
+                color: 'rgba(119, 152, 191, .5)',
+                data: [ 
+                {
+                    x: Date.UTC(2013,0,6), 
+                    y: 22,
+                    'user': 'Billie Bob',
+                    'rfid': 234234324
+                }, { 
+                    x: Date.UTC(2013,0,5), 
+                    y: 5,
+                    'user': 'sally joe',
+                    'rfid': 11111111
+                } ], 
+                tooltip: {
+                        followPointer: false, 
+                        pointFormat: '{point.x}, {point.y}:<br/>{point.user}<br/>',  
+                        },
+            }]
+        });
+    });
+    
+});
+        </script>
+        {% comment %}
+        {% load chartit %}
+        {{ weatherchart|load_charts:"weather_chart" }}
+        {% endcomment %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if module_name == 'access times' %}
+          <div id="access_times_chart">!!!!!!!!!!  access times chart rendered here</div>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
