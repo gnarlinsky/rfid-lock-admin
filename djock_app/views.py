@@ -1,28 +1,24 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response, render, redirect
-from djock_app.models import Door, LockUser, RFIDkeycard, AccessTime, NewKeycardScan
+from django.shortcuts import render_to_response
+import djock_app.models
 import random
 from datetime import datetime
 from django.utils import simplejson
 from termcolor import colored   # temp
-from django.contrib.contenttypes.models import ContentType
-from django.utils.encoding import force_unicode
-from django.contrib.auth.models import User
 from django.utils.timezone import utc
 
+# todo:  remove or make "private"
 def generate_random_access_times(request):
     """ just for dev - generate random access times in a specified range """
     min_num_times = int(request.POST.get('min_num_times'))
     max_num_times = int(request.POST.get('max_num_times'))
 
     # for each keycard in the system, generate a random number of access times, in the range specified in the form
-    for keycard in RFIDkeycard.objects.all():
+    for keycard in djock_app.models.RFIDkeycard.objects.all():
         for i in range(random.randint(min_num_times,max_num_times)):
             #AccessTime(the_rfid=keycard.the_rfid, access_time=get_random_time()).save()
-            # todo:  also get keycard's lockuser and pass it
-            AccessTime(the_rfid=keycard.the_rfid, access_time=get_random_time(), lockuser=keycard.lockuser).save()
+            djock_app.models.AccessTime(the_rfid=keycard.the_rfid, access_time=get_random_time(), lockuser=keycard.lockuser, door=random.choice(keycard.lockuser.doors.all())).save()
     return HttpResponseRedirect("/lockadmin/")
-
 
 from random import randrange
 from datetime import timedelta, datetime
@@ -37,12 +33,6 @@ def get_random_time():
     random_second = randrange(int_delta)
     return (start + timedelta(seconds=random_second))
 
-
-
-
-    
-
-
 # return list of rfid's allowed for all doors, or a particular door,
 #   as json list 
 def get_allowed_rfids(request, doorid=None):
@@ -52,7 +42,7 @@ def get_allowed_rfids(request, doorid=None):
     #   Check that there even is a such 
     # if door id not valid, return ""
     # todo:  return JSON
-    door = Door.objects.filter(pk=doorid)    # doorid should not be pk; note, get returns an rror if no such door; filter returns an empty list
+    door = djock_app.models.Door.objects.filter(pk=doorid)    # doorid should not be pk; note, get returns an rror if no such door; filter returns an empty list
     if door:
         allowed_rfids = door[0].get_allowed_rfids()  # list of Keycard objects
         #alloweds = ",".join([keycard_obj.the_rfid for keycard_obj in allowed_rfids])
@@ -70,7 +60,7 @@ def check(request,doorid, rfid):
     # if door id not valid or rfid not valid, return ""
 
     # Is the request actually for new keycard assignment? 
-    new_scan_queryset = NewKeycardScan.objects.all()
+    new_scan_queryset = djock_app.models.NewKeycardScan.objects.all()
     if new_scan_queryset:
         new_scan = new_scan_queryset.latest("time_initiated")  # get the latest NewKeycardScan object, ordered by the field time_initiated (i.e. time the object was created) 
         # TODO: Things might go awry if someone else initiated a scan later... Currently verifying pk's later,  in
@@ -83,7 +73,7 @@ def check(request,doorid, rfid):
     
         # or is the request actually for authenticating an existing keycard for this door? 
         else: 
-            rfidkeycard_list =  RFIDkeycard.objects.all()
+            rfidkeycard_list =  djock_app.models.RFIDkeycard.objects.all()
             for rfidkeycard in rfidkeycard_list:
                 allowed_doors = rfidkeycard.get_allowed_doors()
                 if allowed_doors:
@@ -93,7 +83,7 @@ def check(request,doorid, rfid):
                                 if int(door.id) == int(doorid):
                                     response = 1
                                     print colored("**** creating and saving accesstime *****","red","on_white")
-                                    at = AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=rfidkeycard.lockuser)  # todo: access time is going to be a bit later...
+                                    at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=rfidkeycard.lockuser, door=djock_app.models.Door.objects.get(id=int(doorid)))  # todo: access time is going to be a bit later...
                                     at.save()
                                     # TODO: If we reuse keycards/keycard nums, AccessTime objects'
                                     # lockusers -- as seen on AccessTimes change_list, for ex -- will be
@@ -103,8 +93,6 @@ def check(request,doorid, rfid):
                                     # the current lockuser in *views.py* (check() ) and assign there.
 
     return HttpResponse(response)
-
-
     
 def initiate_new_keycard_scan(request,lockuser_object_id):
 #def initiate_new_keycard_scan(request):
@@ -112,7 +100,7 @@ def initiate_new_keycard_scan(request,lockuser_object_id):
     # If this lockuser already has a current keycard, don't proceed
     # (This should have been prevented at template level also)
     try: 
-        lu = LockUser.objects.filter(id=lockuser_object_id)
+        lu = djock_app.models.LockUser.objects.filter(id=lockuser_object_id)
     except:
         response_data = {'success':False, "error_mess":"WTF? There's no lock user?"}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
@@ -120,7 +108,7 @@ def initiate_new_keycard_scan(request,lockuser_object_id):
         response_data = {'success':False, 'error_mess':"This lock user is already assigned a keycard! You shouldn't have even gotten this far!"} # Todo: So when stuff like this happens in production...  Should it sent some kind of automated error report to whomever is developing/maintaining the site? 
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
     else:
-        n = NewKeycardScan()
+        n = djock_app.models.NewKeycardScan()
         n.waiting_for_scan = True
         n.assigner_user = request.user
         n.save()   
@@ -137,7 +125,7 @@ def finished_new_keycard_scan(request,new_scan_pk):
     """
     # TODO:  raise exceptions.   
     # TODO:  Error codes to aid developers. So Staff user sees "ERROR (code 2). Try again," not "ERROR (scary message  about the exact error). Try again." 
-    new_scan_queryset = NewKeycardScan.objects.all()
+    new_scan_queryset = djock_app.models.NewKeycardScan.objects.all()
     if not new_scan_queryset:
         response_data = {'success':False, 'error_mess':"No NewKeycardScan objects at all"}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
@@ -163,7 +151,7 @@ def finished_new_keycard_scan(request,new_scan_pk):
     # if waiting for new keycard to be scanned, but timed out
 
     # Verify that the rfid is not the same as that of another ACTIVE keycard
-    keycards_with_same_rfid_qs = RFIDkeycard.objects.filter(the_rfid=new_scan.rfid)
+    keycards_with_same_rfid_qs = djock_app.models.RFIDkeycard.objects.filter(the_rfid=new_scan.rfid)
     for k in keycards_with_same_rfid_qs:
         if k.is_active():
             response_data = {'success':False, 'error_mess':"A keycard with the same RFID is already assigned to %s." % k.lockuser} # to do:  include actual link to this lockuser
