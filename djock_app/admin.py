@@ -378,93 +378,75 @@ class AccessTimeAdmin(admin.ModelAdmin):
             above does not work; it defaults to linking from items in AccessTime col
         """
         super(AccessTimeAdmin, self).__init__(*args, **kwargs) # todo: is this appropriate here? 
-    #def changelist_view(self, request, extra_context=None):
-        """ Show the Highchart of access times """
-        """
-        # todo: should this be happening here or elsewhere? 
-        
-        ##################################
-        # create chart object 
-        ##################################
-        #Step 1: Create a DataPool with the data we want to retrieve.
-        access_time_data = \
-            DataPool(
-               series=
-                [{'options': {
-                   #'source': MonthlyWeatherByCity.objects.all()},
-                   'source': AccessTime.objects.all()},
-                  'terms': [
-                  #  'month',
-                  #  'houston_temp',
-                  #  'boston_temp']}
-                    'access_time',
-                    'the_rfid',
-                    'the_rfid']}
-                 ])
+    def changelist_view(self, request, extra_context=None):
+        """ Send extra context for values for the access times JS chart """
 
-        print colored("creating the Chart object","red","on_white")
 
-        #Step 2: Create the Chart object
-        cht = Chart(
-                datasource = access_time_data,
-                series_options =
-                  [{'options':{
-                      'type': 'scatter',
-                      'stacking': False},
-                    'terms':{
-                     # 'month': [
-                     #   'boston_temp',
-                     #   'houston_temp']
-                      'access_time': [
-                        'the_rfid',
-                        'the_rfid']
-                      }}],
-                chart_options = {
-                    'title':    {'text': 'Door Access Times'},
-                    'subtitle': {'text': '(subtitle)'},
-                    'xAxis':    {'title': { 'text': 'Date'} },
-                    'yAxis':    {'title': { 'text': 'Time of Day'} },
-                    #'tooltip':  {'formatter': 'function() { return "" + this.x + ", " + this.y + "";'},
-                    #'tooltip': { 'formatter': 'function() { return "Price is " + this.x };'},
-                    #'tooltip':  {'formatter': 'function() { return this.x;}'},
-                    #'tooltip': {'pointFormat': '{series.name}: <b>{point.y} !!!!!!</b><br/>'},
-                    'legend':   {   'layout':'vertical', 
-                                    'align':'left',
-                                    'verticalAlign':'top',
-                                    'x':100,
-                                    'y':70,
-                                    'floating':False,
-                                    'backgroundColor': '#FFFFFF',
-                                    'borderWidth':2         } 
+        # todo:  if no times at all........
 
-                   }
-                    )
+        #########################################################################
+        # building array of access times/lockusers/rfids to give the javascript
+        #########################################################################
+        times_data = []
+        # the data we'll need for one data point: 
+        for at in AccessTime.objects.all():
+            door = str(at.door.name)
+            lockuser = str(at.lockuser.first_name) + " " + str(at.lockuser.last_name)
+            rfid = int(at.the_rfid)
+            year = at.access_time.year
+            month = at.access_time.month - 1 # because js starts months at zero
+            day = at.access_time.day
+            hour = at.access_time.hour
+            minute = at.access_time.minute
+            second = at.access_time.second
+            """try: 
+                times_data[door].append((lockuser, rfid, year,day,month,day,hour,minute,second))
+            except: 
+                times_data[door] = [(lockuser, rfid, year,day,month,day,hour,minute,second)]
+            """
+            times_data.append([door,lockuser,rfid,year,month,day,hour,minute,second])
+            #things.append([lockuser, rfid, year,month,day,hour,minute,second])
 
-        ##################################
-        # add chart object to context, so change_list can load_charts it
-        ##################################
-        extra_context={'weatherchart':cht}
+
+        #print colored("OK, here's things: " + str(things), "white", "on_red")
+        from pprint import pprint
+        print colored("here's times data", "red", "on_white")
+        pprint(times_data)
+        #print colored("OK, here's times: ","white", "on_red")
+        #pprint(times_data)
+
+        # Will be indexing things on Doors:So will need to pass in one array for each door. 
+        # So reorganize the above into one dict, with everything indexed on the doors, and give that to extra_context.  i.e. loop through things array, find doors. 
+        # OR could just do that above.  but not yet. 
+
+
+       # array = [str(at.lockuser.first_name) for at in AccessTime.objects.all()] 
+      #  extra_context={'my_test_array':array}
+        # just one random door right now
+        #array =  times_data[times_data.keys()[0]]  
+        #print colored("array: " + str(array), "white", "on_red")
+        #extra_context = {'my_test_array':array}   # todo:  ummm need to pass in the door, too, remember!!!!!!!!!!!  So reorganize data structure. 
+        extra_context = { "access_times_data": times_data }
         return super(AccessTimeAdmin, self).changelist_view(request, extra_context=extra_context)
-        """
 
-        # There's no need to show the page for an individual AccessTime, so no field should link to it.
+        # No need to show the page for an individual AccessTime, so no field should link to it.
         self.list_display_links = (None, )
 
-    ####################################################################################################
+    #########################################################################
     # Page listing all AccessTimes ("change list" page):
-    ####################################################################################################
+    #########################################################################
     # # field names to display, as columns
-    list_display = ('access_time','get_this_lockuser','get_this_door')
+    list_display = ('access_time','get_this_lockuser_html','get_this_door')
     actions=None  # don't provide the actions dropdown
     date_hierarchy = 'access_time' # Set date_hierarchy to the name of a DateField or DateTimeField in model, and the
         # change list page will include a date-based drilldown navigation by that field. (i.e. shows months or days or
         # years or whatever at the top)
     list_filter = ('lockuser','door')  # show filters by RFID and active/inactive on the right
     
-    ####################################################################################################
+    #########################################################################
     # Individual TimeAccess page
     # (Although there's no need link to an individual AccessTime object's page, it still exists.)
-    ####################################################################################################
+    #########################################################################
    # readonly_fields = ('access_time','rfid')   # because obviously these shouldn't be editable.   (but commenting out if want to create some objects from admin just for fun)
 
     def has_delete_permission(self, request, obj=None):
