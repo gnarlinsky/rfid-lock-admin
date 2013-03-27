@@ -1,8 +1,5 @@
 from django.db import models
-from django.forms import ModelForm 
 from django.contrib.auth.models import User
-from django.dispatch import dispatcher
-from django.db.models.signals import post_save
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.management import create_superuser
@@ -10,13 +7,38 @@ from django.db.models import signals
 from django.utils.timezone import utc
 import datetime
 from termcolor import colored   # temp
-from django.db.utils import IntegrityError
-from django import forms
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.utils.encoding import force_unicode
 from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
+
+"""
+# playing with highcharts
+class MonthlyWeatherByCity(models.Model):
+
+    # pretend this is.........
+    # the_rfid = models.CharField(max_length=10,null=True) # the radio-frequency id, however represented... 
+    # or 
+    # lockuser    = models.ForeignKey("LockUser",null=False)
+
+
+    # pretend this is 
+    # door        = models.ForeignKey("Door",null=False)
+    month = models.IntegerField()
+
+    # pretend this is a door's access time
+    boston_temp = models.DecimalField(max_digits=5, decimal_places=1)
+
+    # pretend this another door's access time
+    houston_temp = models.DecimalField(max_digits=5, decimal_places=1)
+
+    #access_time = models.DateTimeField(null=True)    # the time the rfid was used
+
+
+    # so access times have:  
+    # - door - series
+    # - lockuser/the_rfid = what a point is called
+    # - access_time - day: x-xis
+    # - access_time - time of day: y-axis
+"""
 
 
 
@@ -222,30 +244,30 @@ class RFIDkeycard(models.Model):
 
 
 class AccessTime(models.Model):
-    the_rfid           = models.CharField(max_length=10,null=True) # the radio-frequency id, however represented....
-    access_time    = models.DateTimeField(null=True)    # the time the rfid was used
+    the_rfid    = models.CharField(max_length=10,null=True) # the radio-frequency id, however represented....
+    access_time = models.DateTimeField(null=True)    # the time the rfid was used
+    lockuser    = models.ForeignKey("LockUser",null=False)
+    door        = models.ForeignKey("Door",null=False)
 
-    lockuser = models.ForeignKey("LockUser",null=False)
 
     def __unicode__(self):
         return u'%s' % self.access_time
 
+    def get_this_door(self):
+        """ Return the door that was accessed at this time """
+        return self.door
+
     def get_this_lockuser(self):
         """ Return the user's name associated with the RFID for this access time """
-        # Get RFIDkeycard (there should only be one!) with the rfid associated with this access time;
-        # get the lock user names associated with those RFIDkeycards
-
-        # todo...:   If we reuse keycards/keycard nums, this may be incorrect, since lockuser is the CURRENT owner, so this would not be valid for access times of the PREVIOUS owner. It's probably best to associate AccessTimes with lockusers at creation time. I.e. determine the current lockuser in *views.py* (check() ) and assign there. Here will have a FK, and this function will return it. 
-        # todo:  test for this
-        """
-        _rfid_keycard = RFIDkeycard.objects.all().filter(the_rfid__exact=self.the_rfid)
-        if _rfid_keycard:
-            return _rfid_keycard[0].lockuser  
-        else:
-            return None
-        """
         return self.lockuser
 
+    def get_this_lockuser_html(self):
+        """ Returns the HTML (which will have to escape) with link to /lockuser/the_id/ to display on the Access Times change list page """
+        lockuser_link_html =  "<a href='../lockuser/%d/'>%s</a>" %  (self.lockuser.id, self.lockuser)
+        return lockuser_link_html
+    # Django will HTML-escape the output by default. If you'd rather not escape the output of the method,
+    # give the method an allow_tags attribute whose value is True.
+    get_this_lockuser_html.allow_tags = True
 
 class LockUser(models.Model):
     """ (Despite the misleading name, LockUsers are not subclassed Users, but subclassed Models.) """
@@ -531,7 +553,7 @@ class LockUser(models.Model):
 
 
 
-
+# to do: remove this
 
 ####################################################################
 # Prevent interactive question about wanting a superuser created.
