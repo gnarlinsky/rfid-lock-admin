@@ -442,6 +442,7 @@ class LockUser(models.Model):
             return curr_keycard_info
         except:
             return None
+    prettify_get_current_rfid.short_description = "Current RFID"
 
     def get_allowed_doors(self):
         """ Get the Doors this user is allowed access to. """
@@ -474,11 +475,12 @@ class LockUser(models.Model):
         """ Returns list of all access times for this user, which means that the search should include any other
         RFID's this LockUser ever had. In other words, the search is by *person*, not by RFID.
         Although we're in the process of deciding whether there should only be one keycard/RFID per person. see the comment for RFIDkeycard.get_allowed_doors().
+        (TODO) 
         """
 
         if curr_rfid_only:
             #curr_rfid = self.get_current_rfid()  
-            # until fix the only-1-curr-rfid thing, the above actually may refer to multiple instances...  
+            # todo: until fix the only-1-curr-rfid thing, the above actually may refer to multiple instances...  
             # So just for now, for the purposes of getting on with this, just taking the first item
             # if it exists. Although we're in the process of deciding whether there should only be
             # one keycard/RFID per person. see the comment for RFIDkeycard.get_allowed_doors()
@@ -501,8 +503,10 @@ class LockUser(models.Model):
 
     ######Note, stuff is not consistent among these get_blah's because sometimes I'm returning the OBJECT, sometimes actual fields of it
 
-    def prettify_get_all_access_times(self,curr_rfid_only=True):
+    #def prettify_get_all_access_times(self,curr_rfid_only=True):
+    def all_access_times_link(self): 
         """ prettify and sort """
+        """
         _all_access_times_list = self.get_all_access_times()
         if _all_access_times_list:
             _all_access_times_list.sort()
@@ -510,11 +514,18 @@ class LockUser(models.Model):
             return ", ".join(_all)
         else:
             return None
+        """
+        #return "<a href='../accesstime/?lockuser__id__exact=%d/'>View all access times</a>"
+        #return "<a href='google.com'>are you fucking kidding me %s " % self.id
+        return "<a href='../../accesstime/?lockuser__id__exact=%d'>View all access times</a>" %  self.id
+        #
+    all_access_times_link.allow_tags = True
         
 
     def get_last_access_time(self, curr_rfid_only=True):
         """ Get the last time this person used the lock. Same story with current RFID vs previous one as in the
         comment for get_all_access_time().
+
         """
         access_times = self.get_all_access_times(curr_rfid_only=curr_rfid_only)
         
@@ -526,11 +537,23 @@ class LockUser(models.Model):
             return None
 
     def prettify_get_last_access_time(self):  
+        """ todo -  also including link to all access times here (temp) """
         _last = self.get_last_access_time()
         if _last:
             return _last.ctime()
         else:
             return None
+
+    def last_access_time_and_link_to_more(self):  
+        """ todo -  also including link to all access times here (temp) """
+        _last = self.get_last_access_time()
+        link = self.all_access_times_link()
+        if _last:
+            return "%s (%s)" % (_last.ctime(), link)
+        else:
+            return None
+    last_access_time_and_link_to_more.allow_tags = True
+    last_access_time_and_link_to_more.short_description = "Last access"
 
     def __unicode__(self):
         """ In the list of AcessTimes, for example, LockUsers will be represented with their first and last names """
