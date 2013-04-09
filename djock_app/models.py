@@ -10,37 +10,6 @@ from termcolor import colored   # temp
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 
-"""
-# playing with highcharts
-class MonthlyWeatherByCity(models.Model):
-
-    # pretend this is.........
-    # the_rfid = models.CharField(max_length=10,null=True) # the radio-frequency id, however represented... 
-    # or 
-    # lockuser    = models.ForeignKey("LockUser",null=False)
-
-
-    # pretend this is 
-    # door        = models.ForeignKey("Door",null=False)
-    month = models.IntegerField()
-
-    # pretend this is a door's access time
-    boston_temp = models.DecimalField(max_digits=5, decimal_places=1)
-
-    # pretend this another door's access time
-    houston_temp = models.DecimalField(max_digits=5, decimal_places=1)
-
-    #access_time = models.DateTimeField(null=True)    # the time the rfid was used
-
-
-    # so access times have:  
-    # - door - series
-    # - lockuser/the_rfid = what a point is called
-    # - access_time - day: x-xis
-    # - access_time - time of day: y-axis
-"""
-
-
 
 ############### TO DO #############################################
 # make sure various stuff are set unique
@@ -248,21 +217,37 @@ class AccessTime(models.Model):
     access_time = models.DateTimeField(null=True)    # the time the rfid was used
     lockuser    = models.ForeignKey("LockUser",null=False)
     door        = models.ForeignKey("Door",null=False)
+    data_point  = models.TextField()  # todo
+
+    # to do
+    # temp.. trying to see if this will make things faster (e.g. an alternative to get_this_door(), below, for the AccessTime change_list 
+    door_name   = models.CharField(max_length=50)
+    lockuser_name_html = models.CharField(max_length=180) # max_length: approx length of "<a href='../lockuser/%d/'>%s %s<a>" + length of first_name, middle_name, last_name (to do). 
 
 
     def __unicode__(self):
         return u'%s' % self.access_time
 
+    """
+    def get_data_point(self):
+        #  Return data point dict to JSONify for highchart 
+        print colored("----- getting data point ----", "red")
+        data_point = {}
+        data_point['x'] = 'Date.UTC(%d,%d,%d)' % (self.access_time.year, self.access_time.month, self.access_time.day)
+        data_point['y'] = 'Date.UTC(0,0,0, %d,%d,%d)' % (self.access_time.hour, self.access_time.minute, self.access_time.second)
+        data_point['user'] = '"%s %s"' % (self.lockuser.first_name, self.lockuser.last_name)  
+    """
+
     def get_this_door(self):
         """ Return the door that was accessed at this time """
-        return self.door
+        return self.door.name
 
     def get_this_lockuser(self):
         """ Return the user's name associated with the RFID for this access time """
         return self.lockuser
 
     def get_this_lockuser_html(self):
-        """ Returns the HTML (which will have to escape) with link to /lockuser/the_id/ to display on the Access Times change list page """
+        """ Returns the HTML with link to /lockuser/the_id/ to display on the Access Times change list page """
         lockuser_link_html =  "<a href='../lockuser/%d/'>%s</a>" %  (self.lockuser.id, self.lockuser)
         return lockuser_link_html
     # Django will HTML-escape the output by default. If you'd rather not escape the output of the method,
@@ -550,6 +535,7 @@ class LockUser(models.Model):
     def __unicode__(self):
         """ In the list of AcessTimes, for example, LockUsers will be represented with their first and last names """
         return u'%s %s' % (self.first_name, self.last_name)
+        # to do: middle name, if exists
 
 
 
