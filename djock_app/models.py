@@ -46,8 +46,9 @@ class Door(models.Model):
 
 
 
+    """ Staff user door management is not a current use case 
     def get_allowed_rfids(self):
-        """ Return the RFIDs allowed to access this Door """
+        # Return the RFIDs allowed to access this Door 
         #return ", ".join([str(lu.the_rfid) for lu in self.lockuser_set.all()])
         #return self.lockuser_set.all().values_list("rfids")
         #return [lu.prettify_get_current_rfid() for lu in self.lockuser_set.all()]
@@ -63,18 +64,17 @@ class Door(models.Model):
         return ", ".join(self.get_allowed_rfids())
 
     def get_allowed_lockusers(self):
-        """ Get the LockUsers with access to this Door """
+        # Get the LockUsers with access to this Door 
         return ", ".join([str(lu) for lu in self.lockuser_set.all()])
 
     def get_allowed_lockusers_html_links(self):
-        """ Returns the HTML (which will have to escape) with links to /lockuser/the_id/ to display on the Door change list page """
+        #Returns the HTML (which will have to escape) with links to /lockuser/the_id/ to display on the Door change list page 
 
         lockuser_links_list = []
         for lockuser in self.lockuser_set.all():
             lockuser_link_html =  "<a href='../lockuser/%d/'>%s</a>" %  (lockuser.id, lockuser)
             lockuser_links_list.append(lockuser_link_html)
         return ", ".join(lockuser_links_list)
-
     # Django will HTML-escape the output by default. If you'd rather not escape the output of the method,
     # give the method an allow_tags attribute whose value is True.
     get_allowed_lockusers_html_links.allow_tags = True
@@ -84,6 +84,7 @@ class Door(models.Model):
         door_access_times = AccessTime.objects.filter(id=self.id)
         return door_access_times
 
+    """
 
 class NewKeycardScan(models.Model):
     """ For checking whether the current request is for authenticating a keycard or assigning new keycard. """
@@ -170,8 +171,10 @@ class RFIDkeycard(models.Model):
 
 
 
+    """ Staff user door management is not a current use case 
+
     def get_allowed_doors(self):
-        """ Get the Doors this user is allowed access to. """
+        # Get the Doors this user is allowed access to. 
         if self.lockuser:
             return self.lockuser.get_allowed_doors()
         else:
@@ -191,6 +194,8 @@ class RFIDkeycard(models.Model):
     # Django will HTML-escape the output by default. If you'd rather not escape the output of the method,
     # give the method an allow_tags attribute whose value is True.
     get_allowed_doors_html_links.allow_tags = True
+
+    """
 
     def is_active(self):
         if self.date_revoked: # additional checks?
@@ -226,7 +231,8 @@ class AccessTime(models.Model):
 
 
     def __unicode__(self):
-        return u'%s' % self.access_time
+        #return u'%s' % self.access_time
+        return self.access_time.strftime("%B %d, %Y, %I:%M %p")  # e.g. 'April 09, 2013, 12:25 PM'
 
     """
     def get_data_point(self):
@@ -375,13 +381,13 @@ class LockUser(models.Model):
         return self.rfidkeycard_set.all()
 
 
-    # todo:  prettify_get_all_rfids not parallel to other prettify methods....actually returns all but
+    # todo:  get_all_rfids_html not parallel to other prettify methods....actually returns all but
     # current, includes HTML.
     # Todo:  would it make more sense to just tweak the __unicode__ method of RFIDkeycard? 
     ##  Actually this should be all rfid's but the current one???
-    def prettify_get_all_rfids(self):
+    def get_all_rfids_html(self):
         """ Returns results of get_all_rfids(), but as a nice pretty string.
-        Also display date assigned and date revoked, if any, as well as rfid number on LockUser change form and list display
+        Omits the current RFID.  Also display date assigned and date revoked, if any, as well as rfid number on LockUser change form and list display
         """
         all_rfid_keycards = self.get_all_rfids()
         current_keycard = self.get_current_rfid()
@@ -407,19 +413,19 @@ class LockUser(models.Model):
         #_rfid_nums_list = [str(r.the_rfid) for r in _rfid_keycards]
        # return ", ".join(_rfid_nums_list)
         return ",<br>".join(rfid_keycards_info_list)
-    prettify_get_all_rfids.allow_tags = True
+    get_all_rfids_html.allow_tags = True
 
     def get_current_rfid(self):
         """ Get the currently active RFID
         Of all RFID's associated with this LockUser, get the one that's active, i.e. has not been revoked. 
         """
         #_rfid_keycards = self.rfids.all()   # or call get_all_rfids for consistency
-        _rfid_keycards = self.get_all_rfids()
-        _curr_rfid = _rfid_keycards.filter(date_revoked=None)  
+        all_rfid_keycards = self.get_all_rfids()
+        curr_rfid = all_rfid_keycards.filter(date_revoked=None)  
         # todo: consistency with the underscores
         # todo:  there should only be one, so just doing [0] for now
         try:
-            return _curr_rfid[0]  
+            return curr_rfid[0]  
         except:
             return None
 
@@ -449,14 +455,15 @@ class LockUser(models.Model):
         return self.doors.all()            
 
     def prettify_get_allowed_doors(self):
-        _doors = self.get_allowed_doors()
-        _door_names_list = [d.name for d in _doors] 
-        return ", ".join(_door_names_list)
+        allowed_doors = self.get_allowed_doors()
+        door_names_list = [door.name for door in allowed_doors] 
+        return ", ".join(door_names_list)
 
     def get_allowed_doors_html_links(self):
         """ Returns the HTML (which will have to escape) with links to /door/the_id/ to display on the LockUser change list page """
+        allowed_doors = self.get_allowed_doors()
         doors_links_list = []
-        for door in self.doors.all():
+        for door in allowed_doors:
             door_link_html =  "<a href='../door/%d/'>%s</a>" %  (door.id, door.name) 
             doors_links_list.append(door_link_html)
         return ", ".join(doors_links_list)
@@ -471,13 +478,14 @@ class LockUser(models.Model):
     # Wouldn't it more consistent/comprehensible/Pythonic to create *separate methods* for (1)
     # getting all access times for all rfid's a lockuser has ever had and (2) only the current
     # active one. 
-    def get_all_access_times(self, curr_rfid_only=True):
+    #def get_all_access_times(self, curr_rfid_only=True):
+    def get_all_access_times(self):
         """ Returns list of all access times for this user, which means that the search should include any other
         RFID's this LockUser ever had. In other words, the search is by *person*, not by RFID.
         Although we're in the process of deciding whether there should only be one keycard/RFID per person. see the comment for RFIDkeycard.get_allowed_doors().
         (TODO) 
         """
-
+        """
         if curr_rfid_only:
             #curr_rfid = self.get_current_rfid()  
             # todo: until fix the only-1-curr-rfid thing, the above actually may refer to multiple instances...  
@@ -497,9 +505,31 @@ class LockUser(models.Model):
             # records matching RFIDs in previous_rfid and rfid
             #_rfid_keycards = self.get_all_rfids()
 
+        """
+
+        #curr_rfid = self.get_current_rfid()  
+        # todo: until fix the only-1-curr-rfid thing, the above actually may refer to multiple instances...  
+        # So just for now, for the purposes of getting on with this, just taking the first item
+        # if it exists. Although we're in the process of deciding whether there should only be
+        # one keycard/RFID per person. see the comment for RFIDkeycard.get_allowed_doors()
+        #if self.get_current_rfid():
+        #    curr_rfid_keycard = self.get_current_rfid()
+
+        # todo:  try, etc. 
+
+        # Get QuerySet of all AccessTime objects whose RFID matches this LockUser's current RFID:
+        at_query_set = AccessTime.objects.all().filter(lockuser=self)
+        # Now get the access_time field of each AccessTime object
+        all_access_times_list = [access_time_object.access_time for access_time_object in at_query_set]
+        #else:  # no current rfid/lockuser deactivated
+        #    all_access_times_list = None
+
+
         if all_access_times_list:
             a = all_access_times_list[0]
         return all_access_times_list
+
+        
 
     ######Note, stuff is not consistent among these get_blah's because sometimes I'm returning the OBJECT, sometimes actual fields of it
 
@@ -522,14 +552,16 @@ class LockUser(models.Model):
     all_access_times_link.allow_tags = True
         
 
-    def get_last_access_time(self, curr_rfid_only=True):
+    #def get_last_access_time(self, curr_rfid_only=True):
+    def get_last_access_time(self):
         """ Get the last time this person used the lock. Same story with current RFID vs previous one as in the
         comment for get_all_access_time().
 
         """
-        access_times = self.get_all_access_times(curr_rfid_only=curr_rfid_only)
+        access_times = self.get_all_access_times()
         
         # sort dates and grab the last one
+        # todo -- order_by? 
         if access_times:
             access_times.sort()
             return access_times[-1]  
@@ -540,7 +572,8 @@ class LockUser(models.Model):
         """ todo -  also including link to all access times here (temp) """
         _last = self.get_last_access_time()
         if _last:
-            return _last.ctime()
+            #return _last.ctime()
+            return _last.strftime("%B %d, %Y, %I:%M %p") 
         else:
             return None
 
@@ -549,7 +582,7 @@ class LockUser(models.Model):
         _last = self.get_last_access_time()
         link = self.all_access_times_link()
         if _last:
-            return "%s (%s)" % (_last.ctime(), link)
+            return "%s (%s)" % (_last.strftime("%B %d, %Y, %I:%M %p") , link)
         else:
             return None
     last_access_time_and_link_to_more.allow_tags = True
