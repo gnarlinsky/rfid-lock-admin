@@ -46,7 +46,6 @@ class Door(models.Model):
 
 
 
-    """ Staff user door management is not a current use case 
     def get_allowed_rfids(self):
         # Return the RFIDs allowed to access this Door 
         #return ", ".join([str(lu.the_rfid) for lu in self.lockuser_set.all()])
@@ -60,6 +59,7 @@ class Door(models.Model):
         return return_list 
         #return [lu.get_current_rfid() for lu in self.lockuser_set.all()]
 
+    """ Staff user door management is not a current use case 
     def prettify_get_allowed_rfids(self):
         return ", ".join(self.get_allowed_rfids())
 
@@ -171,7 +171,6 @@ class RFIDkeycard(models.Model):
 
 
 
-    """ Staff user door management is not a current use case 
 
     def get_allowed_doors(self):
         # Get the Doors this user is allowed access to. 
@@ -180,6 +179,7 @@ class RFIDkeycard(models.Model):
         else:
             return None
 
+    """ Staff user door management is not a current use case 
     def prettify_get_allowed_doors(self):
         if self.lockuser:
             return self.lockuser.prettify_get_allowed_doors()
@@ -226,8 +226,8 @@ class AccessTime(models.Model):
 
     # to do
     # temp.. trying to see if this will make things faster (e.g. an alternative to get_this_door(), below, for the AccessTime change_list 
-    door_name   = models.CharField(max_length=50)
-    lockuser_name_html = models.CharField(max_length=180) # max_length: approx length of "<a href='../lockuser/%d/'>%s %s<a>" + length of first_name, middle_name, last_name (to do). 
+    #door_name   = models.CharField(max_length=50)
+    #lockuser_name_html = models.CharField(max_length=180) # max_length: approx length of "<a href='../lockuser/%d/'>%s %s<a>" + length of first_name, middle_name, last_name (to do). 
 
 
     def __unicode__(self):
@@ -545,8 +545,6 @@ class LockUser(models.Model):
         else:
             return None
         """
-        #return "<a href='../accesstime/?lockuser__id__exact=%d/'>View all access times</a>"
-        #return "<a href='google.com'>are you fucking kidding me %s " % self.id
         return "<a href='../../accesstime/?lockuser__id__exact=%d'>View all access times</a>" %  self.id
         #
     all_access_times_link.allow_tags = True
