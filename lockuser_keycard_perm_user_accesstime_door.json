@@ -1,0 +1,1029 @@
+[
+  {
+    "pk": 1,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2013-04-10T00:56:21.644Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 0,56,21)\", \"x\": \"Date.UTC(2013,4,10)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-04-10T00:56:28.167Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 0,56,28)\", \"x\": \"Date.UTC(2013,4,10)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 3,
+      "access_time": "2013-04-10T00:56:38.348Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 0,56,38)\", \"x\": \"Date.UTC(2013,4,10)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2013-04-10T00:57:01.078Z",
+      "the_rfid": "1122135122",
+      "lockuser": 1,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 0,57,1)\", \"x\": \"Date.UTC(2013,4,10)\", \"user\": \"\\\"maggie simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 5,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2013-02-22T13:08:14.590Z",
+      "the_rfid": "1122135122",
+      "lockuser": 1,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 13,8,14)\", \"x\": \"Date.UTC(2013,2,22)\", \"user\": \"\\\"maggie simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 6,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2012-10-14T09:18:28.595Z",
+      "the_rfid": "1122135122",
+      "lockuser": 1,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 9,18,28)\", \"x\": \"Date.UTC(2012,10,14)\", \"user\": \"\\\"maggie simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 7,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2013-01-13T05:10:17.597Z",
+      "the_rfid": "1122135122",
+      "lockuser": 1,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 5,10,17)\", \"x\": \"Date.UTC(2013,1,13)\", \"user\": \"\\\"maggie simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 8,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2013-03-02T05:05:25.599Z",
+      "the_rfid": "1122135122",
+      "lockuser": 1,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 5,5,25)\", \"x\": \"Date.UTC(2013,3,2)\", \"user\": \"\\\"maggie simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 9,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2012-11-04T11:48:52.601Z",
+      "the_rfid": "1122135122",
+      "lockuser": 1,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 11,48,52)\", \"x\": \"Date.UTC(2012,11,4)\", \"user\": \"\\\"maggie simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 10,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2013-03-08T17:44:17.603Z",
+      "the_rfid": "1122135122",
+      "lockuser": 1,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 17,44,17)\", \"x\": \"Date.UTC(2013,3,8)\", \"user\": \"\\\"maggie simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 11,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2012-11-03T13:23:43.605Z",
+      "the_rfid": "1122135122",
+      "lockuser": 1,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 13,23,43)\", \"x\": \"Date.UTC(2012,11,3)\", \"user\": \"\\\"maggie simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 12,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2012-11-30T13:40:02.608Z",
+      "the_rfid": "1122135122",
+      "lockuser": 1,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 13,40,2)\", \"x\": \"Date.UTC(2012,11,30)\", \"user\": \"\\\"maggie simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 13,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2013-03-01T17:05:06.610Z",
+      "the_rfid": "1122135122",
+      "lockuser": 1,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 17,5,6)\", \"x\": \"Date.UTC(2013,3,1)\", \"user\": \"\\\"maggie simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 14,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2013-03-01T09:31:56.612Z",
+      "the_rfid": "1122135122",
+      "lockuser": 1,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 9,31,56)\", \"x\": \"Date.UTC(2013,3,1)\", \"user\": \"\\\"maggie simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 15,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2012-12-29T19:38:29.616Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 19,38,29)\", \"x\": \"Date.UTC(2012,12,29)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 16,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-03-15T13:14:04.618Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 13,14,4)\", \"x\": \"Date.UTC(2013,3,15)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 17,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2012-10-19T08:41:36.622Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 8,41,36)\", \"x\": \"Date.UTC(2012,10,19)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 18,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-01-15T07:39:36.626Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 7,39,36)\", \"x\": \"Date.UTC(2013,1,15)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 19,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2012-11-18T22:04:49.629Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 22,4,49)\", \"x\": \"Date.UTC(2012,11,18)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 20,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2012-11-18T08:46:05.632Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 8,46,5)\", \"x\": \"Date.UTC(2012,11,18)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 21,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2012-12-11T18:48:58.636Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 18,48,58)\", \"x\": \"Date.UTC(2012,12,11)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 22,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2012-11-23T14:26:36.640Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 14,26,36)\", \"x\": \"Date.UTC(2012,11,23)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 23,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2012-12-16T15:46:21.644Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 15,46,21)\", \"x\": \"Date.UTC(2012,12,16)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 24,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-03-09T22:58:23.647Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 22,58,23)\", \"x\": \"Date.UTC(2013,3,9)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 25,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-01-01T15:08:58.652Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 15,8,58)\", \"x\": \"Date.UTC(2013,1,1)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 26,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 3,
+      "access_time": "2012-11-09T18:22:27.656Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 18,22,27)\", \"x\": \"Date.UTC(2012,11,9)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 27,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 3,
+      "access_time": "2012-10-20T18:11:03.660Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 18,11,3)\", \"x\": \"Date.UTC(2012,10,20)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 28,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 3,
+      "access_time": "2012-11-05T17:01:08.663Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 17,1,8)\", \"x\": \"Date.UTC(2012,11,5)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 29,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 3,
+      "access_time": "2013-03-02T18:12:25.666Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 18,12,25)\", \"x\": \"Date.UTC(2013,3,2)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 30,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 3,
+      "access_time": "2012-10-28T18:12:31.670Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 18,12,31)\", \"x\": \"Date.UTC(2012,10,28)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 31,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2012-10-21T02:28:31.677Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 2,28,31)\", \"x\": \"Date.UTC(2012,10,21)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 32,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-03-16T16:58:43.680Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 16,58,43)\", \"x\": \"Date.UTC(2013,3,16)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 33,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-03-09T10:06:20.683Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 10,6,20)\", \"x\": \"Date.UTC(2013,3,9)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 34,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2012-12-24T18:03:16.686Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 18,3,16)\", \"x\": \"Date.UTC(2012,12,24)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 35,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2012-10-13T03:38:37.690Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 3,38,37)\", \"x\": \"Date.UTC(2012,10,13)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 36,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-02-16T17:35:22.696Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 17,35,22)\", \"x\": \"Date.UTC(2013,2,16)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 37,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 3,
+      "access_time": "2013-03-07T18:04:34.701Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 18,4,34)\", \"x\": \"Date.UTC(2013,3,7)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 38,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 3,
+      "access_time": "2013-03-21T18:28:48.704Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 18,28,48)\", \"x\": \"Date.UTC(2013,3,21)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 39,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 3,
+      "access_time": "2013-01-13T16:38:39.708Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 16,38,39)\", \"x\": \"Date.UTC(2013,1,13)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 40,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 3,
+      "access_time": "2013-02-18T18:03:02.711Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 18,3,2)\", \"x\": \"Date.UTC(2013,2,18)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 41,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 3,
+      "access_time": "2013-03-14T18:54:26.715Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 18,54,26)\", \"x\": \"Date.UTC(2013,3,14)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 42,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2013-03-10T21:13:16.720Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 21,13,16)\", \"x\": \"Date.UTC(2013,3,10)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 43,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-03-13T20:33:47.722Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 20,33,47)\", \"x\": \"Date.UTC(2013,3,13)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 44,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-01-16T08:49:20.726Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 8,49,20)\", \"x\": \"Date.UTC(2013,1,16)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 45,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2012-12-03T04:13:46.731Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 4,13,46)\", \"x\": \"Date.UTC(2012,12,3)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 46,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-02-16T22:05:46.736Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 22,5,46)\", \"x\": \"Date.UTC(2013,2,16)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 47,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2012-12-22T13:30:46.739Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 13,30,46)\", \"x\": \"Date.UTC(2012,12,22)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 48,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-03-16T15:33:54.744Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 15,33,54)\", \"x\": \"Date.UTC(2013,3,16)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 49,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-03-24T21:27:45.747Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 21,27,45)\", \"x\": \"Date.UTC(2013,3,24)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 50,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-01-22T20:12:23.751Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 20,12,23)\", \"x\": \"Date.UTC(2013,1,22)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 51,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-03-31T19:51:51.754Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 19,51,51)\", \"x\": \"Date.UTC(2013,3,31)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 52,
+    "model": "djock_app.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2012-12-02T23:11:14.760Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 23,11,14)\", \"x\": \"Date.UTC(2012,12,2)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "djock_app.door",
+    "fields": {
+      "name": "Space 1",
+      "description": null
+    }
+  },
+  {
+    "pk": 2,
+    "model": "djock_app.door",
+    "fields": {
+      "name": "Space 2",
+      "description": null
+    }
+  },
+  {
+    "pk": 3,
+    "model": "djock_app.door",
+    "fields": {
+      "name": "Space 3",
+      "description": null
+    }
+  },
+  {
+    "pk": 19,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_logentry",
+      "name": "Can add log entry",
+      "content_type": 7
+    }
+  },
+  {
+    "pk": 20,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_logentry",
+      "name": "Can change log entry",
+      "content_type": 7
+    }
+  },
+  {
+    "pk": 21,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_logentry",
+      "name": "Can delete log entry",
+      "content_type": 7
+    }
+  },
+  {
+    "pk": 1,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_group",
+      "name": "Can add group",
+      "content_type": 2
+    }
+  },
+  {
+    "pk": 4,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_group",
+      "name": "Can change group",
+      "content_type": 2
+    }
+  },
+  {
+    "pk": 7,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_group",
+      "name": "Can delete group",
+      "content_type": 2
+    }
+  },
+  {
+    "pk": 2,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_permission",
+      "name": "Can add permission",
+      "content_type": 1
+    }
+  },
+  {
+    "pk": 5,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_permission",
+      "name": "Can change permission",
+      "content_type": 1
+    }
+  },
+  {
+    "pk": 8,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_permission",
+      "name": "Can delete permission",
+      "content_type": 1
+    }
+  },
+  {
+    "pk": 3,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_user",
+      "name": "Can add user",
+      "content_type": 3
+    }
+  },
+  {
+    "pk": 6,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_user",
+      "name": "Can change user",
+      "content_type": 3
+    }
+  },
+  {
+    "pk": 9,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_user",
+      "name": "Can delete user",
+      "content_type": 3
+    }
+  },
+  {
+    "pk": 10,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_contenttype",
+      "name": "Can add content type",
+      "content_type": 4
+    }
+  },
+  {
+    "pk": 11,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_contenttype",
+      "name": "Can change content type",
+      "content_type": 4
+    }
+  },
+  {
+    "pk": 12,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_contenttype",
+      "name": "Can delete content type",
+      "content_type": 4
+    }
+  },
+  {
+    "pk": 22,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_accesstime",
+      "name": "Can add access time",
+      "content_type": 11
+    }
+  },
+  {
+    "pk": 27,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_accesstime",
+      "name": "Can change access time",
+      "content_type": 11
+    }
+  },
+  {
+    "pk": 32,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_accesstime",
+      "name": "Can delete access time",
+      "content_type": 11
+    }
+  },
+  {
+    "pk": 23,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_door",
+      "name": "Can add door",
+      "content_type": 8
+    }
+  },
+  {
+    "pk": 37,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "can_manage_door_1",
+      "name": "Can manage door to Space 1",
+      "content_type": 8
+    }
+  },
+  {
+    "pk": 38,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "can_manage_door_2",
+      "name": "Can manage door to Space 2",
+      "content_type": 8
+    }
+  },
+  {
+    "pk": 39,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "can_manage_door_3",
+      "name": "Can manage door to Space 3",
+      "content_type": 8
+    }
+  },
+  {
+    "pk": 28,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_door",
+      "name": "Can change door",
+      "content_type": 8
+    }
+  },
+  {
+    "pk": 33,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_door",
+      "name": "Can delete door",
+      "content_type": 8
+    }
+  },
+  {
+    "pk": 24,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_lockuser",
+      "name": "Can add lock user",
+      "content_type": 12
+    }
+  },
+  {
+    "pk": 29,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_lockuser",
+      "name": "Can change lock user",
+      "content_type": 12
+    }
+  },
+  {
+    "pk": 34,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_lockuser",
+      "name": "Can delete lock user",
+      "content_type": 12
+    }
+  },
+  {
+    "pk": 25,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_newkeycardscan",
+      "name": "Can add new keycard scan",
+      "content_type": 9
+    }
+  },
+  {
+    "pk": 30,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_newkeycardscan",
+      "name": "Can change new keycard scan",
+      "content_type": 9
+    }
+  },
+  {
+    "pk": 35,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_newkeycardscan",
+      "name": "Can delete new keycard scan",
+      "content_type": 9
+    }
+  },
+  {
+    "pk": 26,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_rfidkeycard",
+      "name": "Can add rfi dkeycard",
+      "content_type": 10
+    }
+  },
+  {
+    "pk": 31,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_rfidkeycard",
+      "name": "Can change rfi dkeycard",
+      "content_type": 10
+    }
+  },
+  {
+    "pk": 36,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_rfidkeycard",
+      "name": "Can delete rfi dkeycard",
+      "content_type": 10
+    }
+  },
+  {
+    "pk": 13,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_session",
+      "name": "Can add session",
+      "content_type": 5
+    }
+  },
+  {
+    "pk": 14,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_session",
+      "name": "Can change session",
+      "content_type": 5
+    }
+  },
+  {
+    "pk": 15,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_session",
+      "name": "Can delete session",
+      "content_type": 5
+    }
+  },
+  {
+    "pk": 16,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_site",
+      "name": "Can add site",
+      "content_type": 6
+    }
+  },
+  {
+    "pk": 17,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_site",
+      "name": "Can change site",
+      "content_type": 6
+    }
+  },
+  {
+    "pk": 18,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_site",
+      "name": "Can delete site",
+      "content_type": 6
+    }
+  },
+  {
+    "pk": 1,
+    "model": "auth.user",
+    "fields": {
+      "username": "superuser",
+      "first_name": "",
+      "last_name": "",
+      "is_active": true,
+      "is_superuser": true,
+      "is_staff": true,
+      "last_login": "2013-04-10T00:50:16.699Z",
+      "groups": [],
+      "user_permissions": [],
+      "password": "pbkdf2_sha256$10000$XP1tlKv9G1jV$U8tHx/cyMaRH5VB0jwUWqxYRhAdXHwvbaG4iMFx2cuA=",
+      "email": "x@x.com",
+      "date_joined": "2013-04-10T00:43:44.029Z"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "djock_app.rfidkeycard",
+    "fields": {
+      "lockuser": 1,
+      "assigner": 1,
+      "the_rfid": "1122135122",
+      "revoker": null,
+      "date_revoked": null,
+      "date_created": "2013-04-10T00:52:00.220Z"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "djock_app.rfidkeycard",
+    "fields": {
+      "lockuser": 2,
+      "assigner": 1,
+      "the_rfid": "1122135199",
+      "revoker": null,
+      "date_revoked": null,
+      "date_created": "2013-04-10T00:53:21.472Z"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "djock_app.lockuser",
+    "fields": {
+      "phone_number": null,
+      "first_name": "maggie",
+      "last_name": "simpson",
+      "middle_name": "",
+      "deactivate_current_keycard": false,
+      "birthdate": null,
+      "current_keycard_revoker": null,
+      "doors": [
+        1
+      ],
+      "address": "",
+      "email": "maggie@simpfamily.com"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "djock_app.lockuser",
+    "fields": {
+      "phone_number": null,
+      "first_name": "homer",
+      "last_name": "simpson",
+      "middle_name": "",
+      "deactivate_current_keycard": false,
+      "birthdate": null,
+      "current_keycard_revoker": null,
+      "doors": [
+        1,
+        2,
+        3
+      ],
+      "address": "",
+      "email": "ChunkyLover53@aol.com"
+    }
+  }
+]
