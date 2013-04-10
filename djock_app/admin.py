@@ -14,6 +14,9 @@ from chartit import DataPool, Chart
 # -  # the field labeled "rfids" should not be required.  
 ###########################################################################
 
+
+
+""" Staff user door management is not a current use case
 class DoorAdmin(admin.ModelAdmin):
     ###########################################################################
     # Page listing all Doors:
@@ -54,23 +57,22 @@ class DoorAdmin(admin.ModelAdmin):
 
 
     def has_delete_permission(self, request, obj=None):
-        """ Don't display "delete" button """
+        #Don't display "delete" button
         return False
 
 #    def has_add_permission(self, request, obj=None):
-#        """Don't display Save And Add button """
+#        # Don't display Save And Add button
 #        return False
 
 
+"""
 
 
-        """ has_perm(perm, obj=None) / has_perms(perm_list, obj=None)
+""" has_perm(perm, obj=None) / has_perms(perm_list, obj=None)
         Returns True if the user has the specified permission, where perm is in the format "<app label>.<permission codename>". (see documentation on permissions). If the user is inactive, this method will always return False.
 
         If obj is passed in, this method won't check for a permission for the model, but for this specific object.
         """
-
-
             # permission codenames are named can_manage_door_x, where x is the pk num
         # else... return nothing and/or exception? 
 
@@ -124,6 +126,7 @@ class RFIDkeycardForm(ModelForm):
 """
 
 # Only superuser/developers can access RFIDkeycard objects from outside LockUser
+""" Staff user door management is not a current use case
 class RFIDkeycardAdmin(admin.ModelAdmin):
     #form = RFIDkeycardForm # prepopulating with random num
 
@@ -138,6 +141,7 @@ class RFIDkeycardAdmin(admin.ModelAdmin):
     fields = ("the_rfid","lockuser","date_created","date_revoked","get_allowed_doors","is_active")  # here showing fields wouldn't show to a staff user, since the real (not inline) RFIDkeycard change_form would only be visible to superuser.
     readonly_fields = ("the_rfid","deactivate","lockuser","date_created","date_revoked","is_active","get_allowed_doors")
 
+"""
 
 class LockUserForm(ModelForm):
     class Meta:
@@ -202,13 +206,41 @@ class LockUserAdmin(admin.ModelAdmin):
     # fields (i.e. column headings)
     # to do:  show deactivated (i.e. no current keycard) in gray, or de-emphasize another way
     list_display = ('first_name','last_name','email',\
-                    'prettify_get_current_rfid','prettify_get_all_rfids',\
                     'is_active',\
-                    'get_allowed_doors_html_links',\
-                    'prettify_get_last_access_time',
+                    #'prettify_get_current_rfid',\
+                    '_current_rfid_heading',\
+                    #'prettify_get_allowed_doors',\
+                    '_doors_heading',
+                    #'prettify_get_last_access_time',
+                    '_last_access_heading',
     )
+    readonly_fields = ("prettify_get_current_rfid", "get_all_rfids_html","last_access_time_and_link_to_more","prettify_get_last_access_time",)  
 
-    #list_filter = ('rfid','is_active')  # show filters by RFID and active/inactive on the right
+    list_filter = ('doors',)
+
+   #list_display = ('_my_field',)
+   #readonly_fields = ('_my_field', )     
+
+
+    #-------------------------
+    # nicer column labels
+    #-------------------------
+    # todo: DRYer? (all of these)
+
+    def _doors_heading(self, obj):
+        return obj.prettify_get_allowed_doors()
+    _doors_heading.short_description = 'Allowed doors'
+
+    def _last_access_heading(self, obj):
+        return obj.prettify_get_last_access_time()
+    _last_access_heading.short_description = 'Last access'
+
+    def _current_rfid_heading(self, obj):
+        return obj.prettify_get_current_rfid()
+    _current_rfid_heading.short_description = 'Current RFID'
+
+
+
     #exclude = ("birthdate ", "middle_name")   # temp exclusion
 
     # Only the first and last names  will appear as link to the individual LockUser page
@@ -217,6 +249,7 @@ class LockUserAdmin(admin.ModelAdmin):
     ####################################################
     # Individual LockUser page  (change form)
     ####################################################
+
     # Which fields to show, and in what order
     # (parentheses group fields into a single line)
     # to do:  show deactivated (i.e. no current keycard) in gray, or de-emphasize another way
@@ -228,20 +261,17 @@ class LockUserAdmin(admin.ModelAdmin):
                             'phone_number','address', \
                             # will error if the below are not set as read_only...  which makes sense; these are methods and
                             # things I can't edit from the form.. 
-                            'prettify_get_current_rfid','prettify_get_all_rfids',\
-                            'prettify_get_last_access_time', 'prettify_get_all_access_times', \
+                            'prettify_get_current_rfid',\
+                            'last_access_time_and_link_to_more',  \
                             #'is_active', \
                             'doors',
                             'deactivate_current_keycard',
                           #  'rfids',
                             ),
 
-                'description': ('description.....  Create/modify new lock user and assign keycard')
+               # 'description': ('description.....  Create/modify new lock user and assign keycard')
             }),
         )
-
-
-    readonly_fields = ("prettify_get_current_rfid", "prettify_get_all_rfids","prettify_get_last_access_time","prettify_get_all_access_times")   # Obviously access times should not be editable
 
 
     # display options as checkboxes, not default as selection list
@@ -378,17 +408,55 @@ class AccessTimeAdmin(admin.ModelAdmin):
             above does not work; it defaults to linking from items in AccessTime col
         """
         super(AccessTimeAdmin, self).__init__(*args, **kwargs) # todo: is this appropriate here? 
-    def changelist_view(self, request, extra_context=None):
-        """ Send extra context for values for the access times JS chart """
 
+    def changelist_view(self, request, extra_context=None):
+        """ Don't show links for any item; send extra context for values for the access times JS chart """
+
+        # No need to show the page for an individual AccessTime, so no field should link to it.
+        self.list_display_links = (None, )
 
         # todo:  if no times at all........
 
         #########################################################################
         # building array of access times/lockusers/rfids to give the javascript
         #########################################################################
-        times_data = []
+
+        # todo:  jsonify this shit.   don't pass in as list of lists to templates
+
+        # So here's what a series structure looks like. Here, two data points are specified in the first series. 
+        """
+        series: [
+            {
+            name: 'Makerspace',
+            data: [ 
+            {
+               x: Date.UTC(2011,0,1), 
+               y: Date.UTC(0,0,0,10,8,2),
+                'user': 'Billie Bob',
+            }, { 
+                x: Date.UTC(2011,0,1), 
+                y: 50,
+                'user': 'sally joe',
+            } ], 
+            tooltip: {
+                    followPointer: false, 
+                    pointFormat: '{point.user}',  
+                    },
+
+            }, 
+            
+            {   // another series
+            } 
+            
+            ] 
+        """
+        # Note that to graph time vs date: 
+        #   x: Date.UTC(2011,0,1), 
+        #   y: Date.UTC(0,0,0,10,8,2),
+
+        #times_data = []
         # the data we'll need for one data point: 
+        """
         for at in AccessTime.objects.all():
             door = str(at.door.name)
             lockuser = str(at.lockuser.first_name) + " " + str(at.lockuser.last_name)
@@ -399,19 +467,19 @@ class AccessTimeAdmin(admin.ModelAdmin):
             hour = at.access_time.hour
             minute = at.access_time.minute
             second = at.access_time.second
-            """try: 
-                times_data[door].append((lockuser, rfid, year,day,month,day,hour,minute,second))
-            except: 
-                times_data[door] = [(lockuser, rfid, year,day,month,day,hour,minute,second)]
-            """
+            #try: 
+                #times_data[door].append((lockuser, rfid, year,day,month,day,hour,minute,second))
+            #except: 
+                #times_data[door] = [(lockuser, rfid, year,day,month,day,hour,minute,second)]
             times_data.append([door,lockuser,rfid,year,month,day,hour,minute,second])
             #things.append([lockuser, rfid, year,month,day,hour,minute,second])
+        """
 
 
         #print colored("OK, here's things: " + str(things), "white", "on_red")
-        from pprint import pprint
-        print colored("here's times data", "red", "on_white")
-        pprint(times_data)
+        #from pprint import pprint
+        #print colored("here's times data", "red", "on_white")
+        #pprint(times_data)
         #print colored("OK, here's times: ","white", "on_red")
         #pprint(times_data)
 
@@ -426,17 +494,149 @@ class AccessTimeAdmin(admin.ModelAdmin):
         #array =  times_data[times_data.keys()[0]]  
         #print colored("array: " + str(array), "white", "on_red")
         #extra_context = {'my_test_array':array}   # todo:  ummm need to pass in the door, too, remember!!!!!!!!!!!  So reorganize data structure. 
-        extra_context = { "access_times_data": times_data }
+
+        # the series structure: 
+        """
+        series:  a LIST of *dicts*
+        each dict: 
+            series_dict['name'] = string
+            series_dict['color'] = string
+            series_dict['data'] = [ data_point_dict, data_point_dict2, ...] 
+            series_dict['tooltip'] = tooltip_dict
+
+
+                data_point_dict[x] = Date
+                data_point_dict[y] = Date
+                data_point_dict['user'] = string
+
+                tooltip_dict['followPointer'] = false
+                tooltip_dict['pointFormat'] = '{point.user}'    
+        """
+        
+        ############################################################
+        #  yet more testing!!!!!
+        ############################################################
+
+        from django.utils import simplejson
+        # todo: tool tip stays same....
+        tooltip_dict = {}
+        tooltip_dict['followPointer']='false'
+        tooltip_dict['pointFormat']='"{point.user}"'
+
+        all_series = []
+
+        # a series is the access times for one door
+        for door in Door.objects.all(): 
+            one_series = {}
+            one_series['name'] = '"%s"' % door.name
+            one_series['tooltip'] = tooltip_dict
+            # get all AccessTimes for this door
+            #this_door_access_times = AccessTime.objects.filter(door_id=door.id)
+            this_door_access_times = AccessTime.objects.filter(door=door)
+            """
+#             print colored("--------------------","red","on_white")
+#             print colored(str(this_door_access),"red","on_white")
+#             print colored("--------------------","red","on_white")
+            """
+            one_series['data'] = []
+            for at in this_door_access_times:
+                """
+                data_point = {}
+                #test_d['x'] = '"hello"'
+                data_point['user'] = '"%s %s"' % (at.lockuser.first_name, at.lockuser.last_name)    # todo: better: at.lockuser_id or at.lockuser.id ? 
+                #test_d['y'] = '"%s"' % at.access_time
+                #test_d['y2'] = "Date.UTC('%s')" % at.access_time
+
+                year = at.access_time.year
+                month = at.access_time.month - 1 # because js starts months at zero
+                day = at.access_time.day
+                hour = at.access_time.hour
+                minute = at.access_time.minute
+                second = at.access_time.second
+                data_point['x'] = 'Date.UTC(%d,%d,%d)' % (year,month,day)
+                data_point['y'] = 'Date.UTC(0,0,0,%d,%d,%d)' % (hour,minute,second)
+                """
+                #print colored("adding data point  for door %s: %s" % (door.name, at.data_point), "white","on_blue")
+                one_series['data'].append(simplejson.loads(at.data_point))  # todo: ugh with the loads'ing
+            all_series.append(one_series)
+        #extra_context = {"test_jsond": simplejson.dumps([test_d, test_d2]) } 
+        extra_context = {"test_jsond": simplejson.dumps(all_series, indent="") } 
+
+        ############################################################
+
+        # todo: the double quote thing.....
+        # the tooltip is always the same
+        # todo: i.e. don't construct here (?)
+        """
+        tooltip_dict['followPointer'] = 'false'
+        tooltip_dict['pointFormat'] = '"{point.user}"'
+        """
+
+        """
+        all_series = []
+        for each door:
+            construct_one_series(doorname, tooltip-dict, time, lockuser)
+
+        # for each door
+            series_dict = {}   # todo: is this good practice, to reset? 
+            series_dict['name'] = door
+            series_dict['tooltip'] = tooltip_dict
+            # to build list of dicts for one door series, need AccessTimes objects just for this door
+            # for all accesstimes for this door
+                data_point_dict[x] = Date
+
+                ############################################################
+                ############################################################
+                ############################################################
+                ############################################################
+                # !!!!!!!!!!!!!!!!!!!!!   what to put here:   get teh access_time, but then DO. access_time.get_just_the_date_part() for x and access_time.get_just_the_time_part() for y. 
+                ############################################################
+                ############################################################
+                ############################################################
+                ############################################################
+                data_point_dict[y] = Date
+                data_point_dict['user'] = lockuser.first_name + last_name string
+                series_dict['data'].append(data_point_dict)
+        all_series.append(series_dict)
+        """
+
+        #from django.utils import simplejson
+        #access_times_data_json = simplejson.dumps(highchart_dict)
+        #extra_context = { "access_times_data": access_times_data_json} 
+
+        #extra_context = { "access_times_data": times_data }
+        #extra_context = { "access_times_data": test }
+
+
+
+
+
+
+
         return super(AccessTimeAdmin, self).changelist_view(request, extra_context=extra_context)
 
-        # No need to show the page for an individual AccessTime, so no field should link to it.
-        self.list_display_links = (None, )
 
     #########################################################################
     # Page listing all AccessTimes ("change list" page):
     #########################################################################
+    # max num of entries per page
+    #list_per_page = 100
     # # field names to display, as columns
-    list_display = ('access_time','get_this_lockuser_html','get_this_door')
+    #list_display = ('access_time','get_this_lockuser_html','get_this_door')
+    list_display = ('access_time','_lockuser_html_heading','door')   # if just 'lockuser', won't get html for link... todo: but I think there's an easier way to do this
+    #list_display = ('access_time','get_this_lockuser_html','door')   # if just 'lockuser', won't get html for link... todo: but I think there's an easier way to do this
+    #list_display = ('access_time','lockuser_name_html','door_name')
+
+    # todo: method names 
+    def _lockuser_html_heading(self, obj):
+        """ Returns the HTML with link to lock user's change_form to display on
+            the Access Times change list page """
+        #return obj.get_this_lockuser_html()
+        return "<a href='../lockuser/%d/'>%s</a>" %  (obj.lockuser.id, obj.lockuser)
+    _lockuser_html_heading.short_description = 'User'
+    # Django will HTML-escape the output by default. If you'd rather not escape the output of the method, give the method an allow_tags attribute whose value is True.
+    _lockuser_html_heading.allow_tags = True
+
     actions=None  # don't provide the actions dropdown
     date_hierarchy = 'access_time' # Set date_hierarchy to the name of a DateField or DateTimeField in model, and the
         # change list page will include a date-based drilldown navigation by that field. (i.e. shows months or days or
@@ -505,10 +705,10 @@ class StaffUserAdmin(UserAdmin):
 #####################################################################
 # Register models
 #####################################################################
+#admin.site.register(Door, DoorAdmin)
+#admin.site.register(RFIDkeycard, RFIDkeycardAdmin)
 admin.site.register(LockUser,LockUserAdmin)
-admin.site.register(RFIDkeycard, RFIDkeycardAdmin)
 admin.site.register(AccessTime,AccessTimeAdmin)
-admin.site.register(Door, DoorAdmin)
 
 # Register User with UserAdmin. Note that in settings.py, in INSTALLED_APPS,
 #   make sure that 'django.contrib.auth' appears on the list before the app
