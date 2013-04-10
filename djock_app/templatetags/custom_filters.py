@@ -1,23 +1,25 @@
 from django import template
 from djock_app.models import LockUser
 from django.contrib.contenttypes.models import ContentType
+from django.template.defaultfilters import stringfilter, safe, cut
 
 # All the tags and filters are registered in this variable
 register = template.Library()
 
 
-""" This is unnecessary, since the new concept is: 
-    lockuser is not active IFF no current keycard
+#todo
 @register.filter
-def is_lockuser_active(object_id):
-    try:
-        this_lockuser = LockUser.objects.filter(id=object_id)[0]
-    except:
-        this_lockuser = None
-    if this_lockuser:
-        # return this_lockuser.activate 
-        return not this_lockuser.deactivated  # so if deactivated, will return False 
-"""
+@stringfilter # Convert an object to its string value before being passed to function
+def fix_json_string(string):
+    # Marks a string as not requiring further HTML escaping prior to output.
+    string = safe(string)
+    string = string.replace('"\\"',"'").replace('\\"\"', "'") # fix quotes
+    string = cut(string,"\"") # keep fixing
+    string = safe(string)  # keep fixing
+    return string
+
+
+
 
 @register.filter
 def does_lockuser_have_active_keycard(object_id):
@@ -41,7 +43,9 @@ def get_object_type(content_type_id):
         return ct.model
     except:
         return None
-    
+   
+
+# todo
 @register.filter
 def get_original_id(referrer_path):
     """ given the HTTP_REFERER, get the last part of the URL, 
@@ -54,4 +58,18 @@ def get_original_id(referrer_path):
     else: 
         return None
 
+
+
+""" This is unnecessary, since the new concept is: 
+    lockuser is not active IFF no current keycard
+@register.filter
+def is_lockuser_active(object_id):
+    try:
+        this_lockuser = LockUser.objects.filter(id=object_id)[0]
+    except:
+        this_lockuser = None
+    if this_lockuser:
+        # return this_lockuser.activate 
+        return not this_lockuser.deactivated  # so if deactivated, will return False 
+"""
 

@@ -420,98 +420,6 @@ class AccessTimeAdmin(admin.ModelAdmin):
         #########################################################################
         # building array of access times/lockusers/rfids to give the javascript
         #########################################################################
-
-        # todo:  jsonify this shit.   don't pass in as list of lists to templates
-
-        # So here's what a series structure looks like. Here, two data points are specified in the first series. 
-        """
-        series: [
-            {
-            name: 'Makerspace',
-            data: [ 
-            {
-               x: Date.UTC(2011,0,1), 
-               y: Date.UTC(0,0,0,10,8,2),
-                'user': 'Billie Bob',
-            }, { 
-                x: Date.UTC(2011,0,1), 
-                y: 50,
-                'user': 'sally joe',
-            } ], 
-            tooltip: {
-                    followPointer: false, 
-                    pointFormat: '{point.user}',  
-                    },
-
-            }, 
-            
-            {   // another series
-            } 
-            
-            ] 
-        """
-        # Note that to graph time vs date: 
-        #   x: Date.UTC(2011,0,1), 
-        #   y: Date.UTC(0,0,0,10,8,2),
-
-        #times_data = []
-        # the data we'll need for one data point: 
-        """
-        for at in AccessTime.objects.all():
-            door = str(at.door.name)
-            lockuser = str(at.lockuser.first_name) + " " + str(at.lockuser.last_name)
-            rfid = int(at.the_rfid)
-            year = at.access_time.year
-            month = at.access_time.month - 1 # because js starts months at zero
-            day = at.access_time.day
-            hour = at.access_time.hour
-            minute = at.access_time.minute
-            second = at.access_time.second
-            #try: 
-                #times_data[door].append((lockuser, rfid, year,day,month,day,hour,minute,second))
-            #except: 
-                #times_data[door] = [(lockuser, rfid, year,day,month,day,hour,minute,second)]
-            times_data.append([door,lockuser,rfid,year,month,day,hour,minute,second])
-            #things.append([lockuser, rfid, year,month,day,hour,minute,second])
-        """
-
-
-        #print colored("OK, here's things: " + str(things), "white", "on_red")
-        #from pprint import pprint
-        #print colored("here's times data", "red", "on_white")
-        #pprint(times_data)
-        #print colored("OK, here's times: ","white", "on_red")
-        #pprint(times_data)
-
-        # Will be indexing things on Doors:So will need to pass in one array for each door. 
-        # So reorganize the above into one dict, with everything indexed on the doors, and give that to extra_context.  i.e. loop through things array, find doors. 
-        # OR could just do that above.  but not yet. 
-
-
-       # array = [str(at.lockuser.first_name) for at in AccessTime.objects.all()] 
-      #  extra_context={'my_test_array':array}
-        # just one random door right now
-        #array =  times_data[times_data.keys()[0]]  
-        #print colored("array: " + str(array), "white", "on_red")
-        #extra_context = {'my_test_array':array}   # todo:  ummm need to pass in the door, too, remember!!!!!!!!!!!  So reorganize data structure. 
-
-        # the series structure: 
-        """
-        series:  a LIST of *dicts*
-        each dict: 
-            series_dict['name'] = string
-            series_dict['color'] = string
-            series_dict['data'] = [ data_point_dict, data_point_dict2, ...] 
-            series_dict['tooltip'] = tooltip_dict
-
-
-                data_point_dict[x] = Date
-                data_point_dict[y] = Date
-                data_point_dict['user'] = string
-
-                tooltip_dict['followPointer'] = false
-                tooltip_dict['pointFormat'] = '{point.user}'    
-        """
         
         ############################################################
         #  yet more testing!!!!!
@@ -540,78 +448,11 @@ class AccessTimeAdmin(admin.ModelAdmin):
             """
             one_series['data'] = []
             for at in this_door_access_times:
-                """
-                data_point = {}
-                #test_d['x'] = '"hello"'
-                data_point['user'] = '"%s %s"' % (at.lockuser.first_name, at.lockuser.last_name)    # todo: better: at.lockuser_id or at.lockuser.id ? 
-                #test_d['y'] = '"%s"' % at.access_time
-                #test_d['y2'] = "Date.UTC('%s')" % at.access_time
-
-                year = at.access_time.year
-                month = at.access_time.month - 1 # because js starts months at zero
-                day = at.access_time.day
-                hour = at.access_time.hour
-                minute = at.access_time.minute
-                second = at.access_time.second
-                data_point['x'] = 'Date.UTC(%d,%d,%d)' % (year,month,day)
-                data_point['y'] = 'Date.UTC(0,0,0,%d,%d,%d)' % (hour,minute,second)
-                """
                 #print colored("adding data point  for door %s: %s" % (door.name, at.data_point), "white","on_blue")
                 one_series['data'].append(simplejson.loads(at.data_point))  # todo: ugh with the loads'ing
             all_series.append(one_series)
         #extra_context = {"test_jsond": simplejson.dumps([test_d, test_d2]) } 
         extra_context = {"test_jsond": simplejson.dumps(all_series, indent="") } 
-
-        ############################################################
-
-        # todo: the double quote thing.....
-        # the tooltip is always the same
-        # todo: i.e. don't construct here (?)
-        """
-        tooltip_dict['followPointer'] = 'false'
-        tooltip_dict['pointFormat'] = '"{point.user}"'
-        """
-
-        """
-        all_series = []
-        for each door:
-            construct_one_series(doorname, tooltip-dict, time, lockuser)
-
-        # for each door
-            series_dict = {}   # todo: is this good practice, to reset? 
-            series_dict['name'] = door
-            series_dict['tooltip'] = tooltip_dict
-            # to build list of dicts for one door series, need AccessTimes objects just for this door
-            # for all accesstimes for this door
-                data_point_dict[x] = Date
-
-                ############################################################
-                ############################################################
-                ############################################################
-                ############################################################
-                # !!!!!!!!!!!!!!!!!!!!!   what to put here:   get teh access_time, but then DO. access_time.get_just_the_date_part() for x and access_time.get_just_the_time_part() for y. 
-                ############################################################
-                ############################################################
-                ############################################################
-                ############################################################
-                data_point_dict[y] = Date
-                data_point_dict['user'] = lockuser.first_name + last_name string
-                series_dict['data'].append(data_point_dict)
-        all_series.append(series_dict)
-        """
-
-        #from django.utils import simplejson
-        #access_times_data_json = simplejson.dumps(highchart_dict)
-        #extra_context = { "access_times_data": access_times_data_json} 
-
-        #extra_context = { "access_times_data": times_data }
-        #extra_context = { "access_times_data": test }
-
-
-
-
-
-
 
         return super(AccessTimeAdmin, self).changelist_view(request, extra_context=extra_context)
 
@@ -624,8 +465,6 @@ class AccessTimeAdmin(admin.ModelAdmin):
     # # field names to display, as columns
     #list_display = ('access_time','get_this_lockuser_html','get_this_door')
     list_display = ('access_time','_lockuser_html_heading','door')   # if just 'lockuser', won't get html for link... todo: but I think there's an easier way to do this
-    #list_display = ('access_time','get_this_lockuser_html','door')   # if just 'lockuser', won't get html for link... todo: but I think there's an easier way to do this
-    #list_display = ('access_time','lockuser_name_html','door_name')
 
     # todo: method names 
     def _lockuser_html_heading(self, obj):

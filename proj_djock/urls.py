@@ -12,6 +12,9 @@ admin.autodiscover()
 
 
 urlpatterns = patterns('',
+
+    url(r'^chart/', direct_to_template, {'template': 'chart.html'}), 
+
     # Password-reset: add "Forgotten your password?" link on log-in page
     url(r'^admin/password_reset/$', 'django.contrib.auth.views.password_reset', name='admin_password_reset'),
     (r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done'),

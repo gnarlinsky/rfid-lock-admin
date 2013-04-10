@@ -144,10 +144,9 @@ INSTALLED_APPS = (
 
     # mine
     'djock_app',
-    #'bootstrap_toolkit',
     'debug_toolbar',
     'django_extensions',
-    'chartit',
+    #'chartit',
 )
 
 

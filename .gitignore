@@ -19,6 +19,8 @@ expanded_comments.txt
 expanded_comments_pdfs
 todo.rtfd
 pydocs
+# bootstrap:
+demo_project
 
 # Symbolic links #
 ###################

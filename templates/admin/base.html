@@ -1,56 +1,161 @@
 {% load admin_static %}
 {% load url from future %}<!DOCTYPE html>
 
-
+{% comment %}
 {% load bootstrap_toolkit %}
+{% endcomment %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
 <title>{% block title %}{% endblock %}</title>
 
-
-<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}" />
-
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap.css" />
-
-{% comment %} 
-disabling the bootstrap dropdown library because of javascript exceptions on some change form pages:
+{% comment %} disabling the bootstrap dropdown library because of javascript exceptions on some change form pages:
 "Uncaught TypeError: Cannot read property 'fn' of undefined"
 {% bootstrap_javascript_tag "dropdown" %}
 {% endcomment %}
 
+{% comment %} 
+<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}" />
+<!-- <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap.css" /> -->
 
-
-
-
-
-{% block extrastyle %}{% endblock %}
 <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{% block stylesheet_ie %}{% static "admin/css/ie.css" %}{% endblock %}" /><![endif]-->
 
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}
+{% endcomment %} 
+
+
+{% comment %} todo  {% endcomment %}
+
 <script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% static "admin/" %}{% endfilter %}";</script>
-{% block extrahead %}{% endblock %}
+
+
+
+<link rel="stylesheet" href="{{ STATIC_URL }}simplex_bootstrap.min.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-responsive.css">
+
+<!-- todo: here or bottom? --> 
+<script src="{{ STATIC_URL }}divshot_bootstrap.min.js"></script>
+<script src="{{ STATIC_URL }}divshot_jquery.min.js"></script>
+
+
+
+{% block extrastyle %} {% endblock %}
+{% block extrahead %}
+{% comment %} to do {% endcomment %} 
+<style>
+ul li { list-style-type: none;    } 
+
+
+
+.navbar {
+    width:100%; 
+    margin:0 auto; 
+    background-color:#fff; 
+    border-bottom:2px solid #eee;
+    }
+
+#special_well { 
+text-align:center;
+margin:0 auto; 
+margin-bottom:20px; 
+width:70%; 
+}
+
+#navbarRow { 
+margin:0 20px 0 20px;  
+}
+#content-main { 
+    margin-top: 100px; 
+}
+#content { 
+    width:90%;
+    margin:0 auto; 
+}
+#result_list_left {
+    width:88%;
+}
+#filter_list_right { 
+    border-left:1px solid #eee;
+    padding-left:1%; 
+    width:10%; 
+} 
+
+.aligned label { padding:0; } 
+
+#main_form.well { 
+margin-bottom:0px;  
+padding-bottom:0px;  
+}
+
+#keycard_assignment_scan_message { 
+    color:red; 
+    font-size: .8em; 
+    text-align:center; 
+    } 
+
+#assign_new_keycard { 
+    text-align:center; 
+}
+{% comment %}
+#content {
+    background-color: lightgreen; 
+    margin: 0 auto;
+    margin-top: 90px; 
+    width:90%; 
+    }
+#container {
+    background-color: pink; 
+    margin-top:200px;  
+    width:100%; 
+    }
+body { background-color: red; 
+margin-top: 0px; 
+}
+#content-main { 
+background-color: lightblue; 
+} 
+
+{% endcomment %}
+</style>
+{% endblock %}
+
+
+
+
+
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+
 </head>
 {% load i18n %}
 
-<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}" style="margin:0 auto;">
-<div style="margin-left: auto; margin-right:auto; ">
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
 <!-- Container -->
 <div id="container" > 
 
     {% if not is_popup %}
+    
+        {% comment %}
     <!-- Header -->
-    <div align="center" class="masthead" style="margin-top:20px; padding:10px;text-align:center;width:500px; ">
-    {% comment %}
+   <!--  <div align="center" class="masthead" style="margin-top:20px; padding:10px;text-align:center;width:500px; ">
+   -->
+
+   <!--
     <div id="header">
-    {% endcomment %}
-        
+       <div id="branding"> 
+       {% block branding %}{% endblock %}
+       </div>
+       --> 
+
+
+<!--
         <div align="center" class="navbar" style="text-align:center; margin:0 auto; ">
           <div class="navbar-inner" style="">
-
-
-       {% if user.is_active and user.is_staff %} {% comment %} todo:  is_staff?  {% endcomment %}
+          --> 
+        {% endcomment %}
+       {% comment %} todo:  is_staff?  {% endcomment %}
+        {% comment %}
+       {% if user.is_active and user.is_staff %} 
         <div id="user-tools" style="font-size:14px; padding:0; position:relative;text-align:left;  " >
+        <div id="user-tools" >
             {% trans 'Welcome,' %}
             <strong>{% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</strong>.
             {% block userlinks %}
@@ -66,6 +171,109 @@ disabling the bootstrap dropdown library because of javascript exceptions on som
 
 
         {% endif %}
+        {% endcomment %}
+
+
+        {% comment %} Don't show navbar if not logged in {% endcomment %}
+
+{% if user.is_authenticated %}
+
+
+<div class="navbar navbar-fixed-top">
+<!-- <div class="navbar-inner"> -->
+    <div id="navbarRow" class="row"> 
+       <a class="brand" href="/lock/">RFID Lock Administration</a>
+        <form class="navbar-search pull-right" action="">
+            <ul class = "nav">
+            <li><p class="navbar-text pull-right">Logged in as {% firstof user.first_name user.username %} </p> </li>
+                <li><a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> </li>
+                <li><a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a></li>
+            </ul>
+        </form>
+    </div>
+    <div id="navbarRow" class="row"> 
+                <ul class = "nav">
+            <li> <a href='/lockadmin/djock_app/lockuser/'>Lock users</a> </li>
+            <li> <a href='/lockadmin/djock_app/accesstime/'>Room access logs</a> </li>
+            <li> <a href='/lockadmin/djock_app/lockuser/add/'>Create user and assign new keycard</a> </li>
+        </ul>
+    </div>
+   <!--  </div> --> 
+</div><!-- /.navbar -->
+
+{% comment %}
+<div class="navbar navbar-fixed-top">
+
+  <div class="navbar-inner">
+
+          <a class="brand" href="#"><b>IMC/Makerspace RFID Lock Admin</b></a>
+          <div class="navbar-content">
+              <div class="row">
+                    <ul class="nav  pull-right">
+                      <li class="disabled"> <a href="#"><b><i>Welcome, Bob Loblaw</i></b></a> </li>
+                      <li> <a href="#">Log out</a> </li>
+                      <li> <a href="#">Change password</a> </li>
+                    </ul>
+              </div>
+              <div class="row">
+                    <ul class="nav  pull-left">
+                      <li class="disabled"> <a href="#"><b><i>Welcome, Bob Loblaw</i></b></a> </li>
+                      <li> <a href="#">Log out</a> </li>
+                      <li> <a href="#">Change password</a> </li>
+                    </ul>
+              </div>
+    </div>
+
+  </div>
+
+</div>
+
+{% endcomment %}
+
+
+{% endif %}
+
+        {% comment %}
+        <div id="user-tools" >
+            {% block userlinks %}
+                {% url 'django-admindocs-docroot' as docsroot %}
+                {% if docsroot %}
+                    <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
+                {% endif %}
+                <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
+                <a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a>
+            {% endblock %}
+        </div>
+        {% endcomment %}
+
+
+
+
+{% comment %}
+<h1> and another one. add navbar-fixed-top to outside div </h1>
+
+<div class="navbar ">
+      <div class="navbar-inner">
+    <div class="container">
+     
+      <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar">an icon bar</span>
+            <span class="icon-bar">an icon bar</span>
+            <span class="icon-bar">an icon bar</span>
+          </a>
+     
+          <!-- Be sure to leave the brand out there if you want it shown -->
+      <a class="brand" href="#">Project name (class brand)</a>
+     
+      <!-- Everything you want hidden at 940px or less, place within here -->
+    <div class="nav-collapse collapse">
+       <!-- .nav, .navbar-search, .navbar-form, etc -->
+       .nav, .navbar-search, .navbar-form, etc
+          </div> </div></div></div>
+          {% endcomment %}
+
+    
 
 
           {% comment %}
@@ -74,8 +282,13 @@ disabling the bootstrap dropdown library because of javascript exceptions on som
           {% comment %}
         {% block branding %} {% endblock %}
           {% endcomment %}
+          <!--
          <h1><a href='/lock/' class="brand" style="padding:0px;margin:0px;
          font-size:30px;float:center;font-size:40px;font-weight:bold; color:rgba(0, 0, 0, 0.7)  ">{% trans 'RFID Lock Administration' %}</a></h1>
+         --> 
+
+        {% comment %}
+
         <a href='/lock/'>main</a> |
         <a href='/lockadmin/djock_app/lockuser/'>lock users</a> |
         <a href='/lockadmin/djock_app/door/'>door locks</a> |
@@ -84,8 +297,11 @@ disabling the bootstrap dropdown library because of javascript exceptions on som
                                           </div>
                                           </div>
         {% block nav-global %}{% endblock %}
+       ....... TO HERE
 
     </div>
+
+        {% endcomment %}
     <!-- END Header/masthead -->
  
 
@@ -105,6 +321,7 @@ disabling the bootstrap dropdown library because of javascript exceptions on som
     {% endcomment %}
     {% endif %}
 
+
     {% block messages %}
         {% if messages %}
         <ul class="messagelist">{% for message in messages %}
@@ -116,21 +333,26 @@ disabling the bootstrap dropdown library because of javascript exceptions on som
     <!-- Content -->
     <div id="content" class="{% block coltype %}colM{% endblock %}">
 
-        {% block pretitle %}{% endblock %}
-
-        {% comment %}
-        {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
-        {% endcomment %}
+        {% comment %} todo
+        {% block pretitle %{% endblock %}
+        {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %} {% endcomment %}
         {% block content %}
-            {% block object-tools %}{% endblock %}
+            {% comment %} todo, object-tools, sidebar (https://docs.djangoproject.com/en/1.4/obsolete/admin-css/#object-tools) 
+            {% block object-tools %}{% endblock %}    
+            {% endcomment %}
             {{ content }}
         {% endblock %}
-        {% block sidebar %}{% endblock %}
+            {% comment %} {% block sidebar %}{% endblock %} {% endcomment %}
         <br class="clear" />
     </div>
     <!-- END Content -->
 
-    {% block footer %}<div id="footer"></div>{% endblock %}
+{% comment %} Just testing some form styles with bootstrap................
+{% endcomment %}
+    {% block footer %}<div id="footer">[footer]</div>{% endblock %}
+
+
+
 </div>
 <!-- END Container -->
 

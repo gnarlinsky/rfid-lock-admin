@@ -1,201 +1,115 @@
 {% extends "admin/change_list.html" %}
+{% load custom_filters %}
 
-{% comment %}
 {% load i18n admin_static admin_list %}
+{% comment %}
 {% load url from future %}
 {% load admin_urls %}
 {% endcomment %}
 
+{% block extrastyle %}
+{% comment %}
+      <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}" />
+      {% if cl.formset %}
+        <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
+
+      {% endif %}
+{% endcomment %}
+      {% if cl.formset or action_form %}
+        {% url 'admin:jsi18n' as jsi18nurl %}
+        <script type="text/javascript" src="{{ jsi18nurl|default:'../../jsi18n/' }}"></script>
+      {% endif %}
+      {{ media.css }}
+      {% if not actions_on_top and not actions_on_bottom %}
+        <style>
+          #changelist table thead th:first-child {width: inherit}
+        </style>
+      {% endif %}
+{% endblock %}
+
+
 {% block extrahead %} 
-    {{ block.super }}
-    {% if module_name == "access times" %}
-        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"    /></script>
-        <script type="text/javascript" src="/static/Highcharts-3.0.0/js/highcharts.js"></script>
-        <script>
+{{ block.super }}
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"    /></script>
+{% if module_name == "access times" %}
+<script type="text/javascript" src="/static/Highcharts-3.0.0/js/highcharts.js"></script>
 
+<script>
+// todo:  tooltip for all series, not within each
+// todo: make sure things are escaped properly in the JSON string
 
-        // todo:  tooltip for all series, not within each
-$(function () {
+$(document).ready(function() {
+    //$("#show_chart_button").bind("click", function(e) {
+    //$("#show_chart_link").bind("click", function(e) {
+    var hidden_access_times_chart= document.getElementById("hidden_access_times_chart"); 
+    hidden_access_times_chart.style.display="inline"; 
+    alert('!!!!!!!'); 
+//    });
+//}); 
 
-
-    //var myTestArray = {{ my_test_array|safe }}; 
-    //var myTestArray = [['asdfasfsd asdfasfd', 1111135121, 2012, 8, 8, 8, 1, 38, 27], ['asdfasfsd asdfasfd', 1111135121, 2012, 21, 8, 21, 18, 53, 22], ['bob loblah', 1111135121, 2013, 23, 1, 23, 1, 40, 33] ]; 
-    var accessTimesData = {{ access_times_data|safe }}; 
-
-
-
-
-
-
+//$(function () {
     var chart;
-    $(document).ready(function() {
+//    $(document).ready(function() {
         chart = new Highcharts.Chart({
             chart: {
-                renderTo: 'access_times_chart',
+                //renderTo: 'access_times_chart',
+                renderTo: 'hidden_access_times_chart',
                 type: 'scatter',
                 zoomType: 'xy', 
                 plotBorderWidth: 1, 
+                 width: 800,
+                 style: { margin: '0 auto' }
             },
-            title: {
-                align: 'center', 
-                text: 'Access Times for All Doors'
-            },
-            subtitle: {
-                text: 'Click on a door in the legend to toggle its points on/off.<br>Select a region to zoom in.'
-            },
+            title: { align: 'center', text: 'Access Times for All Doors' },
+            subtitle: { text: 'Click on a door in the legend to toggle its points on/off.<br>Select a region to zoom in.' },
             xAxis: {
                 type: 'datetime',
-                dateTimeLabelFormats: {
-                    day: '%b %d,%Y'
-                },
-                title: {
-                    enabled: true,
-                    text: 'Date'
-                },
+                title: { enabled: false, text: 'Date' },
                 startOnTick: false,
-                endOnTick: true,
-                showLastLabel: true
+                endOnTick: false,
+                showLastLabel: false,
+                showFirstLabel: false,
+                maxZoom: 14 * 24 * 3600000, // fourteen days
+                dateTimeLabelFormats: { // don't display the dummy year
+                // todo: faster way to assign one val to a bunch at once?
+                    year: '%b \'%y', // Feb '12
+                    month: '%b \'%y', // Feb '12
+                    day: '%a, %b %e',    // Mon, Feb 8
+                    week: '%b %e',   // Feb 8
+                },
             },
+
+
             yAxis: {
                 type: 'datetime',
-                dateTimeLabelFormats: {
-                    day: '%b %d,%Y'
+                //dateTimeLabelFormats: { day: '%b %d,%Y' },
+                title: { enabled: false, text: 'Time of Day' },
+                startOnTick: false,
+                endOnTick: false,
+                showLastLabel: false,
+                showFirstLabel: false,
+                // don't label top of y-axis with "12:00:00 AM"; it's confusing. 
+                showLastLabel: false, 
+                dateTimeLabelFormats: { // don't display units other than time units at all zoom levels
+                    week: '%H:%M:%S %p',   year: '%I:%M %p', month: '%I:%M %p', week: '%I:%M %p', day: '%I:%M %p', second: '%I:%M:%S %p', minute: '%I:%M:%S %p', hour: '%I:%M %p',    
                 },
-                title: {
-                    text: 'Time'
-                }
             },
-            tooltip: {
-                   /* 
-                    formatter: function() {
-                            return ''+
-                            this.x +' , '+ this.y +{series.name} ';
-                    },
-                    formatter: function() {
-                        var s = '<b>'+ this.x +'</b>';
-
-                        $.each(this.points, function(i, point) {
-                            s += '<br/>'+ point.series.name +': '+
-                            point.y +'m';
-                        });
-
-                        return s;
-                    },*/
-                    followPointer: false, 
-                    hideDelay: 0 // todo: tooltip stuff/hide delay stuff. something is interfering with something else? 
-                    
-                    },
+            tooltip: { followPointer: false, hideDelay: 0 },
             legend: {
-                layout: 'horizontal',
-                align: 'center',
-                verticalAlign: 'top',
-                x: 0,
-                y: 60,
-                floating: false,
-                backgroundColor: '#FFFFFF',
-                borderWidth: 1
+                layout: 'horizontal', align: 'center', verticalAlign: 'top', x: 0, y: 60, floating: false, backgroundColor: '#FFFFFF', borderWidth: 1
             },
             plotOptions: {
                 scatter: {
                     marker: {
-                        radius: 5,
-                        states: {
-                            hover: {
-                                enabled: true,
-                                lineColor: 'rgb(100,100,100)'
-                            }
-                        }
+                        radius: 2,
+                            states: { hover: { enabled: true, lineColor: 'rgb(100,100,100)' } }
                     },
-                    states: {
-                        hover: {
-                            marker: {
-                                enabled: false
-                            }
-                        }
-                    }
+                    states: { hover: { marker: { enabled: false } } }
                 }
             },
-
-            /*******************************************************
-            Here's where we will put the series objects we created. 
-            So will have 
-            series: series_objects
-            *******************************************************/
-            series: [
-                {
-                name: 'Makerspace',
-                color: 'rgba(223, 83, 83, .5)',
-                /*data: [  
-                    [156.2, 60.0], [149.9, 46.8], [169.5, 57.3], [160.0, 64.1], [175.3, 63.6]   
-                ]*/
-                data: [ 
-                {
-                    x: Date.UTC(2011,0,1), 
-                    y: 20,
-                    'user': 'Billie Bob',
-                    'rfid': 234234324
-                }, { 
-                    x: Date.UTC(2011,0,1), 
-                    y: 50,
-                    'user': 'sally joe',
-                    'rfid': 11111111
-                } ], 
-                tooltip: {
-                        followPointer: false, 
-                        pointFormat: '{point.x}, {point.y}:<br/>{point.user}<br/>',  
-                        },
-
-                }, 
-                
-                {
-                name: 'Narnia',
-                color: 'rgba(83, 223, 83, .5)',
-                data: [ 
-                {
-                    x: Date.UTC(2010,0,3), 
-                    y: Date.UTC(2010,0,3),
-                    'user': 'Billie Bob',
-                    'rfid': 234234324
-                }, { 
-                    x: Date.UTC(2010,0,5), 
-                    y: 25,
-                    'user': 'sally joe',
-                    'rfid': 11111111
-                } ],
-
-                tooltip: {
-                        followPointer: false, 
-                        pointFormat: '{point.x}, {point.y}:<br/>{point.user}<br/>',  
-                        },
-    
-            }, 
-                     {
-                name: 'Bike Project',
-                   composition: {
-                       'User': 'Billy Bob',
-                       'RFID': '1231231232313',
-                       },
-                color: 'rgba(119, 152, 191, .5)',
-                data: [ 
-                {
-                    x: Date.UTC(2013,0,6), 
-                    y: 22,
-                    'user': 'Billie Bob',
-                    'rfid': 234234324
-                }, { 
-                    x: Date.UTC(2013,0,5), 
-                    y: 5,
-                    'user': 'sally joe',
-                    'rfid': 11111111
-                } ], 
-                tooltip: {
-                        followPointer: false, 
-                        pointFormat: '{point.x}, {point.y}:<br/>{point.user}<br/>',  
-                        },
-            }]
+            series: {{ test_jsond|fix_json_string }}
         });
     });
-    
 });
         </script>
         {% comment %}
@@ -203,11 +117,132 @@ $(function () {
         {{ weatherchart|load_charts:"weather_chart" }}
         {% endcomment %}
     {% endif %}
+
+
+    {% comment %} todo.rtfd - #10 {% endcomment %} 
+    <script>
+$(function($) {
+    $(document).ready(function($) {
+        var table = document.getElementById("result_list"); 
+        table.setAttribute("class","table");
+    });
+}); 
+
+
+</script>
+
 {% endblock %}
 
+
+
+{% comment %}
 {% block content %}
     {% if module_name == 'access times' %}
-          <div id="access_times_chart">!!!!!!!!!!  access times chart rendered here</div>
+        <div><button id="show_chart_button" name="Show Highchart" />show chart</div>
+        <div id="hidden_access_times_chart">hidden!</div>
+        <div id="access_times_chart">!!!!!!!!!!  access times chart rendered here</div>
+    {% elif  module_name == 'lock users' %} 
+        <a href="/lockadmin/djock_app/lockuser/add/" class="btn"> Add lock user </a> 
     {% endif %}
     {{ block.super }}
+{% endblock %}
+{% endcomment %}
+
+
+
+
+{% block content %}
+  <div id="content-main">
+    {% if module_name == 'access times' %}
+    {% comment %}
+        <div><button id="show_chart_button" name="Show Highchart" />show chart</div>
+    {% endcomment %}
+        <div><p><a href="/chart/" id="show_chart_link">Scatter plot of access times</a></p></div>
+    {% comment %}
+        <div id="hidden_access_times_chart">hidden!</div>
+        <div id="access_times_chart">!!!!!!!!!!  access times chart rendered here</div>
+    {% endcomment %}
+    {% endif %}
+
+        {% comment %}
+        {% block object-tools %}
+                {% if  module_name == 'lock users' %} 
+                    <a href="/lockadmin/djock_app/lockuser/add/" class="btn pull-right"> Add lock user </a> 
+                {% endif %}
+      {% if has_add_permission %}
+        <ul class="object-tools">
+                  {% block object-tools-items %}
+                    <li>
+                      <a href="{% url cl.opts|admin_urlname:'add' %}{% if is_popup %}?_popup=1{% endif %}" class="addlink">
+                        {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
+                      </a>
+                    </li>
+                  {% endblock %}
+        </ul>
+      {% endif %}
+    {% endblock %}
+    {% endcomment %}
+    {% if cl.formset.errors %}
+        <p class="errornote">
+        {% blocktrans count cl.formset.errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+        </p>
+        {{ cl.formset.non_form_errors }}
+    {% endif %}
+    <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+      {% block search %}{% search_form cl %}{% endblock %}
+
+
+      <form id="changelist-form" action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %}>{% csrf_token %}
+      {% if cl.formset %}
+        <div>{{ cl.formset.management_form }}</div>
+      {% endif %}
+
+
+
+      {% block result_list %}
+
+
+
+              {% if action_form and actions_on_top and cl.full_result_count %}
+      <div class="well clearfix" >
+            <div class="pull-left">
+                  {% admin_actions %}
+           </div>
+          <div class="pull-right">
+                {% if  module_name == 'lock users' %} 
+                    <a href="/lockadmin/djock_app/lockuser/add/" class="btn"> Add lock user </a> 
+                {% endif %}
+            </div>
+        </div>
+              {% endif %}
+
+        <div class="well clearfix">
+            <div class="pull-left" id="result_list_left" >
+          {% result_list cl %}
+          </div>
+          <div class="pull-right" id="filter_list_right" >
+          {% block filters %}
+            {% if cl.has_filters %}
+              <div id="changelist-filter">
+                <h2>{% trans 'Filter' %}</h2>
+                  {% block date_hierarchy %}
+                      {% if cl.date_hierarchy %}
+                            <h3>By date</h3> 
+                           {% date_hierarchy cl %}
+                      {% endif %}
+                  {% endblock %}
+                {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+              </div>
+            {% endif %}
+          {% endblock %}
+          </div>
+          </div>
+        {% comment %}
+          {% if action_form and actions_on_bottom and cl.full_result_count %}{% admin_actions %}{% endif %}
+        {% endcomment %}
+      {% endblock %}
+      {% block pagination %}{% pagination cl %}{% endblock %}
+      </form>
+    </div>
+  </div>
 {% endblock %}

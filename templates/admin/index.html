@@ -2,96 +2,67 @@
 {% load i18n admin_static %}
 
 {% block extrastyle %}{{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap.css" />
+ {% comment %}   <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap.css" /> {% endcomment %}
 {% endblock %}
-
-{% comment %}
-    {% block coltype %}colMS{% endblock %}
-{% endcomment %}
-
+{% comment %} {% block coltype %}colMS{% endblock %} {% endcomment %}
 {% block bodyclass %}dashboard{% endblock %}
-
-{% comment %} No breadcrumbs, please
-{% block breadcrumbs %}{% endblock %}
-{% endcomment %}
+{% comment %} {% block breadcrumbs %}{% endblock %} {% endcomment %}
 
 {% block content %}
-    <div id="content-main" style="width:100%">
-    {% if app_list %}   {% comment %} todo - if app_list........   {% endcomment %}
+    <div id="content-main">
+    {% comment %} todo - if app_list........ 
+    {% if app_list %}  
+    {% endcomment %}
+
 {% comment %}
-<div class="row-fluid" style="width:100%">
-    <div class="span4">
-        <a href="/lockadmin/djock_app/lockuser/add/"
-            class="btn btn-success btn-large" style="padding:auto;margin:10px;color:#fff;text-shadow:0 -1.5px 0 rgba(0,0,0,0.25); width:75%; height:150px; vertical-align:middle;">
-            <h4>Add lock user</h4>
-            <p>and assign keycard</p>
-        </a>
+<div class="container">
+    <div class="hero-unit">
+        <h1>Heading</h1>
+        <p>Tagline</p>
+        <p>
+            <a class="btn btn-primary btn-large">
+                Learn more
+            </a>
+        </p>
     </div>
-    <div class="span4">
-        <a href="/lockadmin/djock_app/lockuser/"
-            class="btn btn-info btn-large" style="padding:auto;margin:10px; color:#fff;text-shadow:0 -1.5px 0 rgba(0,0,0,0.25); width:75%; height:150px; vertical-align:middle;">
-            <h4>Lock users</h4>
-        <p>View and manage existing lock users and their space access</p>
-        </a>
-    </div>
-    <div class="span4">
-        <a href="/lockadmin/djock_app/accesstime/" 
-            class="btn btn-primary btn-large" style="padding:auto;margin:10px; color:#fff;text-shadow:0 -1.5px 0
-            rgba(0,0,0,0.25); width:75%; height:150px; vertical-align:middle;">
-        <h4>Room access log</h4>
-        <p>View who came in and at what time; search by date/user/door; view graphs</p>
-        </a>
-    </div>
-    {%endcomment %}
+</div>
+{% endcomment %}
 
-
-
-        <a href="/lockadmin/djock_app/lockuser/add/"
-            class="btn btn-success btn-large" style="padding:auto;margin:10px;color:#fff;text-shadow:0 -1.5px 0 rgba(0,0,0,0.25); width:75%; height:150px; vertical-align:middle;">
-            <h4>Add lock user</h4>
-            <p>and assign keycard</p>
-        </a>
-
-
-        <a href="/lockadmin/djock_app/lockuser/"
-            class="btn btn-info btn-large" style="padding:auto;margin:10px; color:#fff;text-shadow:0 -1.5px 0 rgba(0,0,0,0.25); width:75%; height:150px; vertical-align:middle;">
-            <h4>Lock users</h4>
-        <p>View and manage existing lock users and their space access</p>
-        </a>
-
-
-
-        <a href="/lockadmin/djock_app/accesstime/" 
-            class="btn btn-primary btn-large" style="padding:auto;margin:10px; color:#fff;text-shadow:0 -1.5px 0
-            rgba(0,0,0,0.25); width:75%; height:150px; vertical-align:middle;">
-        <h4>Room access log</h4>
-        <p>View who came in and at what time; search by date/user/door; view graphs</p>
-        </a>
-
-
-
-
-{% comment %}  temp stuff just for dev {% endcomment %}
-    <div style="background-color:lightgray;"> (Just for dev)
-        <form action="/generate_random_access_times/" method="post">    
-        {% csrf_token %}
-            Generate between approximately<br>
-            <input type="text" size="35px" value="0" name="min_num_times"> and 
-            <input type="text" name="max_num_times" value="20"> 
-            <br>random access times for each keycard in the system. 
-            <br><input type="submit" name="generate_access_times">
-            <br>(Note - must have keycards in the system already) 
-        </form>
+<div class="container">
+      <div class="row">
+        <!-- <div class="span4"> -->
+        <div>
+          <div id="special_well" class="well">
+            <h3>View who came in and at what time; search by date/user/door; view graphs</h3>
+            <a href="/lockadmin/djock_app/accesstime/" class="btn btn-danger btn-large">Room access log</a>
+          </div>
+        </div>
+        <!-- <div class="span4"> -->
+        <div>
+          <div id="special_well" class="well">
+            <h3>View and manage (set status, assign doors, e-mail all...)  existing lock users and their space access.</h3>
+            <a href="/lockadmin/djock_app/lockuser/" class="btn btn-info btn-large">Lock users</a>
+          </div>
+        </div>
+        <!-- <div class="span4"> -->
+        <div>
+          <div id="special_well" class="well">
+            <h3>Add new lock user and assign new keycard</h3>
+            <a href="/lockadmin/djock_app/lockuser/add" class="btn btn-success btn-large">New user</a>
+          </div>
+        </div>
+      </div>
     </div>
 
 
 
-
-
+{% comment %}
+todo:  see 'if' above
 {% else %}
     <p>{% trans "You don't have permission to edit anything." %}</p>
+
 {% endif %}
+{% endcomment %}
 
 </div>
-
 {% endblock %}

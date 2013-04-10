@@ -8,6 +8,8 @@
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"/></script>
 <!-- local version of the above --> 
 <!-- <script type="text/javascript" src="/static/admin/js/jquery-1.9.1.min.js"></script> -->
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript"></script> -->
+<!-- <script src="{{ MEDIA_URL }}highcharts/js/highcharts.js" type="text/javascript"></script> -->
 
 <script> 
 // TODO: 5-8 in todo.rtfd (refactoring, checkboxes, etc)
@@ -55,7 +57,7 @@ $(function() {
 
     $("#cancel_add_keycard_button").bind("click", function(e) {
         e.preventDefault();
-        var new_keycard_div = document.getElementById("assign_new_keycard_buttons_and_instructions"); 
+        var new_keycard_div = document.getElementById("assign_new_keycard"); 
         new_keycard_div.style.display="none"; 
         // todo: do anything else to cancel? 
     });
@@ -63,7 +65,7 @@ $(function() {
     // don't show the keycard assignment instructions/buttons by default, but only when user clicks on 'assign new keycard'
     $("#add_keycard_button").bind("click", function(e) {
         e.preventDefault();
-        var new_keycard_div = document.getElementById("assign_new_keycard_buttons_and_instructions"); 
+        var new_keycard_div = document.getElementById("assign_new_keycard"); 
         new_keycard_div.style.display="inline"; 
     });
 
@@ -149,20 +151,57 @@ $('input[id^="id_doors_"]').bind("click",function(e) {
     
 });
 
-    </script>
+// todo ...  see comment #10
+// better to just get children inputs of div submit-row's ?
+//  ...  var submit_rows = document.getElementsByClassName("submit-row"); 
+// Input elements that are submit buttons should have bootstrap class 'btn' 
+// todo:  setAttribute overrides
+$(document).ready(function() {
+    var submit_buttons = document.getElementsByTagName('input');
+    for(var i=0; i<submit_buttons.length; i++){
+        if(submit_buttons[i].getAttribute('type')=='submit'){
+            submit_buttons[i].setAttribute("class","btn"); 
+        }
+    } 
+
+    var submit_row = document.getElementsByClassName("submit-row"); 
+    for(var i=0; i<submit_row.length; i++){
+       submit_row[i].setAttribute("class","pull-right"); 
+    }
+
+    
+}); 
+</script>
+
+
 {% endblock extrahead %}
     
-
+{% block field_sets %}
+{% for fieldset in adminform %}
+<div id="main_form" class="well">
+        {% if content_type_id|get_object_type == "lockuser" %}
+        <h2> Lock user / keycard assignment </h2>
+        {% endif %}
+  {% include "admin/includes/fieldset.html" %}
+  {% endfor %}
+  </div>
+  {% endblock %}
 
 {% comment %}  submit row block {% endcomment %}
 {% block submit_buttons_bottom %}
 
-    <div class="submit-row"> 
+<div class="well">
+
+ {{ block.super }}
+ </div>
+
+    <div  id="submit_row_outer"> 
         {% comment %}  todo:  see #3, todo.rtfd  {% endcomment %}
         {% comment %}{% if original|get_object_type == "LockUser" %}{% endcomment %}
         {% comment %} original is not set if we're *adding*! {% endcomment %} 
         {% if content_type_id|get_object_type == "lockuser" %}
-              <input type="button" id="add_keycard_button" value="Assign keycard" 
+        <div class="well">
+              <input type="button" class="btn"  id="add_keycard_button" value="Assign keycard" 
               {% comment %} todo:  see #4, todo.rtfd {%endcomment %}
              {% if object_id|does_lockuser_have_active_keycard or add %} 
                  disabled 
@@ -171,17 +210,42 @@ $('input[id^="id_doors_"]').bind("click",function(e) {
         {%  endif  %}
 
 
+    {% comment %} 
     <div id="assign_new_keycard" style="border:2px solid green;font-color:green;text-align:center; color:green;">
-        <div id="assign_new_keycard_buttons_and_instructions" style="display:none">
+    {% endcomment %}
 
-        Click "Scan new card," then scan the keycard<br> to be assigned at (any) door lock.<br> (Note: will time out after 2 minutes.)<br> <input type="button" id="start_button" value="Scan new card"><br><br> {% comment %} <button><a href="/start_scan/{{object_id}}">Scan new card</a></button><br><br> {% endcomment %} <i>(I.e.  (Be the Arduino and go to<br> http://192.168.x.x:port_num/checkdoor/doorid/checkrfid/rfid/<br> (if ran ./manage.py runserver 192.168.x.x:port_num))</i><br><br> Click "Done" when you are finished scanning.<br> <input type="button" id="done_button" value="Done"><br><br> <i>After "Done," the new keycard should be available....  For staff users, the indications that a keycard is assigned: can now deactivate current keycard; ______</i><br><br> <input type="button" id="cancel_add_keycard_user_button" value="Cancel" />'; 
-            <div id="keycard_assignment_scan_message" style="color:red; font-size:15px;">
-                (div for scan message)
-            </div>
-        </div>
+    <div id="assign_new_keycard" class="well well-small" style="display:none">
+
+        <h3>Step 1</h3>
+        <p>Click "Scan new card."</p>
+        <p> <input type="button" class="btn"  id="start_button" value="Scan new card"></p>
+        {% comment %} <button><a href="/start_scan/{{object_id}}">Scan new card</a></button><br><br> {% endcomment %} 
+    {% comment %}
+    <div class="progress progress-info progress-striped">
+      <div class="bar" style="width: 20%"></div> 
+      (Note: will time out after 2 minutes.) 
+      </div>
+    {% endcomment %}
+    <br />
+    <h3>Step 2</h3>
+    <p>Scan the keycard to be assigned at the/any door lock.(Note: will time out after 2 minutes.) </p>
+        <p><i>(Development: Be the Arduino and go to http://192.168.x.x:port_num/checkdoor/doorid/checkrfid/rfid/ (if ran ./manage.py runserver 192.168.x.x:port_num))</i></p>
+
+
+    <br />
+    <h3>Step 3</h3>
+    <p>Click "Done" when you are finished scanning.  </p>
+    <p>
+    <input type="button" class="btn" id="done_button" value="Done"> <input type="button" id="cancel_add_keycard_button" class="btn" value="Cancel" /></p>
+    <p></p>
+    <div id="keycard_assignment_scan_message" class="well">
+        (div for scan message)
     </div>
 
- {{ block.super }}
+    </div>
+
+
+
 {% endblock %}   {% comment %}  end submit row block {% endcomment %}
 
 
