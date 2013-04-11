@@ -206,7 +206,7 @@ class LockUserAdmin(admin.ModelAdmin):
     # fields (i.e. column headings)
     # to do:  show deactivated (i.e. no current keycard) in gray, or de-emphasize another way
     list_display = ('first_name','last_name','email',\
-                    'is_active',\
+                    #'is_active',\
                     #'prettify_get_current_rfid',\
                     '_current_rfid_heading',\
                     #'prettify_get_allowed_doors',\

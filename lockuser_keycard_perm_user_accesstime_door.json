@@ -965,6 +965,30 @@
     }
   },
   {
+    "pk": 2,
+    "model": "auth.user",
+    "fields": {
+      "username": "staff_user_1",
+      "first_name": "",
+      "last_name": "",
+      "is_active": true,
+      "is_superuser": false,
+      "is_staff": true,
+      "last_login": "2013-04-11T00:44:38Z",
+      "groups": [],
+      "user_permissions": [
+        24,
+        27,
+        29,
+        38,
+        39
+      ],
+      "password": "pbkdf2_sha256$10000$W2uEagcVzmoL$2qdN5HltYiFbuShxH1TH54lqYOIZ90/zR6nVebSuKAU=",
+      "email": "",
+      "date_joined": "2013-04-11T00:44:38Z"
+    } 
+  },
+  {
     "pk": 1,
     "model": "djock_app.rfidkeycard",
     "fields": {
