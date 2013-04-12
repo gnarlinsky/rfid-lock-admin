@@ -4,7 +4,7 @@ from django.db import models
 from djock_app.models import LockUser, AccessTime, RFIDkeycard, Door
 from termcolor import colored
 from django import forms
-from chartit import DataPool, Chart
+#from chartit import DataPool, Chart
 
 
 #########################  TO DO ##########################################
@@ -147,14 +147,20 @@ class LockUserForm(ModelForm):
     class Meta:
         model = LockUser
 
+    def __init__(self, *args, **kwargs):
+        #self.request = kwargs.pop('request',None)
+        self.doors_not_permitted_to_this_staff_user_but_for_lockuser = kwargs.pop('doors_not_permitted_to_this_staff_user_but_for_lockuser',None)
+        super(LockUserForm, self).__init__(*args, **kwargs) 
+
+    # todo:  clean_fieldname? (https://docs.djangoproject.com/en/1.1/ref/forms/validation/#ref-forms-validation)
     def clean(self):
         """ If no Door were selected -- if user is not permitted to access any door 
-            -- deactivate associated keycard. """
-        print colored("******** CLEANING - LOCKUSERFORM ********","white","on_blue")
+            -- deactivate associated keycard. Also makes sure lockuser still has access to door staff user is not permitted to manage, since those wouldn't be on the form  """
         super(forms.ModelForm, self).clean()
         # grab the cleaned fields we need
         cleaned_doors = self.cleaned_data.get("doors")
-
+        # LockUserAdmin.get_other_doors() ???????
+        # but it needs request, object_id....    what can I get here? 
         cleaned_deactivate_current_keycard = self.cleaned_data.get("deactivate_current_keycard")
 
         # If the user is not permitted to access any door, set deactivate_current_keycard to True. Note that
@@ -163,13 +169,36 @@ class LockUserForm(ModelForm):
         if not cleaned_doors:
             self.cleaned_data['deactivate_current_keycard'] = True
 
+        if self.doors_not_permitted_to_this_staff_user_but_for_lockuser: 
+            for item in self.doors_not_permitted_to_this_staff_user_but_for_lockuser:
+                if self.cleaned_data['doors']:
+                    self.cleaned_data['doors'] = self.cleaned_data['doors'] | Door.objects.filter(id=item.id)
+                else: 
+                    self.cleaned_data['doors'] = Door.objects.filter(id=item.id)
+
+        # get the id of this door; add to QS
         return self.cleaned_data
+        # temp/todo: 
+        # testing faking it: 
+        #form = form + '<li><label for="id_doors_2"><input checked="checked" type="checkbox" name="doors" value="2" id="id_doors_2" /> Space 1</label></li>'
 
 
 class LockUserAdmin(admin.ModelAdmin):
     #inlines = [RFIDkeycardInline]
+    #form = LockUserForm(request.POST, request=request)
     form = LockUserForm
+    def get_form(self, request, obj=None, **kwargs):
+        ModelForm = super(LockUserAdmin, self).get_form(request, obj, **kwargs)
+        class ModelFormMetaClass(ModelForm):
+            def __new__(cls, *args, **kwargs):
+                #kwargs['request'] = request
+                kwargs['doors_not_permitted_to_this_staff_user_but_for_lockuser'] = self.get_other_doors(request,obj.id)
+                return ModelForm(*args, **kwargs)
+        return ModelFormMetaClass
 
+
+    #def save_form(self,request,form,change):
+        #super(LockUserAdmin, self).save_form(request, form, change)
     ####################################################
     # Page listing all LockUsers ("change list" page):
     ####################################################
@@ -224,7 +253,7 @@ class LockUserAdmin(admin.ModelAdmin):
 
     #-------------------------
     # nicer column labels
-    #-------------------------
+    #------------------------
     # todo: DRYer? (all of these)
 
     def _doors_heading(self, obj):
@@ -314,6 +343,7 @@ class LockUserAdmin(admin.ModelAdmin):
 
     # TO DO: refactor these func....
     def get_doors_to_show(self,request):
+        #(todo/temp) object_id is currently only used for debugging
         # superuser will always see all doors (doors_to_show)
         if request.user.is_superuser: 
             return Door.objects.all()
@@ -326,11 +356,23 @@ class LockUserAdmin(admin.ModelAdmin):
         return doors_to_show
 
     # todo: refactor in terms of this template/admin divide? 
-    def get_other_doors(self, request):
+    def get_other_doors(self, request,object_id):
         """ Doors that the staff User is not allowed to administer. In
         change_form template, will get a set of these Door objects from context,
         then check the lockuser_set of each to see if the current lockuser has
-        access to it.  """
+        access to it.  
+        
+        (todo/temp) object_id is currently only used for debugging
+
+        todo: do the check for whether lockuser actually has perms for the non-permitted door here
+        """
+
+
+        this_lu = LockUser.objects.filter(id=object_id)[0]
+
+        
+
+
         # superuser will always see all doors (doors_to_show)
         if request.user.is_superuser: 
             return None 
@@ -340,7 +382,13 @@ class LockUserAdmin(admin.ModelAdmin):
             perm = "djock_app.can_manage_door_%d" % door.pk   # put in proper format for has_perm
             if not request.user.has_perm(perm):
                 doors_not_permitted_to_this_staff_user = doors_not_permitted_to_this_staff_user | Door.objects.filter(pk=door.pk)  # concatenating QuerySets
-        return doors_not_permitted_to_this_staff_user
+
+
+        doors_not_permitted_to_this_staff_user_but_for_lockuser = set(this_lu.get_allowed_doors()).intersection(set(doors_not_permitted_to_this_staff_user))
+        # all elem that are in this set but not the other. i.e. all doors 
+        #return doors_not_permitted_to_this_staff_user
+        return doors_not_permitted_to_this_staff_user_but_for_lockuser
+        # todo: umm... rename these...
 
     # The queryset() method in DoorAdmin restricts a staff user's ability to 
     #   view/change Doors that they do not have permission for (individual objects and change list).
@@ -355,9 +403,9 @@ class LockUserAdmin(admin.ModelAdmin):
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "doors":
             kwargs["queryset"] = self.get_doors_to_show(request)
-            #kwargs["other_doors_non-permitted"] = doors_to_show
-            #kwargs["other_doors_permitted"] = doors_to_show
         return super(LockUserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+      
+
         
     def change_view(self, request, object_id, form_url='', extra_context=None):
         """  LockUser may have access to Doors that the staff user cannot admin;
@@ -366,12 +414,14 @@ class LockUserAdmin(admin.ModelAdmin):
         all Doors have been unchecked.  In change_form template, will get a set
         of these Door objects from context, then check the lockuser_set of each
         to see if the current lockuser has access to it.  """
-        extra_context={"doors_not_permitted_to_this_staff_user":self.get_other_doors(request)}
+        extra_context={"doors_not_permitted_to_this_staff_user":self.get_other_doors(request, object_id)}   # todo:  ugh rename var
         return super(LockUserAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
 
     def has_delete_permission(self, request, obj=None):
         """ Don't display "delete" button """
         return False
+
+        
 
     def save_model(self,request,obj,form,change):
         # if deactivate current keycard was checked (which may have actually happened in clean, if  no Doors were selected) 
@@ -379,8 +429,6 @@ class LockUserAdmin(admin.ModelAdmin):
         # here rather than models.py because need to attach request.user to the RFIDkeycard object being
         # deactivated, to record revoker
         ## todo:  a better way to do this?
-        print colored("********* SAVING LOCKUSER IN *ADMIN * ***************", "white", "on_blue")
-
 
        # if obj.deactivate_current_keycard or not obj.doors.exists():  # although deactivate_current_keycard should have been set to true in clean, if no doors
         if obj.deactivate_current_keycard: 
@@ -397,7 +445,18 @@ class LockUserAdmin(admin.ModelAdmin):
         else:
             obj.current_keycard_revoker = None
 
+        # todo --  ugh this better not be totally before save. 
+
+
+
+        # temp/todo: 
+        # testing faking it: 
+        #form = form + '<li><label for="id_doors_2"><input checked="checked" type="checkbox" name="doors" value="2" id="id_doors_2" /> Space 1</label></li>'
         super(LockUserAdmin, self).save_model(request, obj, form, change)
+
+
+        #allowed_doors = obj.get_allowed_doors()
+        #print something
 
 
 class AccessTimeAdmin(admin.ModelAdmin):
@@ -441,11 +500,6 @@ class AccessTimeAdmin(admin.ModelAdmin):
             # get all AccessTimes for this door
             #this_door_access_times = AccessTime.objects.filter(door_id=door.id)
             this_door_access_times = AccessTime.objects.filter(door=door)
-            """
-#             print colored("--------------------","red","on_white")
-#             print colored(str(this_door_access),"red","on_white")
-#             print colored("--------------------","red","on_white")
-            """
             one_series['data'] = []
             for at in this_door_access_times:
                 #print colored("adding data point  for door %s: %s" % (door.name, at.data_point), "white","on_blue")

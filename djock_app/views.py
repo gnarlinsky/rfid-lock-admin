@@ -41,7 +41,6 @@ def make_access_times(min_num_times, max_num_times):
     # for each keycard in the system, generate a random number of access times, in the range specified in the form
     for keycard in djock_app.models.RFIDkeycard.objects.all():
         for i in range(random.randint(min_num_times,max_num_times)):
-            print "--->" + str(i)
             #AccessTime(the_rfid=keycard.the_rfid, access_time=get_random_time()).save()
             door = random.choice(keycard.lockuser.doors.all())
             if door.id == 1:   # door 1:  only certain days of the week
