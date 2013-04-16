@@ -149,8 +149,7 @@ def check(request,doorid, rfid):
             return HttpResponse(response)
     
 
-    # um, below sux.  refactoring:   just, get the rfid keycard with filter, then check if door is in its allowed
-    print colored(djock_app.models.RFIDkeycard.objects.filter(the_rfid=rfid)[0].get_allowed_doors(), "magenta")
+    # or is the request actually for authenticating an existing keycard for this door? 
     try: 
         rfidkeycard = djock_app.models.RFIDkeycard.objects.get(the_rfid=rfid)
     except:
@@ -158,52 +157,35 @@ def check(request,doorid, rfid):
         return HttpResponse(0)
     # keycard exists, so moving on to check if it's active and get allowed doors (the latter is called on lockuser, so need to check if keycard is active first)
     if rfidkeycard.is_active():
-        print colored("ok, active", "red")
-        print colored("alloweds: "+str(rfidkeycard.get_allowed_doors()), "red")
         for door in rfidkeycard.get_allowed_doors():
             if door.id == int(doorid): 
-                return HttpResponse(1)
-    
+                response=1
+
+                #print colored("**** creating and saving accesstime *****","red","on_white")
+                #at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=rfidkeycard.lockuser, door=djock_app.models.Door.objects.get(id=int(doorid)))  # todo: access time is going to be a bit later...
+                #at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=rfidkeycard.lockuser, door=door) # todo: access time is going to be a bit later...
+                lockuser = rfidkeycard.lockuser
+                at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=lockuser, door=door ) # todo: access time is going to be a bit later...
+
+                """
+                at.lockuser_link_html = make_lockuser_link_html(lockuser.id, lockuser.first_name, lockuser.last_name)
+                """
+                # To do: middle name
+
+                # TODO: If we reuse keycards/keycard nums, AccessTime objects'
+                # lockusers -- as seen on AccessTimes change_list, for ex -- will be
+                # incorrect, since lockuser is the CURRENT owner, so this would not 
+                # be valid for access times of the PREVIOUS owner. It's probably best to
+                # associate AccessTimes with lockusers at creation time. I.e. determine
+                # the current lockuser in *views.py* (check() ) and assign there.
 
 
+                    
+                # todo:  this may be interim....
+                # create the highchart data point for this access time
 
-    #todo: um, refactor that
-    # or is the request actually for authenticating an existing keycard for this door? 
-    rfidkeycard_list =  djock_app.models.RFIDkeycard.objects.all()
-    for rfidkeycard in rfidkeycard_list:
-        print colored(rfidkeycard, "blue")
-        allowed_doors = rfidkeycard.get_allowed_doors()
-        if allowed_doors:
-            for door in rfidkeycard.get_allowed_doors():
-                if rfidkeycard.is_active():
-                    if rfidkeycard.the_rfid == rfid:
-                        if int(door.id) == int(doorid):
-                            response = 1
-                            #print colored("**** creating and saving accesstime *****","red","on_white")
-                            #at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=rfidkeycard.lockuser, door=djock_app.models.Door.objects.get(id=int(doorid)))  # todo: access time is going to be a bit later...
-                            #at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=rfidkeycard.lockuser, door=door) # todo: access time is going to be a bit later...
-                            lockuser = rfidkeycard.lockuser
-                            at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=lockuser, door=door ) # todo: access time is going to be a bit later...
-
-                            """
-                            at.lockuser_link_html = make_lockuser_link_html(lockuser.id, lockuser.first_name, lockuser.last_name)
-                            """
-                            # To do: middle name
-
-                            # TODO: If we reuse keycards/keycard nums, AccessTime objects'
-                            # lockusers -- as seen on AccessTimes change_list, for ex -- will be
-                            # incorrect, since lockuser is the CURRENT owner, so this would not 
-                            # be valid for access times of the PREVIOUS owner. It's probably best to
-                            # associate AccessTimes with lockusers at creation time. I.e. determine
-                            # the current lockuser in *views.py* (check() ) and assign there.
-
-
-                                
-                            # todo:  this may be interim....
-                            # create the highchart data point for this access time
-
-                            at.save() 
-                            assign_data_point_dict_and_save(at)  # todo:  this is interim.... (?)
+                at.save() 
+                assign_data_point_dict_and_save(at)  # todo:  this is interim.... (?)
     return HttpResponse(response)
 
 
