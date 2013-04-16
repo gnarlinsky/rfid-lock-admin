@@ -17,8 +17,11 @@ class LockCommunicationTests(TestCase):
     #fixtures = ['rename_back_to_initial_data.json']  # to save the test user so can succeed on login tests
     # TO DO: copy and rename the above to something that makes sense for here
 
+
+    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
+
     def setUp(self):
-        print colored("\nSETTING UP / TestCase RFIDandDoorCheck", "white","on_green")
+        print colored("\nSETTING UP / TestCase LockCommunicationTests", "white","on_green")
 
         c = Client()
 
@@ -26,6 +29,7 @@ class LockCommunicationTests(TestCase):
         #   NOPE: Model creation and manipulation are tests in and of themselves.  Tests for other stuff
         #   should assume that we already have the objects we need.
         #self.test_lockuser = LockUser(phone_number = "2175555555", first_name = "Michael", last_name = "Jackson", middle_name = "", birthdate = None, address = "", email = "michael@thejackson5.com")
+
 
     # Should take arguments? So that other tests can call it... For example, when door perms
     # for door x are changed, want to test that URL with door x's id return
@@ -65,9 +69,8 @@ class LockCommunicationTests(TestCase):
                 will be returned -- the status code
         """
 
-        c = Client()   # not saving from SetUp??
+        c = Client()   # todo: not saving from SetUp??
         print colored("\nTEST: checking correct response/status for a particular URL - Given URL with door and rfid id's, is the response/status (whether the rfid is good for that door) correct?","blue")
-
         print colored("\t(In fixture: \n\t- door with doorid 2 does exist; but no doors with id's aaaaa\
                         \n\t- rfid 0123456789 (pk 1) does exist; but not abc123, not 9123456789\
                         \n\t- door 2 is associated with 0123456789 and 1123456789 (pk 2) but not with 2123456789\
@@ -76,15 +79,41 @@ class LockCommunicationTests(TestCase):
                         \n\t- 2123456789 is active  (pk 3) (i.e. no date_revoked)\n\t)", "green")
 
 
+
+
+
+
+
+        print colored("\t(In fixture: \n\t- door with doorid 2 does exist; but no doors with id's aaaaa or 10 \
+                        \n\t- rfid 1122135122  does exist; but not abc123, not 9123456789\
+                        \n\t- door 2 is associated with 9999999992  and 1122135199  (pk 2) but not with 1122135122 (which does exist, but is associated with a different door) \
+                        \n\t- 9999999992  is active (i.e. no date_revoked)\
+                        \n\t- 9999999991 is associated with door 2 but is NOT active (i.e. date_revoked is not null)", \
+                    "green") 
+
         # TO DO: the tests below... don't call an additional method, put everything in here?
         # Yes, it modularizes like this, but not in a really comprehensible way, plus have to remember
         #  what the arguments are there............
 
         # this is not comprehensive....
-        self.check_response_and_status(c,"/checkdoor/aaaaa/checkrfid/0123456789/", 404,"")   # or 400?
-        self.check_response_and_status(c,"/checkdoor/2/checkrfid/abc123/", 404,"")    # or 400?
-        self.check_response_and_status(c,"/checkdoor/2/checkrfid/0123456789/", 200,"1")
-        self.check_response_and_status(c,"/checkdoor/2/checkrfid/1123456789/", 200,"0")
+
+        self.check_response_and_status(c,"/checkdoor/10/checkrfid/1123456789/", 200,"0")  # door does not exist 
+        self.check_response_and_status(c,"/checkdoor/2/checkrfid/9123456789/", 200,"0")   # rfid does not exist 
+        self.check_response_and_status(c,"/checkdoor/2/checkrfid/1122135122/", 200,"0")  # rfid not associated with door 2, is active
+        self.check_response_and_status(c,"/checkdoor/2/checkrfid/9999999992/", 200,"0")  # rfid associated with door, is active
+        self.check_response_and_status(c,"/checkdoor/2/checkrfid/9999999991/", 200,"0")  # rfid was associated with door, but now inactive
+
+        # incorrect checking urls, so should return nothing and a not found error
+        self.check_response_and_status(c,"/checkdoor/aaaaa/checkrfid/1123456789/", 404,"")  # door id in wrong format 
+        self.check_response_and_status(c,"/checkdoor/2/checkrfid/abc123/",404, "")  # rfid num in wrong format 
+
+       #    The fixture is changed actually, so for (4) above: 
+
+        #(notice the new thing - no door 10.
+        #plus, it's not NONE for no date_revoked, but "not null"
+        
+
+
 
         # TO DO: tests for get_all_allowed (across doors); e.g. get_allowed_all_doors/
         #       tests for URLS with door id's as well, e.g. get_allowed_one_door/doorid/
@@ -95,11 +124,6 @@ class LockCommunicationTests(TestCase):
         self.check_response_and_status(c,"/get_allowed_one_door/<insert door with one allowed rfid>", "xxx", "<correct json list>")
         self.check_response_and_status(c,"/get_allowed_one_door/<insert door with many allowed rfids>", "xxx", "<correct json list>")
         """
-        # and so on, including doo
-
-
-        # TO DO: for all these tests, should also check calling the actual methods, or should that be
-        # covered by the URL checks?
 
     def test_get_allowed_rfids_for_door(self):
         """ Using a different fixture for this... current fixtures are defunct,
