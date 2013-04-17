@@ -159,8 +159,6 @@ class LockUserForm(ModelForm):
         super(forms.ModelForm, self).clean()
         # grab the cleaned fields we need
         cleaned_doors = self.cleaned_data.get("doors")
-        # LockUserAdmin.get_other_doors() ???????
-        # but it needs request, object_id....    what can I get here? 
         cleaned_deactivate_current_keycard = self.cleaned_data.get("deactivate_current_keycard")
 
         # If the user is not permitted to access any door, set deactivate_current_keycard to True. Note that
@@ -192,7 +190,9 @@ class LockUserAdmin(admin.ModelAdmin):
         class ModelFormMetaClass(ModelForm):
             def __new__(cls, *args, **kwargs):
                 #kwargs['request'] = request
-                kwargs['doors_not_permitted_to_this_staff_user_but_for_lockuser'] = self.get_other_doors(request,obj.id)
+                # get doors this lockuser can access but staff user cannot, unless creating a new user
+                if obj:
+                    kwargs['doors_not_permitted_to_this_staff_user_but_for_lockuser'] = self.get_other_doors(request,obj.id)
                 return ModelForm(*args, **kwargs)
         return ModelFormMetaClass
 

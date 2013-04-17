@@ -1012,6 +1012,31 @@
       "date_created": "2013-04-10T00:53:21.472Z"
     }
   },
+
+  {
+    "pk": 3,
+    "model": "djock_app.rfidkeycard",
+    "fields": {
+      "lockuser": 3,
+      "assigner": 2,
+      "the_rfid": "9999999991",
+      "revoker": 2,
+      "date_revoked": "2013-04-15T02:45:24.879Z",
+      "date_created": "2013-04-15T02:44:45.573Z"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "djock_app.rfidkeycard",
+    "fields": {
+      "lockuser": 3,
+      "assigner": 2,
+      "the_rfid": "9999999992",
+      "revoker": null,
+      "date_revoked": null,
+      "date_created": "2013-04-15T02:47:41.289Z"
+    }
+  }, 
   {
     "pk": 1,
     "model": "djock_app.lockuser",
@@ -1048,6 +1073,24 @@
       ],
       "address": "",
       "email": "ChunkyLover53@aol.com"
+    }
+  }, 
+  {
+    "pk": 3,
+    "model": "djock_app.lockuser",
+    "fields": {
+      "phone_number": null,
+      "first_name": "Lisa",
+      "last_name": "Simpson",
+      "middle_name": "",
+      "deactivate_current_keycard": false,
+      "birthdate": null,
+      "current_keycard_revoker": null,
+      "doors": [
+        2
+      ],
+      "address": "",
+      "email": "lisa@blah.com"
     }
   }
 ]

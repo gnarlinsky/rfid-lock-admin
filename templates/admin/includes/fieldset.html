@@ -28,13 +28,15 @@
                 
                 {% comment %} nk - if this is the Doors row, we need to display some extra info {% endcomment %}                {% if field.field.name == "doors" %}
                     <div id="door_keycard_deactivation_warning" style="color:red;"> </div>
-                    <div id="other_doors"> 
+                    <div id="other_doors_outer"> 
                         {% if doors_not_permitted_to_this_staff_user %} Note: this lockuser also has permission to access the following door(s), that you, the staff user, do not have permission to manage: {% endif %}
+                        <div id="other_doors">
                        {% for another_door in doors_not_permitted_to_this_staff_user %}
                             {% if  another_door.lockuser_set.all  %}
                                 {{ another_door }}
                             {% endif %}
                         {% endfor %}
+                        </div>
                     </div>
                 {% endif %}{% comment %} end nk Doors thing {% endcomment %}
 

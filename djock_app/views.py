@@ -109,8 +109,8 @@ def get_random_time():
 
 # return list of rfid's allowed for all doors, or a particular door,
 #   as json list 
-def get_allowed_rfids(request, doorid=None):
-    """ Returns list of allowed rfid's for the specified door, or 0 if none """
+def get_allowed_rfids(request, doorid):
+    """ Returns list of allowed rfid's for the specified door in JSON format """
     # check that door id is valid. 
     #   Int of a certain length: taken care of in the urlconf
     #   Check that there even is a such 

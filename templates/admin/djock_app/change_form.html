@@ -77,7 +77,9 @@ $(function() {
 *******************************************************************************/
 $(document).ready( function () { 
     var all_door_checkboxes = $('input[id^="id_doors_"]') ; 
+    var other_doors_lockuser_can_access = document.getElementById("other_doors").innerHTML.replace(/\s/g,"");
     if (all_door_checkboxes.not(":checked").length === all_door_checkboxes.length) { // if no doors are checked
+        // note - we don't care if user is permitted doors the staff user can't manage, because staff user shouldn't be able to assign keycards for doors they don't have access to. 
         var add_keycard_button = document.getElementById("add_keycard_button");
         add_keycard_button.disabled=true; 
         // $("#add_keycard_button").attr("disabled","disabled"); 
@@ -137,6 +139,7 @@ $('input[id^="id_doors_"]').bind("click",function(e) {
             var all_door_checkboxes = $('input[id^="id_doors_"]') ; 
             if (all_door_checkboxes.not(":checked").length === all_door_checkboxes.length) {
                 //  .... and lockuser doesn't have access to doors that this staff user is not permitted to manage... 
+                var other_doors_lockuser_can_access = document.getElementById("other_doors").innerHTML.replace(/\s/g,"");
                 if ( !other_doors_lockuser_can_access) {   
                     // ... and if there's a  keycard
                     var curr_keycard =  $('div.field-prettify_get_current_rfid p').text()
