@@ -3,15 +3,9 @@ from termcolor import colored
 from django.test.client import Client
 import simplejson
 
-"""
-# to run only some tests: 
-#   $ ./manage.py test djock_app.LockUserModelTest
-"""
-
 ###################
 # TO DO: 
 ###################
-#  - additional_tests.py 
 # smarter logging/info printing! http://stackoverflow.com/questions/284043/outputting-data-from-unit-test-in-python
 
 
