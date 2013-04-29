@@ -124,6 +124,7 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         password_field.send_keys('staff_user_1')
         password_field.send_keys(Keys.RETURN)
 
+
         print colored("\tNow TRY to get our element to check for delete link presence.", "cyan")
         # Since this throws an exception if element is not found, I'm doing a try/except here instead of a just asserting.... 
         # todo:  is this kosher?
