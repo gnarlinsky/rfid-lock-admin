@@ -114,9 +114,11 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         print return_val
         """
 
+        #################################################################
+        # open browser and log in
+        #################################################################
         print colored("\tOpening browser to get to lockuser's change_form.......", "cyan")
         self.browser.get(self.live_server_url + '/lockadmin/djock_app/lockuser/1')
-
         print colored("\tBut login first..........", "cyan")
         username_field = self.browser.find_element_by_name('username')
         username_field.send_keys('staff_user_1')
@@ -124,25 +126,18 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         password_field.send_keys('staff_user_1')
         password_field.send_keys(Keys.RETURN)
 
+        #################################################################
+        # Now check whether the Delete link is there
+        #################################################################
 
-        print colored("\tNow TRY to get our element to check for delete link presence.", "cyan")
-        # Since this throws an exception if element is not found, I'm doing a try/except here instead of a just asserting.... 
-        # todo:  is this kosher?
-        try:
-            self.browser.find_element_by_class_name('deletelink-box')
-        except NoSuchElementException:    
-            # if we are in this except -- the above element was NOT found -- 
-            # meaning that the test passes
-            self.assertTrue(1)
-        else: 
-            # we're in the else clause, meaning that the code in the try clause 
-            # did NOT raise an exception -- the above element WAS found -- 
-            # meaning that the test fails.
-            self.assertFalse("if we've found the delete link -- which we do not want -- this has to fail")
 
-########################  diff way 2 #########################################################
+        """
+        # yes, could get rid of the else clause and simply set 
+        #  no_element_exception = False 
+        # *before* the try clause -- but this is just a bit more clear...
         print colored("\tNow TRY to get our element to check for delete link presence.", "cyan")
-        # Since this throws an exception if element is not found, I'm doing a try/except here instead of a just asserting.... 
+        # Since this throws an exception if element is not found, I'm doing a 
+        #   try/except here instead of a just asserting.... 
         # todo:  is this kosher?
         try:
             self.browser.find_element_by_class_name('deletelink-box')
@@ -156,16 +151,14 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
             # meaning that the test fails.
             no_element_exception = False
 
-        # yes, could get rid of the else clause and simply set no_element_exception = False *before* the try clause -- but this is just a bit more clear...
-
         self.assertTrue(no_element_exception)
+        """
 
-
-########################  diff way 3 #########################################################
-        # a better/more intuitive way than the above? 
-        #self.assertRaises(NoSuchElementException, self.browser.find_element_by_class_name('deletelink-box'))
-        # above will not work, because gathers the statements at collection time and will error then, not at testing time.
+        # todo: a better/more intuitive way than the above? 
         self.assertRaises(NoSuchElementException, lambda: self.browser.find_element_by_class_name('deletelink-box'))
+        # Note - lambda because something like 
+        #    self.assertRaises(NoSuchElementException, self.browser.find_element_by_class_name('deletelink-box'))
+        # will not work, because gathers the statements at collection time and will error then, not at testing time.
 
         
 
