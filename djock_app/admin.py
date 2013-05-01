@@ -155,24 +155,34 @@ class LockUserForm(ModelForm):
     # todo:  clean_fieldname? (https://docs.djangoproject.com/en/1.1/ref/forms/validation/#ref-forms-validation)
     def clean(self):
         """ If no Door were selected -- if user is not permitted to access any door 
-            -- deactivate associated keycard. Also makes sure lockuser still has access to door staff user is not permitted to manage, since those wouldn't be on the form  """
+            -- deactivate associated keycard. 
+            If the user is permitted access to doors that the staff user is not permitted access, make sure lockuser still has access to door staff user is not permitted to manage, since those wouldn't be on the form. Also, if 'deactivate current keycard' was checked in this situation, the keycard should NOT actually be revoked, because of those other doors. 
+                    (todo)
+            """
         super(forms.ModelForm, self).clean()
         # grab the cleaned fields we need
         cleaned_doors = self.cleaned_data.get("doors")
+        # .get():  if data not there, returns nothing - vs exception for [] 
         cleaned_deactivate_current_keycard = self.cleaned_data.get("deactivate_current_keycard")
 
         # If the user is not permitted to access any door, set deactivate_current_keycard to True. Note that
         # we're changing cleaned_data here, not calling deactivate() on the associated RFIDkeycard.
         #if not cleaned_doors and not cleaned_deactivate_current_keycard:
         if not cleaned_doors:
+            """
             self.cleaned_data['deactivate_current_keycard'] = True
+            """
+            if not self.doors_not_permitted_to_this_staff_user_but_for_lockuser:
+                self.cleaned_data['deactivate_current_keycard'] = True
+            else:  # don't deactivate keycard if no doors checked, because there are still doors lock user can access
+                self.cleaned_data['deactivate_current_keycard'] = False
 
         if self.doors_not_permitted_to_this_staff_user_but_for_lockuser: 
             for item in self.doors_not_permitted_to_this_staff_user_but_for_lockuser:
                 if self.cleaned_data['doors']:
-                    self.cleaned_data['doors'] = self.cleaned_data['doors'] | Door.objects.filter(id=item.id)
+                    self.cleaned_data['doors'] = self.cleaned_data['doors'] | Door.objects.filter(pk=item.pk)
                 else: 
-                    self.cleaned_data['doors'] = Door.objects.filter(id=item.id)
+                    self.cleaned_data['doors'] = Door.objects.filter(pk=item.pk)
 
         # get the id of this door; add to QS
         return self.cleaned_data
@@ -212,20 +222,15 @@ class LockUserAdmin(admin.ModelAdmin):
             obj.save()    #otherwise associated keycard won't become deactivated
     deactivate.short_description = "Deactivate selected lock users/keycards"
 
-#    def deactivate_keycard(self, request, queryset):
-#        """ Deactivate associated keycard """
-#        queryset.update(deactivate_current_keycard=True)
-#        for obj in queryset:
-#            obj.save()    
-#    deactivate_keycard.short_description = "Deactivate selected lock users' keycards"
-
     def email_selected(self, request, queryset):
         """ Upon choosing this action, get new screen with field for entering body of email, etc. """
         pass
-    email_selected.short_description =  "Email selected lock users"
+        # todo -- set up for production... 
+        # todo -- but  -- can still emulate to a high degree, just .. not send. 
+    email_selected.short_description =  "Email selected lock users (not implemented until production)"
+
 
     # Only the following actions will be shown in the dropdown
-    #actions = (activate_keycard, deactivate_keycard, reactivate_keycard, make_active, make_inactive,email_selected)
     actions = (deactivate, email_selected)
 
 
@@ -235,7 +240,7 @@ class LockUserAdmin(admin.ModelAdmin):
     # fields (i.e. column headings)
     # to do:  show deactivated (i.e. no current keycard) in gray, or de-emphasize another way
     list_display = ('first_name','last_name','email',\
-                    #'is_active',\
+                    'is_active',\
                     #'prettify_get_current_rfid',\
                     '_current_rfid_heading',\
                     #'prettify_get_allowed_doors',\
@@ -331,6 +336,7 @@ class LockUserAdmin(admin.ModelAdmin):
         ################
         #  rfids
         ################
+        # todo:  not showing that/not use case
         # if the field name is rfids, don't show any -- only the "+" should be there,
         #   i.e. "assign new keycard"
         if db_field.name == "rfids":
@@ -370,8 +376,6 @@ class LockUserAdmin(admin.ModelAdmin):
 
         this_lu = LockUser.objects.filter(id=object_id)[0]
 
-        
-
 
         # superuser will always see all doors (doors_to_show)
         if request.user.is_superuser: 
@@ -383,7 +387,7 @@ class LockUserAdmin(admin.ModelAdmin):
             if not request.user.has_perm(perm):
                 doors_not_permitted_to_this_staff_user = doors_not_permitted_to_this_staff_user | Door.objects.filter(pk=door.pk)  # concatenating QuerySets
 
-
+        # todo:  no sets please
         doors_not_permitted_to_this_staff_user_but_for_lockuser = set(this_lu.get_allowed_doors()).intersection(set(doors_not_permitted_to_this_staff_user))
         # all elem that are in this set but not the other. i.e. all doors 
         #return doors_not_permitted_to_this_staff_user
@@ -420,6 +424,9 @@ class LockUserAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         """ Don't display "delete" button """
         return False
+        #return True  
+        # todo/temp commenting out 
+        # so back to False later
 
         
 
@@ -473,17 +480,7 @@ class AccessTimeAdmin(admin.ModelAdmin):
 
         # No need to show the page for an individual AccessTime, so no field should link to it.
         self.list_display_links = (None, )
-
-        # todo:  if no times at all........
-
-        #########################################################################
-        # building array of access times/lockusers/rfids to give the javascript
-        #########################################################################
-        
-        ############################################################
-        #  yet more testing!!!!!
-        ############################################################
-
+        """
         from django.utils import simplejson
         # todo: tool tip stays same....
         tooltip_dict = {}
@@ -508,6 +505,8 @@ class AccessTimeAdmin(admin.ModelAdmin):
         #extra_context = {"test_jsond": simplejson.dumps([test_d, test_d2]) } 
         extra_context = {"test_jsond": simplejson.dumps(all_series, indent="") } 
 
+
+        """
         return super(AccessTimeAdmin, self).changelist_view(request, extra_context=extra_context)
 
 
