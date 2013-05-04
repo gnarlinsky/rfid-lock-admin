@@ -576,7 +576,7 @@
     "model": "djock_app.door",
     "fields": {
       "name": "Space 1",
-      "description": null
+      "description": "Space 1!!!1!!"
     }
   },
   {
@@ -592,6 +592,14 @@
     "model": "djock_app.door",
     "fields": {
       "name": "Space 3",
+      "description": "Blah blah door 3 blah"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "djock_app.door",
+    "fields": {
+      "name": "Space 4",
       "description": null
     }
   },
@@ -1041,37 +1049,37 @@
     "pk": 1,
     "model": "djock_app.lockuser",
     "fields": {
-      "phone_number": null,
-      "first_name": "maggie",
-      "last_name": "simpson",
-      "middle_name": "",
+      "phone_number": 2175550001,
+      "first_name": "C. M.",
+      "last_name": "Burns",
       "deactivate_current_keycard": false,
       "birthdate": null,
       "current_keycard_revoker": null,
       "doors": [
-        1
+        1,
+        4
       ],
-      "address": "",
-      "email": "maggie@simpfamily.com"
+      "address": "1000 Mammon Ln. Springfield, IL",
+      "email": "mr.burns@springfieldnuclearpowerplant.com"
     }
   },
   {
     "pk": 2,
     "model": "djock_app.lockuser",
     "fields": {
-      "phone_number": null,
-      "first_name": "homer",
-      "last_name": "simpson",
-      "middle_name": "",
+      "phone_number": 2175553223,
+      "first_name": "Homer",
+      "last_name": "Simpson",
       "deactivate_current_keycard": false,
       "birthdate": null,
       "current_keycard_revoker": null,
       "doors": [
         1,
         2,
-        3
+        3,
+        4
       ],
-      "address": "",
+      "address": "742 Evergreen Terrace, Springfield, IL",
       "email": "ChunkyLover53@aol.com"
     }
   }, 
@@ -1079,18 +1087,17 @@
     "pk": 3,
     "model": "djock_app.lockuser",
     "fields": {
-      "phone_number": null,
+      "phone_number": 2175553223,
       "first_name": "Lisa",
       "last_name": "Simpson",
-      "middle_name": "",
       "deactivate_current_keycard": false,
       "birthdate": null,
       "current_keycard_revoker": null,
       "doors": [
         2
       ],
-      "address": "",
-      "email": "lisa@blah.com"
+      "address": "742 Evergreen Terrace, Springfield, IL",
+      "email": "smartgirl63@yahoo.com"
     }
   }
 ]
