@@ -1,0 +1,317 @@
+{% load custom_filters %}
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<head>
+<title>{% block title %}{% endblock %}</title>
+
+<link rel="stylesheet" href="{{ STATIC_URL }}simplex_bootstrap.min.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}bootstrap-responsive.css">
+
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"    /></script>
+<script type="text/javascript" src="/static/Highcharts-3.0.0/js/highcharts.js"></script>
+
+<script>
+// todo:  tooltip for all series, not within each
+// todo: make sure things are escaped properly in the JSON string
+
+$(document).ready(function() {
+    //$("#show_chart_button").bind("click", function(e) {
+    //$("#show_chart_link").bind("click", function(e) {
+    var chart_here= document.getElementById("chart_here"); 
+    //chart_here.style.display="inline"; 
+//    });
+//}); 
+
+//$(function () {
+    var chart;
+//    $(document).ready(function() {
+        chart = new Highcharts.Chart({
+            chart: {
+                //renderTo: 'access_times_chart',
+                renderTo: 'chart_here',
+                type: 'scatter',
+                zoomType: 'xy', 
+                plotBorderWidth: 1, 
+                 /* width: 800,
+                 style: { margin: '0 auto' }, 
+                 */
+                 spacingTop: 0,
+                 marginTop: 125,
+                 marginLeft:80, 
+                 marginRight:35, 
+            },
+            title: { align: 'center', text: 'Access Times for All Doors' },
+            subtitle: { text: 'Click on a door in the legend to toggle its points on/off.<br/>Select a region to zoom in.<br>Hover over a point to see lock user name.', y:40 },
+            xAxis: {
+                type: 'datetime',
+                title: { enabled: false, text: 'Date' },
+                startOnTick: false,
+                endOnTick: false,
+                //showFirstLabel: false,
+                //showLastLabel: false,
+                //maxZoom: 14 * 24 * 3600000, // fourteen days
+                //minRange: 5 * 24 * 3600000, // 5 days
+                dateTimeLabelFormats: { // don't display the dummy year
+                // todo: faster way to assign one val to a bunch at once?
+                    year: '%b \'%y', // Feb '12
+                    month: '%b \'%y', // Feb '12
+                    //day: '%a, %b %e',    // Mon, Feb 8
+                    day: '%b %e',    // Mon, Feb 8
+                    week: '%b %e',   // Feb 8
+                    hour: '%b %e',   // Feb 8
+
+                },
+            },
+
+
+            yAxis: {
+                type: 'datetime',
+                gridLineWidth: 1, 
+                tickLength: 0,
+                tickWidth: 1,
+                tickPosition: 'outside',
+                //dateTimeLabelFormats: { day: '%b %d,%Y' },
+                title: { enabled: false, text: 'Time of Day' },
+                startOnTick: false,
+                endOnTick: false,
+                minRange: .5 * 3600000, // 30 minutes
+                //maxZoom: 24 * 3600000, // 1 day
+                //minZoom: 24 * 3600000, // 1 day
+                showFirstLabel: true,
+                // don't label top of y-axis with "12:00:00 AM"; it's confusing. 
+                dateTimeLabelFormats: { // don't display units other than time units at all zoom levels
+                    year: '%I:%M %p', 
+                    month: '%I:%M %p', 
+                    week: '%I:%M %p', 
+                    day: '%I:%M %p', 
+                    second: '%I:%M:%S %p', 
+                    minute: '%I:%M %p', 
+                    hour: '%I:%M %p',    
+                },
+            },
+            tooltip: { followPointer: false, hideDelay: 0 },
+            legend: {
+                layout: 'horizontal', align: 'center', verticalAlign: 'top', x: 10, y: 85, 
+                floating: false, backgroundColor: '#FFFFFF', borderWidth: 1
+            },
+            plotOptions: {
+                scatter: {
+                    marker: {
+                        radius: 2,
+                            states: { hover: { enabled: true, lineColor: 'rgb(100,100,100)' } }
+                    },
+                    states: { hover: { marker: { enabled: false } } }
+                }
+            },
+                                                                                                       
+     /*series: {{ test_jsond|fix_json_string }}*/
+     series: {{ chart_data|fix_json_string  }}
+    /* series: [
+    {
+        data: [
+            {
+                y: Date.UTC(0,0,0, 1,56,21),
+                x: Date.UTC(2013,4,10),
+                user: 'anonymous'
+            },
+            {
+                y: Date.UTC(0,0,0, 4,56,11),
+                x: Date.UTC(2013,4,11),
+                user: 'homer simpson'
+            },
+            {
+                y: Date.UTC(0,0,0, 2,16,11),
+                x: Date.UTC(2013,4,19),
+                user: 'homer simpson'
+            },
+            {
+                y: Date.UTC(0,0,0, 0,26,11),
+                x: Date.UTC(2013,5,11),
+                user: 'homer simpson'
+            },
+        ],
+        name: 'Makerspace',
+        tooltip: {
+            followPointer: "false",
+            pointFormat:  "{point.user}"
+            }
+
+    }, 
+    {
+        data: [
+            {
+                y: Date.UTC(0,0,0, 1,56,21),
+                x: Date.UTC(2013,4,10),
+                user: 'anonymous'
+            },
+            {
+                y: Date.UTC(0,0,0, 4,56,11),
+                x: Date.UTC(2013,4,11),
+                user: 'homer simpson'
+            },
+            {
+                y: Date.UTC(0,0,0, 2,16,11),
+                x: Date.UTC(2013,4,19),
+                user: 'homer simpson'
+            },
+            {
+                y: Date.UTC(0,0,0, 0,26,11),
+                x: Date.UTC(2013,5,11),
+                user: 'homer simpson'
+            },
+        ],
+        name: 'Makerspace',
+        tooltip: {
+            followPointer: "false",
+            pointFormat:  "{point.user}"
+            }
+
+    }, 
+    {
+        data: [
+            {
+                y: Date.UTC(0,0,0, 1,56,21),
+                x: Date.UTC(2013,4,10),
+                user: 'anonymous'
+            },
+            {
+                y: Date.UTC(0,0,0, 4,56,11),
+                x: Date.UTC(2013,4,11),
+                user: 'homer simpson'
+            },
+            {
+                y: Date.UTC(0,0,0, 2,16,11),
+                x: Date.UTC(2013,4,19),
+                user: 'homer simpson'
+            },
+            {
+                y: Date.UTC(0,0,0, 0,26,11),
+                x: Date.UTC(2013,5,11),
+                user: 'homer simpson'
+            },
+        ],
+        name: 'Makerspace',
+        tooltip: {
+            followPointer: "false",
+            pointFormat:  "{point.user}"
+            }
+
+    }, 
+    {
+        data: [
+            {
+                y: Date.UTC(0,0,0, 1,56,21),
+                x: Date.UTC(2013,4,10),
+                user: 'anonymous'
+            },
+            {
+                y: Date.UTC(0,0,0, 4,56,11),
+                x: Date.UTC(2013,4,11),
+                user: 'homer simpson'
+            },
+            {
+                y: Date.UTC(0,0,0, 2,16,11),
+                x: Date.UTC(2013,4,19),
+                user: 'homer simpson'
+            },
+            {
+                y: Date.UTC(0,0,0, 0,26,11),
+                x: Date.UTC(2013,5,11),
+                user: 'homer simpson'
+            },
+        ],
+        name: 'Makerspace',
+        tooltip: {
+            followPointer: "false",
+            pointFormat:  "{point.user}"
+            }
+
+    }, 
+    {
+        data: [
+            {
+                y: Date.UTC(0,0,0, 1,56,21),
+                x: Date.UTC(2013,4,10),
+                user: 'anonymous'
+            },
+            {
+                y: Date.UTC(0,0,0, 4,56,11),
+                x: Date.UTC(2013,4,11),
+                user: 'homer simpson'
+            },
+            {
+                y: Date.UTC(0,0,0, 2,16,11),
+                x: Date.UTC(2013,4,19),
+                user: 'homer simpson'
+            },
+            {
+                y: Date.UTC(0,0,0, 0,26,11),
+                x: Date.UTC(2013,5,11),
+                user: 'homer simpson'
+            },
+        ],
+        name: 'Makerspace',
+        tooltip: {
+            followPointer: "false",
+            pointFormat:  "{point.user}"
+            }
+
+    }, 
+    {
+        data: [
+            {
+                y: Date.UTC(0,0,0, 0,66,21),
+                x: Date.UTC(2013,4,10),
+                user: 'lisa simpson'
+            },
+            {
+                y: Date.UTC(0,0,0, 0,56,11),
+                x: Date.UTC(2013,4,11),
+                user: 'homer simpson'
+            },
+            {
+                y: Date.UTC(0,0,0, 0,16,11),
+                x: Date.UTC(2013,4,19),
+                user: 'homer simpson'
+            },
+            {
+                y: Date.UTC(0,0,0, 0,26,11),
+                x: Date.UTC(2013,5,11),
+                user: 'homer simpson'
+            },
+        ],
+        name: 'Bike Project',
+        tooltip: {
+            followPointer: "false",
+            pointFormat:  "{point.user}"
+            }
+
+    },
+
+
+
+
+
+
+
+
+
+
+
+]
+    */ 
+        });
+    });
+        </script> 
+</head>
+
+
+<body>
+<div style="margin:20px; " >
+        <a href="/lockadmin/djock_app/accesstime/">Back to list of access times</a>
+    <div class="hero-unit" style="margin-top:10px; padding:20px; width:900px;  " id="chart_here"> chart go here</div>
+
+        </div>
+
+</body>
+</html>
+

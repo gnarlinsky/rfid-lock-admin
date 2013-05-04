@@ -2,10 +2,8 @@
 {% load custom_filters %}
 
 {% load i18n admin_static admin_list %}
-{% comment %}
 {% load url from future %}
 {% load admin_urls %}
-{% endcomment %}
 
 {% block extrastyle %}
 {% comment %}
@@ -29,109 +27,44 @@
 
 
 {% block extrahead %} 
-{{ block.super }}
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"    /></script>
-{% if module_name == "access times" %}
-<script type="text/javascript" src="/static/Highcharts-3.0.0/js/highcharts.js"></script>
-
-<script>
-// todo:  tooltip for all series, not within each
-// todo: make sure things are escaped properly in the JSON string
-
-$(document).ready(function() {
-    //$("#show_chart_button").bind("click", function(e) {
-    //$("#show_chart_link").bind("click", function(e) {
-    var hidden_access_times_chart= document.getElementById("hidden_access_times_chart"); 
-    hidden_access_times_chart.style.display="inline"; 
-    alert('!!!!!!!'); 
-//    });
-//}); 
-
-//$(function () {
-    var chart;
-//    $(document).ready(function() {
-        chart = new Highcharts.Chart({
-            chart: {
-                //renderTo: 'access_times_chart',
-                renderTo: 'hidden_access_times_chart',
-                type: 'scatter',
-                zoomType: 'xy', 
-                plotBorderWidth: 1, 
-                 width: 800,
-                 style: { margin: '0 auto' }
-            },
-            title: { align: 'center', text: 'Access Times for All Doors' },
-            subtitle: { text: 'Click on a door in the legend to toggle its points on/off.<br>Select a region to zoom in.' },
-            xAxis: {
-                type: 'datetime',
-                title: { enabled: false, text: 'Date' },
-                startOnTick: false,
-                endOnTick: false,
-                showLastLabel: false,
-                showFirstLabel: false,
-                maxZoom: 14 * 24 * 3600000, // fourteen days
-                dateTimeLabelFormats: { // don't display the dummy year
-                // todo: faster way to assign one val to a bunch at once?
-                    year: '%b \'%y', // Feb '12
-                    month: '%b \'%y', // Feb '12
-                    day: '%a, %b %e',    // Mon, Feb 8
-                    week: '%b %e',   // Feb 8
-                },
-            },
-
-
-            yAxis: {
-                type: 'datetime',
-                //dateTimeLabelFormats: { day: '%b %d,%Y' },
-                title: { enabled: false, text: 'Time of Day' },
-                startOnTick: false,
-                endOnTick: false,
-                showLastLabel: false,
-                showFirstLabel: false,
-                // don't label top of y-axis with "12:00:00 AM"; it's confusing. 
-                showLastLabel: false, 
-                dateTimeLabelFormats: { // don't display units other than time units at all zoom levels
-                    week: '%H:%M:%S %p',   year: '%I:%M %p', month: '%I:%M %p', week: '%I:%M %p', day: '%I:%M %p', second: '%I:%M:%S %p', minute: '%I:%M:%S %p', hour: '%I:%M %p',    
-                },
-            },
-            tooltip: { followPointer: false, hideDelay: 0 },
-            legend: {
-                layout: 'horizontal', align: 'center', verticalAlign: 'top', x: 0, y: 60, floating: false, backgroundColor: '#FFFFFF', borderWidth: 1
-            },
-            plotOptions: {
-                scatter: {
-                    marker: {
-                        radius: 2,
-                            states: { hover: { enabled: true, lineColor: 'rgb(100,100,100)' } }
-                    },
-                    states: { hover: { marker: { enabled: false } } }
-                }
-            },
-            series: {{ test_jsond|fix_json_string }}
-        });
-    });
-});
-        </script>
-        {% comment %}
-        {% load chartit %}
-        {{ weatherchart|load_charts:"weather_chart" }}
-        {% endcomment %}
-    {% endif %}
-
+    {{ block.super }}
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"    /></script>
 
     {% comment %} todo.rtfd - #10 {% endcomment %} 
+    {% comment %} changing css class names {% endcomment %} 
     <script>
-$(function($) {
-    $(document).ready(function($) {
-        var table = document.getElementById("result_list"); 
-        table.setAttribute("class","table");
-    });
-}); 
+    $(function($) {
+        $(document).ready(function($) {
+            var table = document.getElementById("result_list"); 
+            table.setAttribute("class","table");
+
+            var info_mess = document.getElementsByClassName("messagelist"); 
+            info_mess[0].setAttribute("class", "messagelist alert alert-info"); 
+
+        });
+    }); 
 
 
-</script>
+    </script>
 
-{% endblock %}
+    <style>
+    .messagelist { 
+        width:60%; 
+        margin: 0 auto; 
+        margin-bottom:20px; 
+        text-align:center; 
+        padding-left:5px; 
+        padding-right:5px; 
+        padding-top:0px; 
+        padding-bottom:10px; 
+        } 
+
+    li.info {
+        padding-top:10px; 
+        padding-bottom:0px; 
+        }
+    </style>
+{% endblock extrahead %}
 
 
 
@@ -153,23 +86,31 @@ $(function($) {
 
 {% block content %}
   <div id="content-main">
+
+
     {% if module_name == 'access times' %}
-    {% comment %}
-        <div><button id="show_chart_button" name="Show Highchart" />show chart</div>
-    {% endcomment %}
-        <div><p><a href="/chart/" id="show_chart_link">Scatter plot of access times</a></p></div>
-    {% comment %}
-        <div id="hidden_access_times_chart">hidden!</div>
-        <div id="access_times_chart">!!!!!!!!!!  access times chart rendered here</div>
-    {% endcomment %}
+        {% comment %}
+            <div><button id="show_chart_button" name="Show Highchart" />show chart</div>
+        {% endcomment %}
+            <div><p><a href="/chart/" id="show_chart_link">Scatter plot of access times</a></p></div>
+        {% comment %}
+            <div id="hidden_access_times_chart">hidden!</div>
+            <div id="access_times_chart">!!!!!!!!!!  access times chart rendered here</div>
+        {% endcomment %}
     {% endif %}
 
-        {% comment %}
-        {% block object-tools %}
+    {% block object-tools %}
+           {% comment %}
                 {% if  module_name == 'lock users' %} 
                     <a href="/lockadmin/djock_app/lockuser/add/" class="btn pull-right"> Add lock user </a> 
                 {% endif %}
+           {% endcomment %}
       {% if has_add_permission %}
+                {% if  module_name == 'lock users' %} 
+                  <div class="pull-right">
+                    <a href="/lockadmin/djock_app/lockuser/add/" class="btn" style="margin:15px;"> Add lock user </a> 
+                    </div>
+                {% else %}
         <ul class="object-tools">
                   {% block object-tools-items %}
                     <li>
@@ -178,10 +119,11 @@ $(function($) {
                       </a>
                     </li>
                   {% endblock %}
-        </ul>
-      {% endif %}
-    {% endblock %}
-    {% endcomment %}
+            </ul>
+                {% endif %}
+          {% endif %}
+    {% endblock object-tools %}
+
     {% if cl.formset.errors %}
         <p class="errornote">
         {% blocktrans count cl.formset.errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
@@ -208,11 +150,16 @@ $(function($) {
             <div class="pull-left">
                   {% admin_actions %}
            </div>
+           {% comment %}
+      {% if has_add_permission %}
           <div class="pull-right">
                 {% if  module_name == 'lock users' %} 
-                    <a href="/lockadmin/djock_app/lockuser/add/" class="btn"> Add lock user </a> 
+                    <a href="/lockadmin/djock_app/lockuser/add/" class="btn">Add lock user </a> 
                 {% endif %}
             </div>
+        {% endif %}
+
+           {% endcomment %}
         </div>
               {% endif %}
 

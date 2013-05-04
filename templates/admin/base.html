@@ -42,19 +42,24 @@
 {% block extrahead %}
 {% comment %} to do {% endcomment %} 
 <style>
-ul li { list-style-type: none;    } 
+ul li { 
+    list-style-type: none;    
+    } 
 
-
+.errorlist { 
+    color: red; 
+    }
 
 .navbar {
     width:100%; 
     margin:0 auto; 
     background-color:#fff; 
     border-bottom:2px solid #eee;
+    margin-bottom:20px; 
     }
 
 .navbar-fixed-top { 
-    top: 30px; 
+    /*top: 30px; */
     max-height: 100px; 
     } 
 
@@ -74,7 +79,9 @@ margin:0 20px 0 20px;
 #content { 
     width:90%;
     margin:0 auto; 
-    margin-top: 150px; 
+    /*
+    margin-top: 115px; 
+}*/
 }
 #result_list_left {
     width:88%;
@@ -203,7 +210,8 @@ background-color: lightblue;
 {% if user.is_authenticated %}
 
 
-<div class="navbar navbar-fixed-top">
+<!-- <div class="navbar navbar-fixed-top"> --> 
+<div class="navbar">
 <!-- <div class="navbar-inner"> -->
     <div id="navbarRow" class="row"> 
        <a class="brand" href="/lock/">RFID Lock Administration</a>
@@ -218,7 +226,7 @@ background-color: lightblue;
     <div id="navbarRow" class="row"> 
                 <ul class = "nav">
             <li> <a href='/lockadmin/djock_app/lockuser/'>Lock users</a> </li>
-            <li> <a href='/lockadmin/djock_app/accesstime/'>Room access logs</a> </li>
+            <li> <a href='/lockadmin/djock_app/accesstime/'>Room access log</a> </li>
             <li> <a href='/lockadmin/djock_app/lockuser/add/'>Create user and assign new keycard</a> </li>
         </ul>
     </div>

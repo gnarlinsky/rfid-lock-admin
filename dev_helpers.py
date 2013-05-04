@@ -82,7 +82,9 @@ def make_access_times(min_num_times=10, max_num_times=10):
 
 def get_random_time():
     """ This function will return a random datetime between two datetime objects.  """
-    now = datetime.utcnow().replace(tzinfo=utc)
+    # todo:  now vs utcnow; datetime stuff
+    #now = datetime.utcnow().replace(tzinfo=utc)
+    now = datetime.now().replace(tzinfo=utc)
     time_period = timedelta(days=180) # about half a year
     start = now - time_period
     time_period_seconds = time_period.total_seconds()

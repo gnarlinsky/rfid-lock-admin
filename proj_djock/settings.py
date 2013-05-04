@@ -100,10 +100,10 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
 )
 
 ROOT_URLCONF = 'proj_djock.urls'
@@ -134,8 +134,8 @@ INSTALLED_APPS = (
     # provides get_profile -- run against a request, that will return the 
     # user object of whoever is requesting the page
     'django.contrib.sessions',
-    'django.contrib.sites',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
      'django.contrib.admin',
@@ -147,6 +147,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'django_extensions',
     #'chartit',
+    'django.contrib.messages',
 )
 
 
@@ -184,6 +185,7 @@ LOGGING = {
 # To access request variable in templates
 TEMPLATE_CONTEXT_PROCESSORS = TCP + (
     'django.core.context_processors.request',
+    'django.contrib.messages.context_processors.messages',
     )
 
 # for debug toolbar - requires that the requesting IP address be listed here

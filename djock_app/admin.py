@@ -4,6 +4,7 @@ from django.db import models
 from djock_app.models import LockUser, AccessTime, RFIDkeycard, Door
 from termcolor import colored
 from django import forms
+from django.contrib import messages
 #from chartit import DataPool, Chart
 
 
@@ -148,8 +149,14 @@ class LockUserForm(ModelForm):
         model = LockUser
 
     def __init__(self, *args, **kwargs):
-        #self.request = kwargs.pop('request',None)
+        print colored("__init__","white","on_magenta")
+        print list(kwargs)
+        print colored("*"*20,"white","on_magenta")
+
+        self.request = kwargs.pop('request',None)
+        self.obj = kwargs.pop('obj',None)
         self.doors_not_permitted_to_this_staff_user_but_for_lockuser = kwargs.pop('doors_not_permitted_to_this_staff_user_but_for_lockuser',None)
+
         super(LockUserForm, self).__init__(*args, **kwargs) 
 
     # todo:  clean_fieldname? (https://docs.djangoproject.com/en/1.1/ref/forms/validation/#ref-forms-validation)
@@ -160,6 +167,9 @@ class LockUserForm(ModelForm):
                     (todo)
             """
         super(forms.ModelForm, self).clean()
+        #print colored("*************************** here are locals  (in clean, after super) ****************************", "red", "on_white")
+        #print locals()
+        print colored("********************  CLEAN *****************************","white","on_magenta")
         # grab the cleaned fields we need
         cleaned_doors = self.cleaned_data.get("doors")
         # .get():  if data not there, returns nothing - vs exception for [] 
@@ -172,10 +182,29 @@ class LockUserForm(ModelForm):
             """
             self.cleaned_data['deactivate_current_keycard'] = True
             """
+            print colored("*"*30, "red", "on_white")
+            print dir(self)
+            print self.obj 
+            print self.request
+            print colored("*"*30, "red", "on_white")
             if not self.doors_not_permitted_to_this_staff_user_but_for_lockuser:
                 self.cleaned_data['deactivate_current_keycard'] = True
             else:  # don't deactivate keycard if no doors checked, because there are still doors lock user can access
                 self.cleaned_data['deactivate_current_keycard'] = False
+                print colored("*******************************************************", "red", "on_white")
+                print colored("*******************************************************", "red", "on_white")
+                print colored("*******************************************************", "red", "on_white")
+                print colored("***************** so this is where would like to send the 'has not been deactivated, actually' message**************************************", "red", "on_white")
+                print colored("*******************************************************", "red", "on_white")
+                print colored("*******************************************************", "red", "on_white")
+                print colored("*******************************************************", "red", "on_white")
+                print colored("*******************************************************", "red", "on_white")
+
+                # todo:  eek!  just adding to cleaned_data!
+                #msg = "%s's keycard was not deactivated because you do not have permission to manage %s." % (self.obj, self.doors_not_permitted_to_this_staff_user_but_for_lockuser)
+                msg = 'will not deactivate'
+                #messages.add_message(self.request, messages.INFO, msg)
+                self.cleaned_data['special_message'] = msg
 
         if self.doors_not_permitted_to_this_staff_user_but_for_lockuser: 
             for item in self.doors_not_permitted_to_this_staff_user_but_for_lockuser:
@@ -275,7 +304,6 @@ class LockUserAdmin(admin.ModelAdmin):
 
 
 
-    #exclude = ("birthdate ", "middle_name")   # temp exclusion
 
     # Only the first and last names  will appear as link to the individual LockUser page
     list_display_links = ['first_name','last_name']
@@ -431,6 +459,9 @@ class LockUserAdmin(admin.ModelAdmin):
         
 
     def save_model(self,request,obj,form,change):
+        print colored("************* save_model() ***********************","white","on_magenta")
+        print colored("\t************* here's obj: ","white","on_magenta")
+        print obj.__dict__
         # if deactivate current keycard was checked (which may have actually happened in clean, if  no Doors were selected) 
         # need to deactivate current keycard.  Doing this
         # here rather than models.py because need to attach request.user to the RFIDkeycard object being
@@ -440,8 +471,10 @@ class LockUserAdmin(admin.ModelAdmin):
        # if obj.deactivate_current_keycard or not obj.doors.exists():  # although deactivate_current_keycard should have been set to true in clean, if no doors
         if obj.deactivate_current_keycard: 
             obj.current_keycard_revoker = request.user
-            from django.contrib import messages
             msg = "%s's keycard was deactivated successfully." % obj
+            print colored("*"*20,"white","on_magenta")
+            print colored("where got messages at this point? can intercept?","white","on_magenta")
+            print type(messages)
             messages.add_message(request, messages.INFO, msg)
 
             #current_keycard = obj.get_current_rfid() 
@@ -451,6 +484,52 @@ class LockUserAdmin(admin.ModelAdmin):
             # there may be no current keycard, so a new one should be prevented from being assigned
         else:
             obj.current_keycard_revoker = None
+            print colored("==========="*10, "blue", "on_white")
+            try:
+                if form.cleaned_data['special_message'] == 'will not deactivate':
+                    # nicer way to print the doors, not "set([<Door: Space 1>])"
+                    doors_not_permit = ", ".join(door.name for door in list(form.doors_not_permitted_to_this_staff_user_but_for_lockuser))
+                    msg = "%s's keycard was not deactivated because you do not have permission to manage %s." % (obj, doors_not_permit)
+                    messages.add_message(request, messages.INFO, msg)
+            except KeyError:
+                pass
+                
+            #msg = form.cleaned_data["special_message"]
+            """
+            print msg
+            print colored("*******************************************************", "red", "on_white")
+            print colored("*******************************************************", "red", "on_white")
+            print colored("*******************************************************", "red", "on_white")
+            print colored("***************** AND THIS WHERE WOULD LIKE TO RECEIVE IT........**************************************", "red", "on_white")
+            print colored("*******************************************************", "red", "on_white")
+            print colored("*******************************************************", "red", "on_white")
+            print colored("*******************************************************", "red", "on_white")
+            print colored("*******************************************************", "red", "on_white")
+            print colored("wmaybe can put something on mess here????here got messages at this point? can intercept?","white","on_magenta")
+            print "CAN GET FROM FORM ???????"
+            print colored("*******************************************************", "red", "on_white")
+            print form
+            print colored("*******************************************************", "red", "on_white")
+            print dir(form)
+            print colored("*******************************************************", "red", "on_white")
+            print form.__dict__
+            print colored("*******************************************************", "red", "on_white")
+            print colored("*******************************************************", "red", "on_white")
+            print colored("*******************************************************", "red", "on_white")
+            print colored("*******************************************************", "red", "on_white")
+            print colored("*******************************************************", "red", "on_white")
+            #print colored("*************************** here are locals ****************************", "red", "on_white")
+            #print locals()
+            """
+            """
+            print type(messages)
+            print request._messages
+            print type(request._messages)
+            """
+            """
+            from pprint import pprint 
+            pprint(request.__dict__)
+            """
 
         # todo --  ugh this better not be totally before save. 
 

@@ -19,7 +19,7 @@ from django.contrib.auth.models import Permission
 
 class Door(models.Model):
     """ Doors with RFID locks installed. """
-    name    = models.CharField(max_length=50, unique=True)  # e.g. "Makerspace," "Bike Project," etc.
+    name        = models.CharField(max_length=50, unique=True)  # e.g. "Makerspace," "Bike Project," etc.
     description = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
@@ -28,23 +28,22 @@ class Door(models.Model):
 
 
     def save(self,*args,**kwargs):
-        """ When a new Door is added, create a corresponding Permission """
-
+        """ When a new Door is added, create a corresponding Permission, if it does not exist already """
         print colored("SAVING-Door", "magenta")
+
         super(Door,self).save(*args,**kwargs)
 
-        content_type = ContentType.objects.get(app_label='djock_app',model='door')
+        if not Permission.objects.filter(codename='can_manage_door_%d' % self.pk): 
+            content_type = ContentType.objects.get(app_label='djock_app',model='door')
 
-        # todo:  IntegrityError: columns content_type_id, codename are not unique
-        print colored("SAVING-Permission", "magenta")
-        # create() saves as well
-        Permission.objects.create( \
-                codename='can_manage_door_%d' % self.pk, \
-                name = 'Can manage door to %s' % self.name,\
-                content_type = content_type)   
+            # todo:  IntegrityError: columns content_type_id, codename are not unique
+            print colored("SAVING-Permission", "magenta")
+            # create() saves as well
+            Permission.objects.create( \
+                    codename='can_manage_door_%d' % self.pk, \
+                    name = 'Can manage door to %s' % self.name,\
+                    content_type = content_type)   
         
-
-
 
     def get_allowed_rfids(self):
         # Return the RFIDs allowed to access this Door 
@@ -88,7 +87,9 @@ class Door(models.Model):
 
 class NewKeycardScan(models.Model):
     """ For checking whether the current request is for authenticating a keycard or assigning new keycard. """
-    time_initiated = models.DateTimeField(auto_now_add=True)
+    #time_initiated = models.DateTimeField(auto_now_add=True)
+    # auto_now_add and time zone stuff do not play well together sometimes...
+    time_initiated = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))
     waiting_for_scan = models.BooleanField(default=True) 
     doorid = models.CharField(max_length=50)   # doorid as in the requesting url
     rfid = models.CharField(max_length=10)   # rfid as in the requesting url
@@ -99,8 +100,9 @@ class NewKeycardScan(models.Model):
     # to do: additional parameters for door, rfid? 
 
     def timed_out(self,minutes=2):
-        """ Check whether specified number of minutes have passed since user indicated they were going to go scan in a card for assigning it.  Defaults to 2 minutes. """
-        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        """ Check whether specified number of minutes have passed since user 
+        indicated they were going to go scan in a card for assigning it.  """
+        now = datetime.datetime.now().replace(tzinfo=utc)
         max_time = datetime.timedelta(minutes=minutes)
         delta = now - self.time_initiated
         time_diff_minutes = round( delta.total_seconds() / 60, 2)
@@ -117,11 +119,7 @@ class RFIDkeycard(models.Model):
     this RFID has access to; can get times when it was used (i.e. AccessTimes),
     and ........
 
-    Note for nk when  get to LockUser: when a lockuser is "deactivated," their card is deactivated as well  (but not the other way around, by the way!) -
-        and the date_revoked will be automatically populated (so in addition to manually revoking a card).
-         This means that if there's no revoked date, the card is still active, and don't need
-         a separate is_active field here... just ask: is_active() --> can just check if there's a revoked date,
-         OR if today's date is between assigned/revoked...
+    Note for nk when  get to LockUser: when a lockuser is "deactivated," their card is deactivated as well  (but not the other way around, by the way!) - and the date_revoked will be automatically populated (so in addition to manually revoking a card).  This means that if there's no revoked date, the card is still active, and don't need a separate is_active field here... just ask: is_active() --> can just check if there's a revoked date, OR if today's date is between assigned/revoked...
     """
     # todo -- or should I assume no duplicate keycards ever?  I think duplicates are ok -- it's feasible that keycards could be reused. 
     #the_rfid    = models.CharField(max_length=10,null=False,blank=False, editable=False,unique=True) # the radio-frequency id
@@ -132,7 +130,9 @@ class RFIDkeycard(models.Model):
     # This should not be a field that staff users can fill in.  It should be created
     # automatically when the associated **LockUser** is deactivated
 
-    date_created = models.DateTimeField(auto_now_add=True)
+    #date_created = models.DateTimeField(auto_now_add=True)
+    # auto_now_add and time zone stuff do not play well together sometimes...
+    date_created = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))
 
 
     ####################################################################
@@ -173,11 +173,15 @@ class RFIDkeycard(models.Model):
 
 
     def get_allowed_doors(self):
-        # Get the Doors this user is allowed access to. 
-        if self.lockuser:
-            return self.lockuser.get_allowed_doors()
-        else:
-            return None
+        """ Get the Doors this user is allowed access to.  """
+        return self.lockuser.get_allowed_doors()
+        # todo: 
+        # the 'else' there is unneccessary because the lockuser field null=False
+        # ...exception?
+        #if self.lockuser:
+        #    return self.lockuser.get_allowed_doors()
+        #else:   
+        #    return None
 
     """ Staff user door management is not a current use case 
     def prettify_get_allowed_doors(self):
@@ -208,10 +212,10 @@ class RFIDkeycard(models.Model):
         # When time zone support is enabled, Django uses time-zone-aware 
         # datetime objects. If your code creates datetime objects, they should
         # be aware too.
-        #now = datetime.datetime.now()
-        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        now = datetime.datetime.now().replace(tzinfo=utc)
         self.date_revoked = now
         self.revoker = user
+
 
 
         ############# log entry here? ########################
@@ -220,15 +224,9 @@ class RFIDkeycard(models.Model):
 class AccessTime(models.Model):
     the_rfid    = models.CharField(max_length=10,null=True) # the radio-frequency id, however represented....
     access_time = models.DateTimeField(null=True)    # the time the rfid was used
-    lockuser    = models.ForeignKey("LockUser",null=False)
-    door        = models.ForeignKey("Door",null=False)
+    lockuser    = models.ForeignKey("LockUser",null=True)
+    door        = models.ForeignKey("Door",null=True)
     data_point  = models.TextField()  # todo
-
-    # to do
-    # temp.. trying to see if this will make things faster (e.g. an alternative to get_this_door(), below, for the AccessTime change_list 
-    #door_name   = models.CharField(max_length=50)
-    #lockuser_name_html = models.CharField(max_length=180) # max_length: approx length of "<a href='../lockuser/%d/'>%s %s<a>" + length of first_name, middle_name, last_name (to do). 
-
 
     def __unicode__(self):
         #return u'%s' % self.access_time
@@ -244,13 +242,15 @@ class AccessTime(models.Model):
         data_point['user'] = '"%s %s"' % (self.lockuser.first_name, self.lockuser.last_name)  
     """
 
+    """
     def get_this_door(self):
-        """ Return the door that was accessed at this time """
+        # Return the door that was accessed at this time
         return self.door.name
 
     def get_this_lockuser(self):
-        """ Return the user's name associated with the RFID for this access time """
+     # Return the user's name associated with the RFID for this access time
         return self.lockuser
+    """
 
     def get_this_lockuser_html(self):
         """ Returns the HTML with link to /lockuser/the_id/ to display on the Access Times change list page """
@@ -265,12 +265,12 @@ class LockUser(models.Model):
     ####################################################################
     #  Contact info 
     ####################################################################
+    # todo:  which explicitly required......
     first_name      = models.CharField(max_length=50)
-    middle_name     = models.CharField(max_length=50,blank=True)
     last_name       = models.CharField(max_length=50)
     address         = models.CharField(max_length=100,blank=True)
     email           = models.EmailField(blank=True,unique=True)  # todo: blank okay for NOW, later - required
-    phone_number    = models.IntegerField(max_length=30,null=True,blank=True) # todo: later - required
+    phone_number    = models.IntegerField(max_length=30,null=True,blank=True) # todo: later - required ; string...?
     birthdate       = models.DateField(null=True)
 
     ################################################################################
@@ -316,20 +316,21 @@ class LockUser(models.Model):
             # todo: see expanded_comments.txt, (2) (basically -- this may not be the new scan obj we need...)
             new_scan = new_scan_queryset.latest("time_initiated")  
             if new_scan.ready_to_assign:
-                print colored("Assigning keycard that was just scanned","blue")
-                # save new_scan before saving new_keycard! 
                 new_scan.ready_to_assign = False   
-                new_scan.save()
+                new_scan.save() # save new_scan before saving new_keycard! 
                 # assign the rfid from the keycard that was just scanned
                 new_keycard = RFIDkeycard(lockuser=self, the_rfid=new_scan.rfid, assigner=new_scan.assigner_user)
 
                 new_keycard.save()
                         
-        try:
+        """try:
             # there should be at most one... for now just get the first one (todo)
             current_keycard = self.get_current_rfid()   # self or lu? 
         except:
             current_keycard = None
+        """
+        current_keycard = self.get_current_rfid()   # self or lu? 
+        
 
         # We'll deactivate a LockUser's current keycard here, if deactivate_current_keycard is checked on the LockUser's change_form, or if no doors were selected. 
         # not doing a check for door existence here. At this point, deactivate_current_keycard is set to true if there were no doors (see admin.py), but doors may not have been saved yet, so checking self.doors.exists() would be misleading. 
@@ -339,12 +340,12 @@ class LockUser(models.Model):
             current_keycard.deactivate(self.current_keycard_revoker)
             current_keycard.save()# save keycard since have changed it
 
-            # should the following two statements actually go into deactivate() ?
+            # todo: should the following two statements actually go into deactivate() ?
             self.deactivate_current_keycard = False   # because no current keycard to deactivate anymore
             self.current_keycard_revoker = None
 
-            # or 
-            #super(LockUser, self).save(*args, **kwargs)  # save again
+            # todo: or 
+            # super(LockUser, self).save(*args, **kwargs)  # save again
             # ?
             self.save()
 
@@ -385,13 +386,17 @@ class LockUser(models.Model):
     # current, includes HTML.
     # Todo:  would it make more sense to just tweak the __unicode__ method of RFIDkeycard? 
     ##  Actually this should be all rfid's but the current one???
+    # todo: rename  to indicate that getting all but CURRENT
     def get_all_rfids_html(self):
         """ Returns results of get_all_rfids(), but as a nice pretty string.
         Omits the current RFID.  Also display date assigned and date revoked, if any, as well as rfid number on LockUser change form and list display
         """
         all_rfid_keycards = self.get_all_rfids()
-        current_keycard = self.get_current_rfid()
-        all_keycards_except_current = list(set(all_rfid_keycards).difference([current_keycard]))
+        # todo: exclude, not set diff: http://stackoverflow.com/questions/5945912/how-to-get-the-difference-of-two-querysets-in-django
+        #current_keycard = self.get_current_rfid()
+        #all_keycards_except_current = list(set(all_rfid_keycards).difference([current_keycard]))
+        
+        all_keycards_except_current = all_rfid_keycards.exclude(date_revoked=None)
 
         #rfid_keycards_info_list = [str(r.the_rfid) for r in _rfid_keycards]
         #rfid_keycards_info_list = ["RFID: %s (activated %s; revoked %s)" % (keycard.the_rfid,keycard.date_created.ctime(), keycard.date_revoked.ctime()) for keycard in rfid_keycards]
@@ -401,12 +406,14 @@ class LockUser(models.Model):
             date_assigned = keycard.date_created.ctime()
             assigner = keycard.assigner
             #creator = keycard.get_creator()
+
+            # the except was really only useful in development, so excluding it from coverage
             try:
                 date_revoked = keycard.date_revoked.ctime()   
                 revoker = keycard.revoker
-                info_str = "RFID : %s (activated on %s by %s; revoked on %s by %s)" % (rf,date_assigned, assigner,date_revoked, revoker)
-            except:
-                info_str = "RFID : %s (activated on %s by %s [couldn't get revoker] )" % (rf,assigned,assigner)
+                info_str = "RFID: %s (activated on %s by %s; revoked on %s by %s)" % (rf,date_assigned, assigner,date_revoked, revoker)
+            except:  # pragma: no cover
+                info_str = "RFID: %s (activated on %s by %s [couldn't get revoker] )" % (rf,date_assigned,assigner)
             rfid_keycards_info_list.append(info_str)
 
         #return ", ".join("RFID: %s (activated %s; revoked %s)" % (curr,curr_rfid.date_created, curr_rfid.date_revoked))
@@ -464,7 +471,7 @@ class LockUser(models.Model):
         allowed_doors = self.get_allowed_doors()
         doors_links_list = []
         for door in allowed_doors:
-            door_link_html =  "<a href='../door/%d/'>%s</a>" %  (door.id, door.name) 
+            door_link_html =  "<a href='../door/%d/'>%s</a>" %  (door.pk, door.name) 
             doors_links_list.append(door_link_html)
         return ", ".join(doors_links_list)
     # Django will HTML-escape the output by default. If you'd rather not escape the output of the method, 
@@ -480,7 +487,7 @@ class LockUser(models.Model):
     # active one. 
     #def get_all_access_times(self, curr_rfid_only=True):
     def get_all_access_times(self):
-        """ Returns list of all access times for this user, which means that the search should include any other
+        """ Returns list of all access times (the actual access_time field, not the objects) for this user, which means that the search should include any other
         RFID's this LockUser ever had. In other words, the search is by *person*, not by RFID.
         Although we're in the process of deciding whether there should only be one keycard/RFID per person. see the comment for RFIDkeycard.get_allowed_doors().
         (TODO) 
@@ -517,21 +524,23 @@ class LockUser(models.Model):
 
         # todo:  try, etc. 
 
-        # Get QuerySet of all AccessTime objects whose RFID matches this LockUser's current RFID:
-        at_query_set = AccessTime.objects.all().filter(lockuser=self)
+        # Get QuerySet of all AccessTime objects for this lockuser
+        #at_query_set = AccessTime.objects.all().filter(lockuser=self)
+        at_query_set = AccessTime.objects.all().filter(lockuser=self).order_by('access_time')
+
         # Now get the access_time field of each AccessTime object
         all_access_times_list = [access_time_object.access_time for access_time_object in at_query_set]
         #else:  # no current rfid/lockuser deactivated
         #    all_access_times_list = None
 
 
-        if all_access_times_list:
-            a = all_access_times_list[0]
+        #if all_access_times_list:
+        #    a = all_access_times_list[0]
         return all_access_times_list
 
         
 
-    ######Note, stuff is not consistent among these get_blah's because sometimes I'm returning the OBJECT, sometimes actual fields of it
+    ######Note,todo,  stuff is not consistent among these get_blah's because sometimes I'm returning the OBJECT, sometimes actual fields of it
 
     #def prettify_get_all_access_times(self,curr_rfid_only=True):
     def all_access_times_link(self): 
@@ -550,18 +559,23 @@ class LockUser(models.Model):
     all_access_times_link.allow_tags = True
         
 
+    # todo: 
     #def get_last_access_time(self, curr_rfid_only=True):
     def get_last_access_time(self):
-        """ Get the last time this person used the lock. Same story with current RFID vs previous one as in the
+        """ Get the last time this person used the lock. 
+        Same story with current RFID vs previous one as in the
         comment for get_all_access_time().
 
         """
         access_times = self.get_all_access_times()
         
-        # sort dates and grab the last one
-        # todo -- order_by? 
+        # grab the last one
         if access_times:
-            access_times.sort()
+            #access_times.sort()
+            #return access_times[-1]  
+            #access_times.latest('access_time')
+            # as get_all_access_times() returns a list of the access_time *fields*, not the objects, already ordered by time, we can just grab the last one in the list
+            #access_times.sort()
             return access_times[-1]  
         else:
             return None
@@ -589,7 +603,6 @@ class LockUser(models.Model):
     def __unicode__(self):
         """ In the list of AcessTimes, for example, LockUsers will be represented with their first and last names """
         return u'%s %s' % (self.first_name, self.last_name)
-        # to do: middle name, if exists
 
 
 
@@ -605,15 +618,13 @@ class LockUser(models.Model):
 # Prevent interactive question about wanting a superuser created.  (This code
 # has to go in this otherwise empty "models" module so that it gets processed by
 # the "syncdb" command during database creation.)
-signals.post_syncdb.disconnect(
-    create_superuser,
-    sender=auth_models,
-    dispatch_uid='django.contrib.auth.management.create_superuser')
+
+signals.post_syncdb.disconnect(    create_superuser, sender=auth_models, dispatch_uid='django.contrib.auth.management.create_superuser') # pragma: no cover  (exclude this code from coverage)
 
 
 # Create our own test user automatically.
 
-def create_testuser(app, created_models, verbosity, **kwargs):
+def create_testuser(app, created_models, verbosity, **kwargs):  # pragma: no cover
   if not settings.DEBUG:
     return
   try:

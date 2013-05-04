@@ -1,111 +1,51 @@
 from django.http import HttpResponse, HttpResponseRedirect
+from django.template import RequestContext
 from django.shortcuts import render_to_response
 import djock_app.models
-import random
 from datetime import datetime
 from django.utils import simplejson
 from termcolor import colored   # temp
 from django.utils.timezone import utc
+from django.contrib.auth.decorators import login_required
+from djock_app.misc import get_arg_default
 
-# todo:  remove or make "private"
-def generate_random_access_times(request=None,shell=False, min_t=10, max_t=10):
-    """ just for dev - generate random access times in a specified range """
-    if not shell:
-        min_num_times = int(request.POST.get('min_num_times'))
-        max_num_times = int(request.POST.get('max_num_times'))
-    else:
-        min_num_times = int(min_t)
-        max_num_times = int(max_t)
-    
-    # need to call this from other places (like in the interpreter), so moving to its func
-    make_access_times(min_num_times, max_num_times)
-    if not shell:
-        return HttpResponseRedirect("/lockadmin/")
-    else:
-        return "done"
+# todo
+# return series for chartit in JSON format
+def chartify(request): 
 
+    #########################################################################
+    # building array of access times/lockusers/rfids to give the javascript
+    #########################################################################
+    from django.utils import simplejson
+    from djock_app.models import Door, AccessTime
+    # todo: tool tip stays same....
+    tooltip_dict = {}
+    tooltip_dict['followPointer']='false'
+    tooltip_dict['pointFormat']='"{point.user}"'
 
+    all_series = []
 
-"""
-# todo: is there a way to use allow_tags or that functionality without using a method? 
-# todo:  callback...things.. how to get the url to an object... i feel that i've encountered this somewhere......
-def make_lockuser_link_html(the_id, first_name, last_name, middle_name = ""):
-    # todo: middle name
-    link = "<a href='../lockuser/%d/'>%s %s</a>" % (the_id, first_name, last_name)
-    return link
-make_lockuser_link_html.allow_tags = True
-# todo:  not actually allowing tags 
-"""
+    # a series is the access times for one door
+    for door in Door.objects.all(): 
+        one_series = {}
+        one_series['name'] = '"%s"' % door.name
+        one_series['tooltip'] = tooltip_dict
+        # get all AccessTimes for this door
+        #this_door_access_times = AccessTime.objects.filter(door_id=door.id)
+        this_door_access_times = AccessTime.objects.filter(door=door)
+        one_series['data'] = []
+        for at in this_door_access_times:
+            #print colored("adding data point  for door %s: %s" % (door.name, at.data_point), "white","on_blue") 
+            one_series['data'].append(simplejson.loads(at.data_point))  # todo: ugh with the loads'ing           
+        all_series.append(one_series)
+    #extra_context = {"test_jsond": simplejson.dumps([test_d, test_d2]) } 
+    extra_context = {'chart_data': simplejson.dumps(all_series, indent="") } 
+    print colored("----   chartify ------", "red")
+    print extra_context['chart_data']
 
-def make_access_times(min_num_times, max_num_times):
-    # for each keycard in the system, generate a random number of access times, in the range specified in the form
-    for keycard in djock_app.models.RFIDkeycard.objects.all():
-        for i in range(random.randint(min_num_times,max_num_times)):
-            #AccessTime(the_rfid=keycard.the_rfid, access_time=get_random_time()).save()
-            door = random.choice(keycard.lockuser.doors.all())
-            if door.id == 1:   # door 1:  only certain days of the week
-                j = 0
-                while j<1:
-                    the_date_time = get_random_time()
-                    if (the_date_time.weekday()==5 or the_date_time.weekday()==6 or the_date_time.weekday()==4):
-                        lockuser = keycard.lockuser
-                        at=djock_app.models.AccessTime(the_rfid=keycard.the_rfid, access_time=the_date_time, lockuser=lockuser, door=door)
-                        """
-                        at.lockuser_link_html = make_lockuser_link_html(lockuser.id, lockuser.first_name, lockuser.last_name)
-                        at.lockuser_name_html = lockuser_link_html
-                        at.save()
-                        """
-                        # todo
-                        assign_data_point_dict_and_save(at)
-                        j+=1
-            elif door.id == 2:   # door 2:  more than all others
-                j = 0
-                while j<5:
-                    the_date_time = get_random_time()
-                    lockuser = keycard.lockuser
-                    at=djock_app.models.AccessTime(the_rfid=keycard.the_rfid, access_time=the_date_time, lockuser=lockuser, door=door )
-                    """
-                    at.lockuser_link_html = make_lockuser_link_html(lockuser.id, lockuser.first_name, lockuser.last_name)
-                    """
-                    at.save()
-                    assign_data_point_dict_and_save(at)
-                    j+=1
-            elif door.id == 3: # door 3: only for 4 hours during the day
-                j = 0
-                while j<5:
-                    the_date_time = get_random_time()
-                    if the_date_time.hour >15 and the_date_time.hour < 19:
-                        lockuser = keycard.lockuser
-                        at=djock_app.models.AccessTime(the_rfid=keycard.the_rfid, access_time=the_date_time, lockuser=lockuser, door=door)
-                        """
-                        at.lockuser_link_html = make_lockuser_link_html(lockuser.id, lockuser.first_name, lockuser.last_name)
-                        """
-                        at.save()
-                        assign_data_point_dict_and_save(at)
-                        j+=1
-            #djock_app.models.AccessTime(the_rfid=keycard.the_rfid, access_time=get_random_time(), lockuser=keycard.lockuser, door=random.choice(keycard.lockuser.doors.all())).save()
-            else:  # all other doors
-                the_date_time = get_random_time()
-                lockuser = keycard.lockuser
-                at=djock_app.models.AccessTime(the_rfid=keycard.the_rfid, access_time=the_date_time, lockuser=lockuser, door=door, )
-                """
-                at.lockuser_link_html = make_lockuser_link_html(lockuser.id, lockuser.first_name, lockuser.last_name)
-                """
-                at.save()
-                assign_data_point_dict_and_save(at)
-    return at
+    return render_to_response('chart.html', dictionary=extra_context, context_instance=RequestContext(request))
 
 
-from random import randrange
-from datetime import timedelta, datetime
-def get_random_time():
-    """ This function will return a random datetime between two datetime objects.  """
-    now = datetime.utcnow().replace(tzinfo=utc)   
-    time_period = timedelta(days=180) # about half a year
-    start = now - time_period  
-    time_period_seconds = time_period.total_seconds()
-    random_second = randrange(time_period_seconds)
-    return (start + timedelta(seconds=random_second))
 
 # return list of rfid's allowed for all doors, or a particular door,
 #   as json list 
@@ -165,7 +105,10 @@ def check(request,doorid, rfid):
                 #at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=rfidkeycard.lockuser, door=djock_app.models.Door.objects.get(id=int(doorid)))  # todo: access time is going to be a bit later...
                 #at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=rfidkeycard.lockuser, door=door) # todo: access time is going to be a bit later...
                 lockuser = rfidkeycard.lockuser
-                at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=lockuser, door=door ) # todo: access time is going to be a bit later...
+
+                #at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=lockuser, door=door ) # todo: access time is going to be a bit later...
+                # todo: time zone stuff
+                at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.now().replace(tzinfo=utc), lockuser=lockuser, door=door ) # todo: access time is going to be a bit later...
 
                 """
                 at.lockuser_link_html = make_lockuser_link_html(lockuser.id, lockuser.first_name, lockuser.last_name)
@@ -181,48 +124,35 @@ def check(request,doorid, rfid):
 
 
                     
-                # todo:  this may be interim....
                 # create the highchart data point for this access time
 
-                at.save() 
-                assign_data_point_dict_and_save(at)  # todo:  this is interim.... (?)
+                # todo - see sticky (x) 
+                # todo:  this may be interim....
+                data_point_dict = {}
+                # data point dict to JSONify for the access times highchart  
+                data_point = {}
+                data_point_dict['x'] = 'Date.UTC(%d,%d,%d)' % (at.access_time.year, at.access_time.month, at.access_time.day)
+                data_point_dict['y'] = 'Date.UTC(0,0,0, %d,%d,%d)' % (at.access_time.hour, at.access_time.minute, at.access_time.second)
+                data_point_dict['user'] = '"%s %s"' % (at.lockuser.first_name, at.lockuser.last_name)  
+                at.data_point = simplejson.dumps(data_point_dict)
+                at.save()
     return HttpResponse(response)
 
 
-# todo - see sticky (x) 
-def assign_data_point_dict_and_save(at):
-    #print colored("----assign_data_point_dict_and_save----------------------", "magenta")
-    data_point_dict = {}
-
-    # todo:  here? 
-    # data point dict to JSONify for the access times highchart  
-    data_point = {}
-    data_point_dict['x'] = 'Date.UTC(%d,%d,%d)' % (at.access_time.year, at.access_time.month, at.access_time.day)
-    data_point_dict['y'] = 'Date.UTC(0,0,0, %d,%d,%d)' % (at.access_time.hour, at.access_time.minute, at.access_time.second)
-    data_point_dict['user'] = '"%s %s"' % (at.lockuser.first_name, at.lockuser.last_name)  
-    # todo: 
-    #  which is best? the above or, for example, 
-    #       data_point_dict['user' = '"%s %s"' % (rfidkeycard.lockuser.first_name, rfidkeycard.lockuser.last_name) 
-    # without at.save()
-
-    # todo:   JSONify, assign to AccessTime field
-    at.data_point = simplejson.dumps(data_point_dict)
-    #print colored("just assigned this dict (here str):  %s" % str(data_point_dict), "white","on_magenta")
-
-    # and save everything
-    at.save()
-
+@login_required
 def initiate_new_keycard_scan(request,lockuser_object_id):
+    """ Try start waiting for new keycard scan; return success/fail message """
 #def initiate_new_keycard_scan(request):
 
     # If this lockuser already has a current keycard, don't proceed
     # (This should have been prevented at template level also)
     try: 
-        lu = djock_app.models.LockUser.objects.filter(id=lockuser_object_id)
+        #lu = djock_app.models.LockUser.objects.filter(id=lockuser_object_id)
+        lu = djock_app.models.LockUser.objects.get(id=lockuser_object_id)
     except:
         response_data = {'success':False, "error_mess":"WTF? There's no lock user?"}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-    if lu[0].get_current_rfid():
+    if lu.get_current_rfid():
         response_data = {'success':False, 'error_mess':"This lock user is already assigned a keycard! You shouldn't have even gotten this far!"} # Todo: So when stuff like this happens in production...  Should it sent some kind of automated error report to whomever is developing/maintaining the site? 
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
     else:
@@ -233,6 +163,10 @@ def initiate_new_keycard_scan(request,lockuser_object_id):
         response_data = {'success':True, 'new_scan_pk':n.pk}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
     
+
+
+# todo: 
+@login_required
 #def finished_new_keycard_scan(request, lockuser_object_id):
 def finished_new_keycard_scan(request,new_scan_pk):
     """  Verify this is the NewKeycardScan object we initiated, that the rfid
@@ -240,13 +174,16 @@ def finished_new_keycard_scan(request,new_scan_pk):
         haven't timed out. Then get the rfid from the newly-scanned card. 
 
         Also verifying __, ____, .........
+
+        The new RFIDkeycard object is created upon LockUser save, after change_form form has been submitted.
     """
     # TODO:  raise exceptions.   
     # TODO:  Error codes to aid developers. So Staff user sees "ERROR (code 2). Try again," not "ERROR (scary message  about the exact error). Try again." 
     new_scan_queryset = djock_app.models.NewKeycardScan.objects.all()
-    if not new_scan_queryset:
-        response_data = {'success':False, 'error_mess':"No NewKeycardScan objects at all"}
-        return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
+
+    #if not new_scan_queryset:
+    #    response_data = {'success':False, 'error_mess':"No NewKeycardScan objects at all"}
+    #    return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
     # Verify that the scan object is the one we need, not one initiated later by someone else, for example.
     new_scan_right_pk_qs = new_scan_queryset.filter(pk = new_scan_pk)  # make sure we have the newKeycardScan object we started with, not one that another staff user initiated *after* us. 
@@ -256,11 +193,14 @@ def finished_new_keycard_scan(request,new_scan_pk):
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
     new_scan = new_scan_right_pk_qs[0]
-    min_till_timeout = 2
-    timed_out, time_diff_minutes = new_scan.timed_out(minutes=min_till_timeout)
+    #min_till_timeout = 2
+    #timed_out, time_diff_minutes = new_scan.timed_out(minutes=min_till_timeout)
+    default_timeout_minutes = get_arg_default(djock_app.models.NewKeycardScan.timed_out,'minutes')
+    timed_out, time_diff_minutes = new_scan.timed_out()  # defaults to two minutes
     if timed_out:
     #if new_scan.timed_out(minutes=min_till_timeout):
-        response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done'.... So don't take %f minutes next time, please, fatty. Run to that lock! You could use the exercise." % (min_till_timeout,time_diff_minutes)}
+        #response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done'.... So don't take %f minutes next time, please, fatty. Run to that lock! You could use the exercise." % (min_till_timeout,time_diff_minutes)}
+        response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done'.... "  % default_timeout_minutes}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
     if not new_scan.rfid:  
@@ -279,7 +219,7 @@ def finished_new_keycard_scan(request,new_scan_pk):
     # grab the assigner, and save NewKeycardScan object
     new_scan.waiting_for_scan = False
     new_scan.ready_to_assign = True 
-    new_scan.assigner_user = request.user
+    new_scan.assigner_user = request.user  # todo:  wasn't assigner_user already set? 
     new_scan.save()
 
     response_data = {'success':True, 'rfid':new_scan.rfid}

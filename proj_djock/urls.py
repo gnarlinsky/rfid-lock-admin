@@ -13,13 +13,14 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 
-    url(r'^chart/', direct_to_template, {'template': 'chart.html'}), 
+    url(r'^chart/', views.chartify), 
+    #url(r'^chart/', direct_to_template, {'template': 'chart.html'}), 
 
     # Password-reset: add "Forgotten your password?" link on log-in page
     url(r'^admin/password_reset/$', 'django.contrib.auth.views.password_reset', name='admin_password_reset'),
-    (r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done'),
-    (r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm'),
-    (r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete'),
+    url(r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done'),
+    url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm'),
+    url(r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete'),
 
     url(r'^lockadmin/', include(admin.site.urls)),
     # go directly to the admin page for the *application*
@@ -71,7 +72,6 @@ urlpatterns = patterns('',
     url(r'^t/$', direct_to_template, {'template': 'test/index.html' }    ),
     #url(r'fake/$', 'djock_app.views.fake_assign' ), 
 
-    url(r'^generate_random_access_times/$',views.generate_random_access_times), 
 
     # Uncomment the admin/doc line below to enable admin documentation:
     #url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

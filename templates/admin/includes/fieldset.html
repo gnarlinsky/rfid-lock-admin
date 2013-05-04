@@ -30,11 +30,12 @@
                     <div id="door_keycard_deactivation_warning" style="color:red;"> </div>
                     <div id="other_doors_outer"> 
                         {% if doors_not_permitted_to_this_staff_user %} Note: this lockuser also has permission to access the following door(s), that you, the staff user, do not have permission to manage: {% endif %}
+                        {% comment %}Some below on one line to avoid white space in rendered template. (replacing whitespace in some tests to accomodate for this) {% endcomment %}
                         <div id="other_doors">
-                       {% for another_door in doors_not_permitted_to_this_staff_user %}
+                        {% for another_door in doors_not_permitted_to_this_staff_user %}
                             {% if  another_door.lockuser_set.all  %}
-                                {{ another_door }}
-                            {% endif %}
+                                {{ another_door }}{% if  forloop.counter != doors_not_permitted_to_this_staff_user|length %},{% endif %}{% comment %} avoid a trailing comma {% endcomment %}
+                            {% endif %} 
                         {% endfor %}
                         </div>
                     </div>
