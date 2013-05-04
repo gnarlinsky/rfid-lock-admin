@@ -129,98 +129,15 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         """
         - clicks 'New user' button
         """
-
-        # instead of 
-        #       add_lockuser_button.click()
-        # using action chains -- here, click-and-hold and release -- to slow down the walkthrough
-
-        # Get the element to click on and set up the action chains object
         add_lockuser_button = self.browser.find_element_by_id('new_user_button')
         if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
         add_lockuser_button.click()
-        #self.browser.save_screenshot(os.path.join(self.screenshots_dir,'4.png'))
-        # todo:  note that this will work on os x only, but the results are higher quality than using save_screenshot
+
+        """
+        - (lock user add form loads (/lockadmin/djock_app/lockuser/add/) )
+        """
         if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
-        time.sleep(SLOWER)  
-       # action_chain =  ActionChains(self.browser)
-
-        # add the actions 
-        #action_chain.move_to_element(add_lockuser_button)
-        #time.sleep(SLOWER)
         
-        ###############################################################################################
-        # todo:  not actually showing the mouse moving to the element....  is it because it's a link??????
-        #  worry about the mouse thign later please!!!!! who knows it could be a firefox thing or os x!!!  so just move on!!!!!!!
-        ###############################################################################################
-        """
-        self.mouse.move_by_offset(20,20).perform()
-        time.sleep(SLOWER)
-        self.mouse.move_by_offset(20,20).perform()
-        time.sleep(SLOWER)
-        self.mouse.move_by_offset(20,20).perform()
-        time.sleep(SLOWER)
-        self.mouse.move_by_offset(20,20).perform()
-        time.sleep(SLOWER)
-        action_chain.move_by_offset(20,20)
-        time.sleep(SLOWER)
-        action_chain.move_by_offset(20,20)
-        time.sleep(SLOWER)
-        action_chain.move_by_offset(20,20)
-        time.sleep(SLOWER)
-        action_chain.click_and_hold(add_lockuser_button)
-        time.sleep(SLOWER)
-        action_chain.release(add_lockuser_button)
-        time.sleep(SLOWER)
-
-        # run the actions
-        action_chain.perform()
-
-        time.sleep(SLOWER)  
-        
-        hover = ActionChains(self.browser).move_to_element(add_lockuser_button)
-        hover.perform(); time.sleep(3)
-
-        drawing = ActionChains(self.browser)\
-                .click_and_hold(add_lockuser_button)\
-                .move_by_offset(-4, -6)\
-                .move_by_offset(30, 20)\
-                .move_by_offset(10, 20)\
-                .release(add_lockuser_button)
-        #Now we know what we want to happen, let's perform the actions
-        drawing.perform()
-        """
-
-
-        """
-        test_move = ActionChains(self.browser)\
-                .move_by_offset(-4, -6)\
-                .move_by_offset(30, 20)\
-                .move_by_offset(10, 20)
-        test_move.perform()
-        time.sleep(3)
-
-        test_move = ActionChains(self.browser)\
-                .move_by_offset(-4, -6)\
-                .move_by_offset(30, 20)\
-                .move_by_offset(10, 20)
-        test_move.perform()
-        time.sleep(3)
-        test_move = ActionChains(webdriver)\
-                .move_by_offset(-4, -6)\
-                .move_by_offset(30, 20)\
-                .move_by_offset(10, 20)
-        test_move.perform()
-        time.sleep(3)
-
-        """
-        time.sleep(SLOWER)
-
-
-        ###############################################################################################
-        """
-        - (add form loads (/lockadmin/djock_app/lockuser/add/) )
-        """
-    ########  BUT!  THIS *SHOULD* BE A PLACE TO *PAUSE*  FOR X SECONDS, FOR THE SAKE OF THE SCREENCAPTURE 
 
         """
         - fills out fields 
