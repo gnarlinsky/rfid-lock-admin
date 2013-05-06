@@ -45,22 +45,23 @@ def get_object_type(content_type_id):
         return None
    
 
-# todo
+"""
 @register.filter
 def get_original_id(referrer_path):
-    """ given the HTTP_REFERER, get the last part of the URL, 
-        which should be the object id. No checking of any kind here, 
-        but the expected referer url is something like '...lockuser/3/' 
-    """
+   #  given the HTTP_REFERER, get the last part of the URL, 
+   #     which should be the object id. No checking of any kind here, 
+   #     but the expected referer url is something like '...lockuser/3/' 
     split_path = referrer_path.split("/")
     if len(split_path)>1: # more than just "/"
         return split_path[-2]
     else: 
         return None
+"""
 
 
 
-""" This is unnecessary, since the new concept is: 
+""" 
+This is unnecessary, since the new concept is: 
     lockuser is not active IFF no current keycard
 @register.filter
 def is_lockuser_active(object_id):
