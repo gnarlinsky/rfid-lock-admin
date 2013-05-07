@@ -78,51 +78,7 @@ class LockUserAdminTests(TestCase):
         def tearDown(self):
             pass
 
-        def test_get_form(self):
-            """ """
-            pass
-
         def test_deactivate(self):
-            """ """
-            pass
-
-        def test_email_selected(self):
-            """ """
-            pass
-
-        def test__doors_heading(self):
-            """ """
-            pass
-
-        def test__last_access_heading(self):
-            """ """
-            pass
-
-        def test__current_rfid_heading(self):
-            """ """
-            pass
-
-        def test_formfield_for_foreignkey(self):
-            """ """
-            pass
-
-        def test_formfield_for_manytomany(self):
-            """ """
-            pass
-
-        def test_get_doors_to_show(self):
-            """ """
-            pass
-
-        def test_get_other_doors(self):
-            """ """
-            pass
-
-        def test_change_view(self):
-            """ """
-            pass
-
-        def test_save_model(self):
             """ """
             pass
 
@@ -135,22 +91,7 @@ class AccessTimeAdminTests(TestCase):
         def tearDown(self):
             pass
 
-        def test___init__(self):
-            """ """
-            pass
-
-        def test_changelist_view(self):
-            """ """
-            pass
 
         def test__lockuser_html_heading(self):
-            """ """
-            pass
-
-        def test_has_delete_permission(self):
-            """ """
-            pass
-
-        def test_has_add_permission(self):
             """ """
             pass
