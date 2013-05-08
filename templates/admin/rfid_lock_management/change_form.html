@@ -1,0 +1,453 @@
+{% extends "admin/change_form.html" %}
+{% load custom_filters %}
+{% load i18n admin_urls %}
+
+
+{% block extrahead %}
+{{ block.super }}
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"/></script>
+
+
+<script src="{{STATIC_URL}}bootstrap-tooltip.js"></script>
+<script src="{{STATIC_URL}}bootstrap-popover.js"></script>
+
+<!-- local version of the above --> 
+<!-- <script type="text/javascript" src="/static/admin/js/jquery-1.9.1.min.js"></script> -->
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript"></script> -->
+<!-- <script src="{{ MEDIA_URL }}highcharts/js/highcharts.js" type="text/javascript"></script> -->
+
+<script> 
+// TODO: 5-8 in todo.rtfd (refactoring, checkboxes, etc)
+
+/*******************************************************************************
+* Scan/assign new keycard 
+*******************************************************************************/
+$(function() {
+    var start_get_rfid = function() {
+       $.getJSON("/start_scan/{{object_id}}/", function(result) {
+            if (result.success == true) {
+                // NewKeycardScan object should be initiated and saved now
+                new_scan_pk = result.new_scan_pk; 
+                var new_keycard_div = document.getElementById("keycard_assignment_scan_message1"); 
+                new_keycard_div.style.display='inline'; 
+                $("#keycard_assignment_scan_message1").html("<br /><div class='alert alert-info'>Ready to read keycard. Go on to Step 2.</div>"); 
+                var new_keycard_div = document.getElementById("keycard_assignment_scan_message1a"); 
+                new_keycard_div.style.display='inline'; 
+                $("#keycard_assignment_scan_message1a").html( "<p><div class='alert alert-warning'> Development: open another browser window and go to http://192.168.x.x:port_num/checkdoor/<i>doorid</i>/checkrfid/<i>rfid</i>, e.g. <a href='http://{{request.META.HTTP_HOST}}/checkdoor/1/checkrfid/abcde99999' target='_blank'>http://{{request.META.HTTP_HOST}}/checkdoor/1/checkrfid/abcde99999/</a> (if abcde99999 has not been assigned yet.)</div> </p>");  
+
+                
+            } else {
+                var new_keycard_div = document.getElementById("keycard_assignment_scan_message1"); 
+                new_keycard_div.style.display='inline'; 
+                $("#keycard_assignment_scan_message1").html("<br /><div class='alert alert-info'>ERROR (" + result.error_mess + ") Hit Save to save lock user without assigning keycard or try again.</div>"); 
+                var new_keycard_div = document.getElementById("keycard_assignment_scan_message1a"); 
+                new_keycard_div.style.display='inline'; 
+                $("#keycard_assignment_scan_message1a").html( "<br /> <p><div class='alert alert-warning'> Development: open another browser window and go to http://192.168.x.x:port_num/checkdoor/<i>doorid</i>/checkrfid/<i>rfid</i>, e.g. <a href='http://{{request.META.HTTP_HOST}}/checkdoor/1/checkrfid/abcde99999' target='_blank'>http://{{request.META.HTTP_HOST}}/checkdoor/1/checkrfid/abcde99999</a> (if abcde99999 has not been assigned yet.)</div> </p>");  
+                }
+        });
+    };
+
+    var done_get_rfid = function() {
+       $.getJSON("/done_scan/"+new_scan_pk+"/", function(result) {
+            if (result.success == true) {
+                // todo:  double check id (id comes from field.field }}
+                $("#id_rfidkeycard_set-0-the_rfid").val(result.rfid); 
+                var new_keycard_div = document.getElementById("keycard_assignment_scan_message2"); 
+                new_keycard_div.style.display='inline'; 
+                //$("#keycard_assignment_scan_message2").html("<div class='alert alert-info'>Success! Save to complete keycard assignment. ("+result.rfid+")</div>"); 
+                $("#keycard_assignment_scan_message2").html("<div class='alert alert-info'>Success! Save to complete keycard assignment.</div>"); 
+                // if deactivate keycard is checked for some reason, but we're assigning a new keycard....   let user know
+                var deactivate_keycard_checkbox = document.getElementById("id_deactivate_current_keycard");
+                if (deactivate_keycard_checkbox.checked == true) {
+                    $("#keycard_assignment_scan_message3").html("<div class='alert alert-warning'>(Note: 'Deactivate current keycard' is checked.  Don't check it if you want to assign a keycard.)</div>"); 
+        }
+        else { 
+                    $("#keycard_assignment_scan_message3").html(""); 
+        }
+
+            } else {
+                var new_keycard_div = document.getElementById("keycard_assignment_scan_message2"); 
+                new_keycard_div.style.display='inline'; 
+                $("#keycard_assignment_scan_message2").html( "<div class='alert alert-info'>ERROR (" + result.error_mess + ") Hit Save to save lock user without assigning keycard or try again.</div>"); 
+              //setTimeout(done_get_rfid, 250); // wait 250 sec before trying done_get_rfid again
+
+                var deactivate_keycard_checkbox = document.getElementById("id_deactivate_current_keycard");
+            }
+        });
+    };
+
+
+    $("#start_button").bind("click", function(e) {
+        e.preventDefault();
+        start_get_rfid();
+    });
+
+    $("#done_button").bind("click", function(e) {
+        e.preventDefault();
+        // if deactivate keycard is checked for some reason, but we're assigning a new keycard....   let user know
+        /*var deactivate_keycard_checkbox = document.getElementById("id_deactivate_current_keycard");
+        if (deactivate_keycard_checkbox.checked == true) {
+            $("#keycard_assignment_scan_message3").html("<div class='alert alert-warning'>('Deactivate current keycard' is checked -- are you sure? Don't check it if you want to assign a keycard.)</div>"); 
+        }
+        */
+        done_get_rfid();
+    });
+
+    $("#cancel_add_keycard_button").bind("click", function(e) {
+        e.preventDefault();
+        var new_keycard_div = document.getElementById("assign_new_keycard"); 
+        new_keycard_div.style.display="none"; 
+        // todo: do anything else to cancel? 
+    });
+
+    // don't show the keycard assignment instructions/buttons by default, but only when user clicks on 'assign new keycard'
+    $("#add_keycard_button").bind("click", function(e) {
+        e.preventDefault();
+        var new_keycard_div = document.getElementById("assign_new_keycard"); 
+        new_keycard_div.style.display="inline"; 
+    });
+
+  
+
+
+/*******************************************************************************
+* Behavior/state of "Assign keycard" button & selected Doors/"Deactivate current keycard" checkbox 
+*******************************************************************************/
+$(document).ready( function () { 
+    var all_door_checkboxes = $('input[id^="id_doors_"]') ; 
+    var other_doors_lockuser_can_access = document.getElementById("other_doors").innerHTML.replace(/\s/g,"");
+    if (all_door_checkboxes.not(":checked").length === all_door_checkboxes.length) { // if no doors are checked
+        // note - we don't care if user is permitted doors the staff user can't manage, because staff user shouldn't be able to assign keycards for doors they don't have access to. 
+        var add_keycard_button = document.getElementById("add_keycard_button");
+        add_keycard_button.disabled=true; 
+        // $("#add_keycard_button").attr("disabled","disabled"); 
+
+
+            // todo
+        if ("{{add}}" == "True") { // adding, not changing, lockuser, so no message about doors yet
+
+            /*  no doors checked, but add - hover says 
+                Hit 'Save and continue editing' to assign a keycard. 
+                */
+                var over = document.getElementById('overlay')
+                over.setAttribute('data-content','Click "Save and continue" to assign keycard.'); 
+                over.setAttribute('rel', 'popover')
+                over.setAttribute('style','display:inline;')
+                //$("#overlay").rel='popover';
+                //$("#overlay").setAttribute('data-content','bha blah do this'); 
+                //$("#overlay").data-content='bha blah do this';
+                $("#overlay").popover();
+        }
+        else {  // disabled because there are no doors, so hover message should reflect that
+
+                var over = document.getElementById('overlay')
+                over.setAttribute('data-content','Select at least one door to assign keycard.'); 
+                over.setAttribute('rel', 'popover')
+                over.setAttribute('style','display:inline;')
+                //$("#overlay").rel='popover';
+                //$("#overlay").setAttribute('data-content','bha blah do this'); 
+                //$("#overlay").data-content='bha blah do this';
+                $("#overlay").popover();
+            /*
+                but if not add, then disabled because no doors, so hover says: 
+                    Select at least one door to assign keycard. 
+            */
+
+        }
+
+
+
+
+    }
+}); 
+
+
+// When any input elements whose id's start with "id_door_" (i.e. all the Door checkboxes) is clicked: 
+$('input[id^="id_doors_"]').bind("click",function(e) { 
+    var all_door_checkboxes = $('input[id^="id_doors_"]') ; 
+    // check whether at least one Door is checked
+    if (all_door_checkboxes.not(":checked").length === all_door_checkboxes.length) { // no doors are checked
+
+        // Make sure that this LockUser is permitted access to doors that the *staff* user is not permitted to manage. 
+        // Are there doors that this lockuser can access but this staff user cannot manage: 
+        var add_keycard_button = document.getElementById("add_keycard_button");
+        var deactivate_keycard_checkbox = document.getElementById("id_deactivate_current_keycard");
+        var other_doors_lockuser_can_access = document.getElementById("other_doors").innerHTML.replace(/\s/g,"");
+
+        if ( !other_doors_lockuser_can_access) {  // no doors, so disable "assign keycard" button
+            add_keycard_button.disabled=true; 
+            if ("{{add}}" == "False")  { 
+                var over = document.getElementById('overlay')
+                over.setAttribute('data-content','Select at least one door to assign keycard.'); 
+                over.setAttribute('rel', 'popover')
+                over.setAttribute('style','display:inline;')
+                //$("#overlay").rel='popover';
+                //$("#overlay").setAttribute('data-content','bha blah do this'); 
+                //$("#overlay").data-content='bha blah do this';
+                $("#overlay").popover();
+
+            /* ***************************** to do ***************************
+            the hover message here and another place 
+            Select at least one door to assign keycard
+            
+            or will hover message be taken care of in the previous function? .
+
+            ************************************************************** */
+            } 
+
+/*
+<div style="    position: relative; ">
+<!--<div id="example" style=" position: absolute;        top: 0; left: 0; opacity: .1; background-color: blue; height: 35px; width: 140px; " rel="popover" data-content="Click 'Save and continue editing' to assign a keycard."></div>
+-->
+    <input type="button" class="btn" id="assign_keycard_button" value="Assign keycard"  disabled='disabled'> 
+    <div id="overlay"  rel="popover" data-content="Click 'Save and continue editing' to assign a keycard."></div>
+</div>
+
+<script>
+$(function ()
+{
+});
+*/
+
+        
+            
+            var curr_keycard =  $('div.field-prettify_get_current_rfid p').text(); 
+            if (curr_keycard=="None") {   // if  no assigned keycard, warn that won't be able to assign
+                //$("#door_keycard_deactivation_warning").html( "Warning: Select at least one door to assign keycard."); 
+                //$("#add_keycard_button").disabled=true; 
+
+                // todo... wow the logic in here ..... sucks
+                if ("{{add}}"==False) { 
+                    var over = document.getElementById('overlay')
+                    over.setAttribute('data-content','Select at least one door to assign keycard.'); 
+                    over.setAttribute('rel', 'popover')
+                    over.setAttribute('style','display:inline;')
+                    $("#overlay").popover();
+                }
+            } else {  // if there is an assigned keycard, a different warning
+                $("#door_keycard_deactivation_warning").html("Warning: If no door is selected, this user's keycard will be deactivated.  To uncheck 'Deactivate current keycard,' select a door."); 
+                // Check 'Deactivate current keycard' to emphasize that unchecking all doors will deactivate user's keycard
+                deactivate_keycard_checkbox.checked = true; 
+                var over = document.getElementById('overlay')
+                over.removeAttribute('data-content'); 
+                over.removeAttribute('rel'); 
+                over.setAttribute('style','display:none')
+            }
+
+
+
+
+
+
+
+} 
+
+    }
+    else {    // at least one Door is checked, so don't disable "Assign Keycard" button -- unless the LockUser has already been assigned a keycard. (If there's a current keycard already, the button should already be disabled via the template... but this interferes, so doublecheck..). 
+        if ("{{add}}" == "True") { // Also, if we're only adding, not changing, can't actually assign keycard until save lockuser, so accounting for that. 
+               // $("#door_keycard_deactivation_warning").html("Please save to assign keycard"); 
+        } else {  // change, not add
+            var curr_keycard =  $('div.field-prettify_get_current_rfid p').text()
+            var add_keycard_button = document.getElementById("add_keycard_button");
+            if (curr_keycard!="None") {   
+                add_keycard_button.disabled=true; 
+
+
+            } else { 
+                add_keycard_button.disabled=false;  
+                var over = document.getElementById('overlay')
+                over.removeAttribute('data-content'); 
+                over.removeAttribute('rel')
+                over.setAttribute('style','display:none')
+            }
+        } 
+    } 
+}); 
+
+
+    // todo:  simplify logic
+    $("#id_deactivate_current_keycard").bind("click",function(e) {   
+
+        var deactivate_keycard_checkbox = document.getElementById("id_deactivate_current_keycard");
+        // if user trying to uncheck deactivate current keycard.... 
+        if (deactivate_keycard_checkbox.checked == false) {
+            // .... but no doors are selected .....
+            var all_door_checkboxes = $('input[id^="id_doors_"]') ; 
+            if (all_door_checkboxes.not(":checked").length === all_door_checkboxes.length) {
+                //  .... and lockuser doesn't have access to doors that this staff user is not permitted to manage... 
+                var other_doors_lockuser_can_access = document.getElementById("other_doors").innerHTML.replace(/\s/g,"");
+                if ( !other_doors_lockuser_can_access) {   
+                    // ... and if there's a  keycard
+                    var curr_keycard =  $('div.field-prettify_get_current_rfid p').text()
+                    if (curr_keycard!="None") {   
+                        $("#door_keycard_deactivation_warning").html("Uh, you don't want to deactivate the keycard, but you don't want to pick any doors either? Get it together. To uncheck 'Deactivate current keycard,' pick a freaking door!"); 
+                        deactivate_keycard_checkbox.checked = true;
+                    } 
+                }
+            }
+        } 
+    }); 
+    
+});
+
+// todo ...  see comment #10
+// better to just get children inputs of div submit-row's ?
+//  ...  var submit_rows = document.getElementsByClassName("submit-row"); 
+// Input elements that are submit buttons should have bootstrap class 'btn' 
+// todo:  setAttribute overrides
+$(document).ready(function() {
+    var submit_buttons = document.getElementsByTagName('input');
+    for(var i=0; i<submit_buttons.length; i++){
+        if(submit_buttons[i].getAttribute('type')=='submit'){
+            submit_buttons[i].setAttribute("class","btn"); 
+        }
+    } 
+
+    var submit_row = document.getElementsByClassName("submit-row"); 
+    for(var i=0; i<submit_row.length; i++){
+       submit_row[i].setAttribute("class","pull-right"); 
+    }
+
+    
+}); 
+</script>
+
+
+{% endblock extrahead %}
+    
+{% block field_sets %}
+{% for fieldset in adminform %}
+<div id="main_form" class="well">
+        {% if content_type_id|get_object_type == "lockuser" %}
+        <h2> Lock user / keycard assignment </h2>
+        {% endif %}
+  {% include "admin/includes/fieldset.html" %}
+  {% endfor %}
+  </div>
+  {% endblock %}
+
+{% comment %}  submit row block {% endcomment %}
+{% block submit_buttons_bottom %}
+
+<div class="well">
+
+ {{ block.super }}
+ </div>
+
+    <div  id="submit_row_outer"> 
+        {% comment %}  todo:  see #3, todo.rtfd  {% endcomment %}
+        {% comment %}{% if original|get_object_type == "LockUser" %}{% endcomment %}
+        {% comment %} original is not set if we're *adding*! {% endcomment %} 
+        {% if content_type_id|get_object_type == "lockuser" %}
+        <div class="well">
+
+<div style="position: relative; ">
+{% comment %}
+    <input type="button" class="btn" id="assign_keycard_button" value="Assign keycard"  disabled='disabled'> 
+{% endcomment %}
+              <input type="button" class="btn"  id="add_keycard_button" value="Assign keycard" 
+              {% comment %} todo:  see #4, todo.rtfd {%endcomment %}
+             {% if object_id|does_lockuser_have_active_keycard or add %} 
+                 disabled 
+             {%  endif  %}
+        />
+{% comment %}
+    <div id="overlay"  rel="popover" data-content="Click 'Save and continue editing' to assign a keycard."></div>
+{% endcomment %}
+    <div id="overlay"
+             {% if object_id|does_lockuser_have_active_keycard or add %} 
+                 style="display:none" 
+             {%  endif  %}
+    ></div>
+</div>
+
+
+
+
+
+
+
+
+{% comment %}
+              <input type="button" class="btn"  id="add_keycard_button" value="Assign keycard" 
+{% endcomment %}
+              {% comment %} todo:  see #4, todo.rtfd {%endcomment %}
+{% comment %}
+             {% if object_id|does_lockuser_have_active_keycard or add %} 
+                 disabled 
+             {%  endif  %}
+        />
+{% endcomment %}
+        {%  endif  %}
+
+
+    {% comment %} 
+    <div id="assign_new_keycard" style="border:2px solid green;font-color:green;text-align:center; color:green;">
+    {% endcomment %}
+
+    <div id="assign_new_keycard" class="well well-small" style="display:none">
+
+   <input type="button" id="cancel_add_keycard_button" class="btn" value="Cancel">
+        <h3>Step 1</h3>
+        <p>Click "Scan new card."</p>
+        <p> <input type="button" class="btn"  id="start_button" value="Scan new card" ></p>
+        <p><div id="keycard_assignment_scan_message1"></div> </p>
+        {% comment %} <button><a href="/start_scan/{{object_id}}">Scan new card</a></button><br><br> {% endcomment %} 
+    {% comment %}
+    <div class="progress progress-info progress-striped">
+      <div class="bar" style="width: 20%"></div> 
+      (Note: will time out after 2 minutes.) 
+      </div>
+    {% endcomment %}
+    <br />
+    <h3>Step 2</h3>
+    <p>Scan the keycard to be assigned at the/any door lock.(Note: will time out after 2 minutes.) </p>
+    <p><div id="keycard_assignment_scan_message1a" ></div> </p>
+
+    <br />
+    <h3>Step 3</h3>
+    <p>Click "Done" when you are finished scanning.  </p>
+    <p> <input type="button" class="btn" id="done_button" value="Done" style="margin-bottom:20px;"> </p>
+    <p><div id="keycard_assignment_scan_message2"></div></p>
+    <p><div id="keycard_assignment_scan_message3"></div></p>
+
+    </div>
+
+
+
+
+{% endblock %}   {% comment %}  end submit row block {% endcomment %}
+
+
+
+
+
+{% comment %}
+{% block object-tools %}
+{% if change %}{% if not is_popup %}
+<div style="text-align:center;">
+    <a href="../../fake/" class="btn btn-info btn-large" style="color:white; margin:10px auto ">Fake assign keycard<br>(== scanning a new keycard and getting the number)</a> 
+    <a href="" class="btn btn-info btn-large disabled" style="color:white; margin:10px auto ">
+    Deactivate keycard
+    </a> 
+</div>
+<ul class="object-tools">
+    {% block object-tools-items %} {{block.super}} {% endblock %}
+</ul>
+{% endif %}{% endif %}
+{% endblock %}
+
+{% endcomment %}
+
+
+
+{% comment %}
+{% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+
+
+{% block submit_buttons_bottom %}
+Or move in here? 
+     {{block.super}}
+{% endblock %}
+
+{% endcomment %}
