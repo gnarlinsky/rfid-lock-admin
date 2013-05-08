@@ -6,6 +6,11 @@
 {% block extrahead %}
 {{ block.super }}
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"/></script>
+
+
+<script src="{{STATIC_URL}}bootstrap-tooltip.js"></script>
+<script src="{{STATIC_URL}}bootstrap-popover.js"></script>
+
 <!-- local version of the above --> 
 <!-- <script type="text/javascript" src="/static/admin/js/jquery-1.9.1.min.js"></script> -->
 <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript"></script> -->
@@ -408,47 +413,6 @@ $(document).ready(function() {
 
     </div>
 
-<hr>
-<h1>TEMP!!!!!!</h1> 
-
-<h2>Example of creating Popover with Twitter Bootstrap</h2>
-<script src="http://www.w3resource.com//twitter-bootstrap/twitter-bootstrap-v2/js/bootstrap-tooltip.js"></script>
-<script src="http://www.w3resource.com//twitter-bootstrap/twitter-bootstrap-v2/js/bootstrap-popover.js"></script>
-<!--
-todo!!!!!  actually download the above and keep locally
-<script src="{{ STATIC_URL }}blah blah blah blah .js"></script>
---> 
-<script>
-$(function ()
-{ $("#overlay").popover();
-});
-</script>
-
-<!-- <input type="button" class="btn" id="example" value="Assign keycard" rel="popover" data-content="Blah blah blah " data-original-title="tooltip title"> -->
-<div style="    position: relative; ">
-<!--<div id="example" style=" position: absolute;        top: 0; left: 0; opacity: .1; background-color: blue; height: 35px; width: 140px; " rel="popover" data-content="Click 'Save and continue editing' to assign a keycard."></div>
--->
-    <input type="button" class="btn" id="assign_keycard_button" value="Assign keycard"  disabled='disabled'> 
-    <div id="overlay"  rel="popover" data-content="Click 'Save and continue editing' to assign a keycard."></div>
-</div>
-
-<input type="button" class="btn" id="add_keycard_button" value="Assign keycard">
-
-
-<script src="http://www.w3resource.com//twitter-bootstrap/twitter-bootstrap-v2/js/bootstrap-tooltip.js"></script>
-<script src="http://www.w3resource.com//twitter-bootstrap/twitter-bootstrap-v2/js/bootstrap-popover.js"></script>
-<script>
-$(function ()
-{ $("#example").popover();
-});
-</script>
-<a href="#" id="example" class="btn btn-success" rel="popover" data-content="It's so simple to create a tooltop for my website!" data-original-title="Twitter Bootstrap Popover">hover for popover</a>
-<input type="button" class="btn" id="add_keycard_button" value="Assign keycard">
-
-<hr>
-
-
-<a href="#" id="example" class="btn btn-success" rel="popover" data-content="It's so simple to create a tooltop for my website!" data-original-title="Twitter Bootstrap Popover">hover for popover</a>
 
 
 
