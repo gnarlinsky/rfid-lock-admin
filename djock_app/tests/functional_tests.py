@@ -82,7 +82,7 @@ from djock_app.admin import LockUserAdmin
 # 
 #     def setUp(self):
 #         """ Start up Selenium WebDriver browser instance """
-#         print colored("\nLiveServerTestCase RenameLaterFunctionalTests", "white","on_green")
+#         print colored("\nLiveServerTestCase GeneralFunctionalTests", "white","on_green")
 #         print colored(self._testMethodName + ": " + self._testMethodDoc, "green")
 # 
 #         #################################################################
@@ -150,7 +150,7 @@ from djock_app.admin import LockUserAdmin
 # todo:  class LoginStuff........ to separate from stuff where ... already logged in? so can just setUp logging in? If required..............
 
 # LiveServerTestCase starts up a test web server in a separate thread
-class RenameLaterFunctionalTests(LiveServerTestCase):
+class GeneralFunctionalTests(LiveServerTestCase):
     #fixtures = ['test_staff_superuser.json']  # to save the test user so can succeed on login tests
                                             # (everything should be same for a non-staff superuser as
                                             # well, though... Test for that? )
@@ -162,7 +162,7 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
 
     def setUp(self):
         """ Start up Selenium WebDriver browser instance """
-        print colored("\nLiveServerTestCase RenameLaterFunctionalTests", "white","on_green")
+        print colored("\nLiveServerTestCase GeneralFunctionalTests", "white","on_green")
         print colored(self._testMethodName + ": " + self._testMethodDoc, "green")
 
         #################################################################
@@ -457,7 +457,8 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         print colored("\tBack on change list, lockuser should still have keycard (active: True).", "blue")
         rows = self.browser.find_elements_by_tag_name('tr')
         rows_text = [row.text for row in rows]
-        self.assertIn('C. M. Burns mr.burns@springfieldnuclearpowerplant.com True RFID: 1122135122 (activated on Wed Apr 10 00:52:00 2013 by superuser) Space 1, Space 4 April 10, 2013, 12:57 AM', rows_text) # todo:  note hardcoded.....  
+
+        self.assertIn('C. M. Burns mr.burns@springfieldnuclearpowerplant.com True RFID: 1122135122 (activated on April 10, 2013, 12:52 AM by superuser) Space 1, Space 4 April 10, 2013, 12:57 AM (Space 1)', rows_text) # todo:  note hardcoded.....  
 
         print colored("\tHit back to go back to the change form", "cyan")
         self.browser.back()
@@ -547,7 +548,7 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         rows = self.browser.find_elements_by_tag_name('tr')
         rows_text = [row.text for row in rows]
 
-        self.assertIn( 'Lisa Simpson smartgirl63@yahoo.com False None Space 2 None', rows_text) # todo:  note hardcoded.....  
+        self.assertIn( 'Lisa Simpson smartgirl63@yahoo.com False None Space 2 (None)', rows_text) # todo:  note hardcoded.....  
 
 
         print colored("\tHit back to go back to the change form", "cyan")

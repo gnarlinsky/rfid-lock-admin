@@ -10,6 +10,8 @@ from djock_app.admin import LockUserForm, LockUserAdmin, AccessTimeAdmin
 from termcolor import colored 
 from django import forms 
 from django.contrib.admin.sites import AdminSite
+from django.http import HttpResponsePermanentRedirect
+
 
 
 # todo:  a number of tests
@@ -107,6 +109,23 @@ class AccessTimeAdminTests(TestCase):
     def tearDown(self):
         pass
 
+    def test_change_form_redirection(self):
+        """ Check that if we try to go to an individual Access Time object's change form, we're redirected back to the change list. """
+
+        # follow=False: prevent from following the redirect and actually loading the next url
+        response = self.client.get("/lockadmin/djock_app/accesstime/1/", follow=False) 
+        self.assertRedirects(response, '/lockadmin/djock_app/accesstime/')
+
+
+
+
+
+        #client = Client()
+        #response = client.get('/lockadmin/djock_app/accesstime/1/')
+        response = self.client.get('/lockadmin/djock_app/accesstime/1/')
+        #self.assertEqual(response.status_code, 302)
+        #self.assertTrue(isinstance(response, HttpResponsePermanentRedirect))
+        #self.assertEqual(response.META['HTTP_LOCATION'], '/lockadmin/djock_app/accesstime/')
 
     def test_lockuser_html_heading(self):
         """ Does the AccessTime change list page display LockUsers as links to their change pages? """

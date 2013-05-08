@@ -39,19 +39,20 @@ def make_access_times(min_num_times=10, max_num_times=10):
                         at.save()
                         counter += 1
                         j+=1
-            elif door.id == 2:   # door 2:  more than all others
+            elif door.id == 2:   # door 2:  more than all others, but only between 8 am and 3 pm
                 j = 0
-                while j<5:
+                while j<2:
                     the_date_time = get_random_time()
-                    lockuser = keycard.lockuser
-                    at=AccessTime(the_rfid=keycard.the_rfid, access_time=the_date_time, lockuser=lockuser, door=door )
-                    """
-                    at.lockuser_link_html = make_lockuser_link_html(lockuser.id, lockuser.first_name, lockuser.last_name)
-                    """
-                    assign_data_point_dict(at)
-                    at.save()
-                    counter += 1
-                    j+=1
+                    if the_date_time.hour >9 and the_date_time.hour < 14:
+                        lockuser = keycard.lockuser
+                        at=AccessTime(the_rfid=keycard.the_rfid, access_time=the_date_time, lockuser=lockuser, door=door )
+                        """
+                        at.lockuser_link_html = make_lockuser_link_html(lockuser.id, lockuser.first_name, lockuser.last_name)
+                        """
+                        assign_data_point_dict(at)
+                        at.save()
+                        counter += 1
+                        j+=1
             elif door.id == 3: # door 3: only for 4 hours during the day
                 j = 0
                 while j<5:

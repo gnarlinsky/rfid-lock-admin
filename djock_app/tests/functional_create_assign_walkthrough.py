@@ -250,4 +250,4 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         self.assertIn('staff_user_1', td_cells[4].text)
         self.assertIn(rfid, td_cells[4].text)
         self.assertEqual(td_cells[5].text, 'Space 2') 
-        self.assertEqual(td_cells[6].text, 'None')
+        self.assertEqual(td_cells[6].text, '(None)')

@@ -332,9 +332,9 @@ class LockUserModelTests(TestCase):
         # "RFID : %s (activated on %s by %s; revoked on %s by %s)" % (rf,date_assigned, assigner,date_revoked, revoker)
         correct_output_string = \
             "RFID: %s (activated on %s by %s; revoked on %s by %s),<br>" % \
-                    (rk3.the_rfid,rk3.date_created.ctime(), rk3.assigner,rk3.date_revoked.ctime(), rk3.revoker) \
+                    (rk3.the_rfid,rk3.date_created.strftime("%B %d, %Y, %I:%M %p"), rk3.assigner,rk3.date_revoked.strftime("%B %d, %Y, %I:%M %p"), rk3.revoker) \
             + "RFID: %s (activated on %s by %s; revoked on %s by %s)" % \
-                    (rk4.the_rfid,rk4.date_created.ctime(), rk4.assigner,rk4.date_revoked.ctime(), rk4.revoker)
+                    (rk4.the_rfid,rk4.date_created.strftime("%B %d, %Y, %I:%M %p"), rk4.assigner,rk4.date_revoked.strftime("%B %d, %Y, %I:%M %p"), rk4.revoker)
 
         self.assertEqual(lu2.get_all_rfids_html(),correct_output_string)
         # note - the try/except in get_all_rfids_html is really only there because during development it was possible to have a non-current keycard with no date_revoked and no revoker.. So no unit test for that, but something to note for test coverage. 
@@ -365,7 +365,7 @@ class LockUserModelTests(TestCase):
         
         staff_only_user = User.objects.create_user('johnny_staff', 'js@jmail.com', 'my_password')
         curr_rfid = RFIDkeycard.objects.create(the_rfid='abcde22222', lockuser=lu, assigner=staff_only_user)
-        correct_return_string = "RFID: %s (activated on %s by %s)" % (curr_rfid.the_rfid, curr_rfid.date_created.ctime(), curr_rfid.assigner)
+        correct_return_string = "RFID: %s (activated on %s by %s)" % (curr_rfid.the_rfid, curr_rfid.date_created.strftime("%B %d, %Y, %I:%M %p"), curr_rfid.assigner)
         self.assertEqual(lu.prettify_get_current_rfid(), correct_return_string)
 
 

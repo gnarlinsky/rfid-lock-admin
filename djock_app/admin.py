@@ -6,6 +6,8 @@ from termcolor import colored
 from django import forms
 from django.contrib import messages
 #from chartit import DataPool, Chart
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 
 
 #########################  TO DO ##########################################
@@ -282,8 +284,8 @@ class LockUserAdmin(admin.ModelAdmin):
     _doors_heading.short_description = 'Allowed doors'
 
     def _last_access_heading(self, obj):
-        return obj.prettify_get_last_access_time()
-        # todo!!!!! need the last accessed door as well. So.........  do that in models, actually .  Some kind of prettify_get_last_access_time_plus_door
+        #return obj.prettify_get_last_access_time()
+        return obj.prettify_get_last_access_time_and_door()
     _last_access_heading.short_description = 'Last access'
 
     def _current_rfid_heading(self, obj):
@@ -470,6 +472,11 @@ class AccessTimeAdmin(admin.ModelAdmin):
         self.list_display_links = (None, )
         return super(AccessTimeAdmin, self).changelist_view(request, extra_context=extra_context)
 
+    def change_view(self, request, extra_context=None):
+        """ Don't allow access to individual AccessTime objects  """
+        # No need to show the link to  page for an individual AccessTime, so no field should link to it...
+        # .... but the page can still be accessed, so redirect to change list 
+        return HttpResponseRedirect(reverse('admin:djock_app_accesstime_changelist'))
 
     #########################################################################
     # Page listing all AccessTimes ("change list" page):

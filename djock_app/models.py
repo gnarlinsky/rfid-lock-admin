@@ -402,13 +402,15 @@ class LockUser(models.Model):
         rfid_keycards_info_list = []
         for keycard in all_keycards_except_current:
             rf = keycard.the_rfid
-            date_assigned = keycard.date_created.ctime()
+            #date_assigned = keycard.date_created.ctime()
+            date_assigned = keycard.date_created.strftime("%B %d, %Y, %I:%M %p")
             assigner = keycard.assigner
             #creator = keycard.get_creator()
 
             # the except was really only useful in development, so excluding it from coverage
             try:
-                date_revoked = keycard.date_revoked.ctime()   
+                #date_revoked = keycard.date_revoked.ctime()   
+                date_revoked = keycard.date_revoked.strftime("%B %d, %Y, %I:%M %p")
                 revoker = keycard.revoker
                 info_str = "RFID: %s (activated on %s by %s; revoked on %s by %s)" % (rf,date_assigned, assigner,date_revoked, revoker)
             except:  # pragma: no cover
@@ -450,7 +452,8 @@ class LockUser(models.Model):
         #curr = [str(c.the_rfid) for c in curr_rfid]  # todo - again! haven't coded anythign yet 
             #to account for there only being one current per person!/my fake data forces me to do this...  
         try:
-            curr_keycard_info = "RFID: %s (activated on %s by %s)" % (curr_rfid.the_rfid, curr_rfid.date_created.ctime(), curr_rfid.assigner)
+            #curr_keycard_info = "RFID: %s (activated on %s by %s)" % (curr_rfid.the_rfid, curr_rfid.date_created.ctime(), curr_rfid.assigner)
+            curr_keycard_info = "RFID: %s (activated on %s by %s)" % (curr_rfid.the_rfid, curr_rfid.date_created.strftime("%B %d, %Y, %I:%M %p"), curr_rfid.assigner)
             return curr_keycard_info
         except:
             return None
@@ -580,20 +583,42 @@ class LockUser(models.Model):
             return None
 
     def prettify_get_last_access_time(self):  
-        """ todo -  also including link to all access times here (temp) """
-        _last = self.get_last_access_time()
-        if _last:
-            #return _last.ctime()
-            return _last.strftime("%B %d, %Y, %I:%M %p") 
+        last = self.get_last_access_time()
+        if last:
+            #return last.ctime()
+            return last.strftime("%B %d, %Y, %I:%M %p") 
         else:
             return None
 
+    def prettify_get_last_access_time_and_door(self):  
+        """ Includes the door this access time is associated with (for change list) """
+        at_query_set = AccessTime.objects.filter(lockuser=self)  # todo: note - a different appraoch than similar methods
+        last = at_query_set.latest('access_time')
+        
+        #if last:
+        #    #return last.ctime()
+        #    return last.access_time.strftime("%B %d, %Y, %I:%M %p") + " (" + last.door.name + ")"
+        #else:
+        #    return None
+        return last.access_time.strftime("%B %d, %Y, %I:%M %p") + " (" + last.door.name + ")"
+
+        """
+        # Now get the access_time field of each AccessTime object
+        all_access_times_list = [access_time_object.access_time for access_time_object in at_query_set]
+        last = self.get_last_access_time()
+        if last:
+            #return last.ctime()
+            return last.strftime("%B %d, %Y, %I:%M %p") 
+        else:
+            return None
+        """
+
     def last_access_time_and_link_to_more(self):  
-        """ todo -  also including link to all access times here (temp) """
-        _last = self.get_last_access_time()
+        """ including link to all access times (for change form) """
+        last = self.get_last_access_time()
         link = self.all_access_times_link()
-        if _last:
-            return "%s (%s)" % (_last.strftime("%B %d, %Y, %I:%M %p") , link)
+        if last:
+            return "%s (%s)" % (last.strftime("%B %d, %Y, %I:%M %p") , link)
         else:
             return None
     last_access_time_and_link_to_more.allow_tags = True
