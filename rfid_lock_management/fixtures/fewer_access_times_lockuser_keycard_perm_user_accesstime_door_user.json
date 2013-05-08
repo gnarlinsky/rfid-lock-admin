@@ -1,0 +1,564 @@
+[
+  {
+    "pk": 1,
+    "model": "rfid_lock_management.accesstime",
+    "fields": {
+      "door": 1,
+      "access_time": "2013-04-10T00:56:21.644Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 0,56,21)\", \"x\": \"Date.UTC(2013,3,10)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "rfid_lock_management.accesstime",
+    "fields": {
+      "door": 3,
+      "access_time": "2013-04-16T00:56:38.348Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 0,56,38)\", \"x\": \"Date.UTC(2013,3,16)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 48,
+    "model": "rfid_lock_management.accesstime",
+    "fields": {
+      "door": 2,
+      "access_time": "2013-03-16T15:33:54.744Z",
+      "the_rfid": "1122135199",
+      "lockuser": 2,
+      "data_point": "{\"y\": \"Date.UTC(0,0,0, 15,33,54)\", \"x\": \"Date.UTC(2013,2,16)\", \"user\": \"\\\"homer simpson\\\"\"}"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "rfid_lock_management.door",
+    "fields": {
+      "name": "Space 1",
+      "description": "Space 1!!!1!!"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "rfid_lock_management.door",
+    "fields": {
+      "name": "Space 2",
+      "description": null
+    }
+  },
+  {
+    "pk": 3,
+    "model": "rfid_lock_management.door",
+    "fields": {
+      "name": "Space 3",
+      "description": "Blah blah door 3 blah"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "rfid_lock_management.door",
+    "fields": {
+      "name": "Space 4",
+      "description": null
+    }
+  },
+  {
+    "pk": 19,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_logentry",
+      "name": "Can add log entry",
+      "content_type": 7
+    }
+  },
+  {
+    "pk": 20,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_logentry",
+      "name": "Can change log entry",
+      "content_type": 7
+    }
+  },
+  {
+    "pk": 21,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_logentry",
+      "name": "Can delete log entry",
+      "content_type": 7
+    }
+  },
+  {
+    "pk": 1,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_group",
+      "name": "Can add group",
+      "content_type": 2
+    }
+  },
+  {
+    "pk": 4,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_group",
+      "name": "Can change group",
+      "content_type": 2
+    }
+  },
+  {
+    "pk": 7,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_group",
+      "name": "Can delete group",
+      "content_type": 2
+    }
+  },
+  {
+    "pk": 2,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_permission",
+      "name": "Can add permission",
+      "content_type": 1
+    }
+  },
+  {
+    "pk": 5,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_permission",
+      "name": "Can change permission",
+      "content_type": 1
+    }
+  },
+  {
+    "pk": 8,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_permission",
+      "name": "Can delete permission",
+      "content_type": 1
+    }
+  },
+  {
+    "pk": 3,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_user",
+      "name": "Can add user",
+      "content_type": 3
+    }
+  },
+  {
+    "pk": 6,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_user",
+      "name": "Can change user",
+      "content_type": 3
+    }
+  },
+  {
+    "pk": 9,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_user",
+      "name": "Can delete user",
+      "content_type": 3
+    }
+  },
+  {
+    "pk": 10,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_contenttype",
+      "name": "Can add content type",
+      "content_type": 4
+    }
+  },
+  {
+    "pk": 11,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_contenttype",
+      "name": "Can change content type",
+      "content_type": 4
+    }
+  },
+  {
+    "pk": 12,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_contenttype",
+      "name": "Can delete content type",
+      "content_type": 4
+    }
+  },
+  {
+    "pk": 22,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_accesstime",
+      "name": "Can add access time",
+      "content_type": 11
+    }
+  },
+  {
+    "pk": 27,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_accesstime",
+      "name": "Can change access time",
+      "content_type": 11
+    }
+  },
+  {
+    "pk": 32,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_accesstime",
+      "name": "Can delete access time",
+      "content_type": 11
+    }
+  },
+  {
+    "pk": 23,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_door",
+      "name": "Can add door",
+      "content_type": 8
+    }
+  },
+  {
+    "pk": 37,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "can_manage_door_1",
+      "name": "Can manage door to Space 1",
+      "content_type": 8
+    }
+  },
+  {
+    "pk": 38,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "can_manage_door_2",
+      "name": "Can manage door to Space 2",
+      "content_type": 8
+    }
+  },
+  {
+    "pk": 39,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "can_manage_door_3",
+      "name": "Can manage door to Space 3",
+      "content_type": 8
+    }
+  },
+  {
+    "pk": 28,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_door",
+      "name": "Can change door",
+      "content_type": 8
+    }
+  },
+  {
+    "pk": 33,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_door",
+      "name": "Can delete door",
+      "content_type": 8
+    }
+  },
+  {
+    "pk": 24,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_lockuser",
+      "name": "Can add lock user",
+      "content_type": 12
+    }
+  },
+  {
+    "pk": 29,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_lockuser",
+      "name": "Can change lock user",
+      "content_type": 12
+    }
+  },
+  {
+    "pk": 34,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_lockuser",
+      "name": "Can delete lock user",
+      "content_type": 12
+    }
+  },
+  {
+    "pk": 25,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_newkeycardscan",
+      "name": "Can add new keycard scan",
+      "content_type": 9
+    }
+  },
+  {
+    "pk": 30,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_newkeycardscan",
+      "name": "Can change new keycard scan",
+      "content_type": 9
+    }
+  },
+  {
+    "pk": 35,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_newkeycardscan",
+      "name": "Can delete new keycard scan",
+      "content_type": 9
+    }
+  },
+  {
+    "pk": 26,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_rfidkeycard",
+      "name": "Can add rfi dkeycard",
+      "content_type": 10
+    }
+  },
+  {
+    "pk": 31,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_rfidkeycard",
+      "name": "Can change rfi dkeycard",
+      "content_type": 10
+    }
+  },
+  {
+    "pk": 36,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_rfidkeycard",
+      "name": "Can delete rfi dkeycard",
+      "content_type": 10
+    }
+  },
+  {
+    "pk": 13,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_session",
+      "name": "Can add session",
+      "content_type": 5
+    }
+  },
+  {
+    "pk": 14,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_session",
+      "name": "Can change session",
+      "content_type": 5
+    }
+  },
+  {
+    "pk": 15,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_session",
+      "name": "Can delete session",
+      "content_type": 5
+    }
+  },
+  {
+    "pk": 16,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "add_site",
+      "name": "Can add site",
+      "content_type": 6
+    }
+  },
+  {
+    "pk": 17,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "change_site",
+      "name": "Can change site",
+      "content_type": 6
+    }
+  },
+  {
+    "pk": 18,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "delete_site",
+      "name": "Can delete site",
+      "content_type": 6
+    }
+  },
+  {
+    "pk": 1,
+    "model": "auth.user",
+    "fields": {
+      "username": "superuser",
+      "first_name": "",
+      "last_name": "",
+      "is_active": true,
+      "is_superuser": true,
+      "is_staff": true,
+      "last_login": "2013-04-10T00:50:16.699Z",
+      "groups": [],
+      "user_permissions": [],
+      "password": "pbkdf2_sha256$10000$XP1tlKv9G1jV$U8tHx/cyMaRH5VB0jwUWqxYRhAdXHwvbaG4iMFx2cuA=",
+      "email": "x@x.com",
+      "date_joined": "2013-04-10T00:43:44.029Z"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "auth.user",
+    "fields": {
+      "username": "staff_user_1",
+      "first_name": "",
+      "last_name": "",
+      "is_active": true,
+      "is_superuser": false,
+      "is_staff": true,
+      "last_login": "2013-04-11T00:44:38Z",
+      "groups": [],
+      "user_permissions": [
+        24,
+        27,
+        29,
+        38,
+        39
+      ],
+      "password": "pbkdf2_sha256$10000$W2uEagcVzmoL$2qdN5HltYiFbuShxH1TH54lqYOIZ90/zR6nVebSuKAU=",
+      "email": "",
+      "date_joined": "2013-04-11T00:44:38Z"
+    } 
+  },
+  {
+    "pk": 1,
+    "model": "rfid_lock_management.rfidkeycard",
+    "fields": {
+      "lockuser": 1,
+      "assigner": 1,
+      "the_rfid": "1122135122",
+      "revoker": null,
+      "date_revoked": null,
+      "date_created": "2013-04-10T00:52:00.220Z"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "rfid_lock_management.rfidkeycard",
+    "fields": {
+      "lockuser": 2,
+      "assigner": 1,
+      "the_rfid": "1122135199",
+      "revoker": null,
+      "date_revoked": null,
+      "date_created": "2013-04-10T00:53:21.472Z"
+    }
+  },
+
+  {
+    "pk": 3,
+    "model": "rfid_lock_management.rfidkeycard",
+    "fields": {
+      "lockuser": 3,
+      "assigner": 2,
+      "the_rfid": "9999999991",
+      "revoker": 2,
+      "date_revoked": "2013-04-15T02:45:24.879Z",
+      "date_created": "2013-04-15T02:44:45.573Z"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "rfid_lock_management.rfidkeycard",
+    "fields": {
+      "lockuser": 3,
+      "assigner": 2,
+      "the_rfid": "9999999992",
+      "revoker": null,
+      "date_revoked": null,
+      "date_created": "2013-04-15T02:47:41.289Z"
+    }
+  }, 
+  {
+    "pk": 1,
+    "model": "rfid_lock_management.lockuser",
+    "fields": {
+      "phone_number": "1-217-555-0001",
+      "first_name": "C. M.",
+      "last_name": "Burns",
+      "deactivate_current_keycard": false,
+      "birthdate": null,
+      "current_keycard_revoker": null,
+      "doors": [
+        1,
+        4
+      ],
+      "address": "1000 Mammon Ln. Springfield, IL",
+      "email": "mr.burns@springfieldnuclearpowerplant.com"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "rfid_lock_management.lockuser",
+    "fields": {
+      "phone_number": " 2175553223",
+      "first_name": "Homer",
+      "last_name": "Simpson",
+      "deactivate_current_keycard": false,
+      "birthdate": null,
+      "current_keycard_revoker": null,
+      "doors": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "address": "742 Evergreen Terrace, Springfield, IL",
+      "email": "ChunkyLover53@aol.com"
+    }
+  }, 
+  {
+    "pk": 3,
+    "model": "rfid_lock_management.lockuser",
+    "fields": {
+      "phone_number": "(217) 555-3223",
+      "first_name": "Lisa",
+      "last_name": "Simpson",
+      "deactivate_current_keycard": false,
+      "birthdate": null,
+      "current_keycard_revoker": null,
+      "doors": [
+        2
+      ],
+      "address": "742 Evergreen Terrace, Springfield, IL",
+      "email": "smartgirl63@yahoo.com"
+    }
+  }
+]
