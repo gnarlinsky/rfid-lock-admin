@@ -585,12 +585,11 @@ class GeneralFunctionalTests(LiveServerTestCase):
 
 
 class LogIn(LiveServerTestCase):
-    # Temp2 --  do NOT login in setUp
 
     fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
     def setUp(self):
         """ Start up Selenium WebDriver browser instance """
-        print colored("\nLiveServerTestCase Temp2", "white","on_green")
+        print colored("\nLiveServerTestCase LogIn", "white","on_green")
         print colored(self._testMethodName + ": " + self._testMethodDoc, "green")
 
         #################################################################
