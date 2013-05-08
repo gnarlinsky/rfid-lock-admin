@@ -1,6 +1,6 @@
 import simplejson
 import random
-from djock_app.models import RFIDkeycard, AccessTime
+from rfid_lock_management.models import RFIDkeycard, AccessTime
 from django.utils.timezone import utc
 from datetime import timedelta, datetime
 

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-coverage run manage.py test djock_app
+coverage run manage.py test rfid_lock_management 
 
-#coverage report -m --include="djock_app/*" --omit="djock_app/misc.py,djock_app/tests/*"
+#coverage report -m --include="rfid_lock_management/*" --omit="rfid_lock_management/misc.py,rfid_lock_management/tests/*"
 
 # don't report on django packages, or any other packages that aren't mine
-coverage report -m --include="djock_app/*,proj_djock/*" --omit="djock_app/misc.py,djock_app/tests/*,/Users/gnadia/Insync/gnadia.code@gmail.com/ve/*"
+coverage report -m --include="rfid_lock_management/*,proj_rfid_lock_management/*" --omit="rfid_lock_management/misc.py,rfid_lock_management/tests/*,/Users/gnadia/Insync/gnadia.code@gmail.com/ve/*"
 
-#coverage html --include="djock_app/*" --omit="djock_app/misc.py,djock_app/tests/*"
-coverage html --include="djock_app/*,proj_djock/" --omit="djock_app/misc.py,djock_app/tests/*,/Users/gnadia/Insync/gnadia.code@gmail.com/ve/*"
+#coverage html --include="rfid_lock_management/*" --omit="rfid_lock_management/misc.py,rfid_lock_management/tests/*"
+coverage html --include="rfid_lock_management/*,proj_rfid_lock_management/" --omit="rfid_lock_management/misc.py,rfid_lock_management/tests/*,/Users/gnadia/Insync/gnadia.code@gmail.com/ve/*"
 
 open htmlcov/index.html

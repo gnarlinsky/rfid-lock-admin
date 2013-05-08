@@ -48,15 +48,15 @@
 {% block nav-global %}
     {% comment %}
 <!--  {% if user.is_staff %} -->
-   <a href="/lockadmin/djock_app/lockuser/add/" class="ml">Assign new keycard</a>
+   <a href="/lockadmin/rfid_lock_management/lockuser/add/" class="ml">Assign new keycard</a>
    <p class="ml">|</p>
-   <a href="/lockadmin/djock_app/accesstime/" class="ml">Room access log</a> <p class="ml">|</p>
-    <a href="/lockadmin/djock_app/lockuser/" class="ml">View/Manage lock users</a> <p class="ml">|</p>
+   <a href="/lockadmin/rfid_lock_management/accesstime/" class="ml">Room access log</a> <p class="ml">|</p>
+    <a href="/lockadmin/rfid_lock_management/lockuser/" class="ml">View/Manage lock users</a> <p class="ml">|</p>
     <a href="/lockadmin/auth/user/add/" class="ml">Add STAFF users</a> <p class="ml">|</p>
    <a href="/lockadmin/auth/user/" class="ml">Manage STAFF users</a> <p class="ml">
     {% endcomment %}
     {% comment %}
-    <a href="/lockadmin/djock_app/lockuser/?is_active__exact=0" class="ml">Inactive LockUsers</a>
+    <a href="/lockadmin/rfid_lock_management/lockuser/?is_active__exact=0" class="ml">Inactive LockUsers</a>
     <p class="ml">|</p>
     Link above is a "deep link" to a filter model for not yet/no longer activated lock users.
     (Note -- I'd like non-superuser staff to NOT have the ability to delete models -- 

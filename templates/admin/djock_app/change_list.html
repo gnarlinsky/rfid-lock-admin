@@ -75,7 +75,7 @@
         <div id="hidden_access_times_chart">hidden!</div>
         <div id="access_times_chart">!!!!!!!!!!  access times chart rendered here</div>
     {% elif  module_name == 'lock users' %} 
-        <a href="/lockadmin/djock_app/lockuser/add/" class="btn"> Add lock user </a> 
+        <a href="/lockadmin/rfid_lock_management/lockuser/add/" class="btn"> Add lock user </a> 
     {% endif %}
     {{ block.super }}
 {% endblock %}
@@ -102,13 +102,13 @@
     {% block object-tools %}
            {% comment %}
                 {% if  module_name == 'lock users' %} 
-                    <a href="/lockadmin/djock_app/lockuser/add/" class="btn pull-right"> Add lock user </a> 
+                    <a href="/lockadmin/rfid_lock_management/lockuser/add/" class="btn pull-right"> Add lock user </a> 
                 {% endif %}
            {% endcomment %}
       {% if has_add_permission %}
                 {% if  module_name == 'lock users' %} 
                   <div class="pull-right">
-                    <a href="/lockadmin/djock_app/lockuser/add/" class="btn" style="margin:15px;"> Add lock user </a> 
+                    <a href="/lockadmin/rfid_lock_management/lockuser/add/" class="btn" style="margin:15px;"> Add lock user </a> 
                     </div>
                 {% else %}
         <ul class="object-tools">
@@ -154,7 +154,7 @@
       {% if has_add_permission %}
           <div class="pull-right">
                 {% if  module_name == 'lock users' %} 
-                    <a href="/lockadmin/djock_app/lockuser/add/" class="btn">Add lock user </a> 
+                    <a href="/lockadmin/rfid_lock_management/lockuser/add/" class="btn">Add lock user </a> 
                 {% endif %}
             </div>
         {% endif %}
