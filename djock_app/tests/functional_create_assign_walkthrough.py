@@ -105,6 +105,7 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         - logs in 
         """
         self.browser.get(self.live_server_url + '/lockadmin') # user opens web browser; goes to main admin page
+        self.browser.maximize_window()
 
         if SCREENSHOTS: sc_counter += 1; time.sleep(SLOWER); os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
 
@@ -145,7 +146,7 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         first_name = 'Marge'
         last_name = 'Simpson'
         email = 'marge@yahoo.com'
-        phone_number =  2175553223  # todo: str
+        phone_number =  '2175553223'  
         address = '742 Evergreen Terrace, Springfield, IL'
 
         self.browser.find_element_by_name('first_name').send_keys(first_name)
@@ -217,6 +218,7 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         """
         done_button = self.browser.find_element_by_css_selector("input[value='Done']")
         done_button.click()
+        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
 
 
         """

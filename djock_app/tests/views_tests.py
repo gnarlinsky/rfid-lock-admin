@@ -11,10 +11,7 @@ from djock_app.misc import get_arg_default
 
 
 
-""" the urls: 
-url(r'^chart/', views.chartify),
-url(r'done_scan/(?P<new_scan_pk>\d+)/$',views.finished_new_keycard_scan),
-"""
+# todo:  concerning testing tautologies........
 
 # to do: No tests for getallowed and check views, right?  The lock_comm_tests.py test these more indirectly/without using the actual view method names....
 #url(r'checkdoor/(?P<doorid>\d+)/checkrfid/(?P<rfid>\w{10})/$',views.check
@@ -27,6 +24,48 @@ url(r'done_scan/(?P<new_scan_pk>\d+)/$',views.finished_new_keycard_scan),
 #class ChartifyTests(TestCase):
 #    def setUp(self):
 #        print colored("\nTestCase ChartifyTests", "white", "on_green")
+class ChartTests(TestCase):
+    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
+    
+    def setUp(self):
+        print colored("\nTestCase NewKeycardScanTests", "white", "on_green")
+        print colored(self._testMethodName + ": " + self._testMethodDoc, "green") 
+        self.client = Client()
+
+
+    def test_chartify(self):
+        """ Does chartify() return response with the correct(ly formatted) data for HighChart plot of access times? """
+        # login as staff user in fixture
+        self.client.login(username='staff_user_1',password='staff_user_1')
+        response = self.client.get("/chart/") 
+        response.context['chart_data']
+
+        print colored("\tCheck response status code","blue")
+        self.assertEqual(response.status_code, 200)
+
+        print colored("\tCheck response content type","blue")
+        self.assertEqual(response['content-type'],'text/html; charset=utf-8')
+
+        # tooltip hardcoded in view as well
+        tooltip = {   'followPointer': 'false', 'pointFormat': '"{point.user}"'}
+
+        all_doors_series = []
+
+        for door in Door.objects.all():
+            # get the data points for this door
+            at_this_door = AccessTime.objects.filter(door=door)
+            data_points_values_list = at_this_door.values_list('data_point')
+            data =   [simplejson.loads(dp[0]) for dp in data_points_values_list]
+
+            # create door series
+            door_series = { 'name':'"%s"' % door.name, 'data':data, 'tooltip':tooltip}
+
+            # append to list of all door series
+            all_doors_series.append(door_series)
+
+        print colored("\tCheck response context for chart_type string","blue") # the one we're really interested in
+        self.assertEqual(response.context['chart_data'], simplejson.dumps(all_doors_series,indent=""))
+
      
 class NewKeycardScanTests(TestCase):
         #fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
@@ -320,7 +359,7 @@ class NewKeycardScanTests(TestCase):
 
         print colored("\tCheck response content","blue")
         self.assertEqual(simplejson.loads(response.content)['success'], False)
-        self.assertEqual(simplejson.loads(response.content)['error_mess'], "No NewKeycardScan obj with pk %d" % new_scan_pk)
+        self.assertEqual(simplejson.loads(response.content)['error_mess'], "No NewKeycardScan obj with pk %d." % new_scan_pk)
 
 
 
@@ -352,7 +391,7 @@ class NewKeycardScanTests(TestCase):
 
         print colored("\tCheck response content","blue")
         self.assertEqual(simplejson.loads(response.content)['success'], False)
-        self.assertEqual(simplejson.loads(response.content)['error_mess'], "Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done'.... "  % default_timeout_minutes)
+        self.assertEqual(simplejson.loads(response.content)['error_mess'], "Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done.' "  % default_timeout_minutes)
 
         
 
@@ -373,7 +412,7 @@ class NewKeycardScanTests(TestCase):
 
         print colored("\tCheck response content","blue")
         self.assertEqual(simplejson.loads(response.content)['success'], False)
-        self.assertEqual(simplejson.loads(response.content)['error_mess'], "NewKeycardScan does not have rfid")
+        self.assertEqual(simplejson.loads(response.content)['error_mess'], "NewKeycardScan does not have RFID.")
 
     def test_finished_new_keycard_scan_keycard_with_same_rfid_exists(self):
         """ A keycard with the same RFID is already assigned to another lockuser """

@@ -12,4 +12,5 @@ from lock_comm_tests import *
 from staff_users_tests import *
 from views_tests import *
 from functional_create_assign_walkthrough import *
+from templatetags_tests import *
 

@@ -19,7 +19,7 @@ from django.contrib.auth.models import Permission
 
 class Door(models.Model):
     """ Doors with RFID locks installed. """
-    name        = models.CharField(max_length=50, unique=True)  # e.g. "Makerspace," "Bike Project," etc.
+    name        = models.CharField(max_length=50, unique=True,null=False)  # e.g. "Makerspace," "Bike Project," etc.
     description = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
@@ -29,7 +29,6 @@ class Door(models.Model):
 
     def save(self,*args,**kwargs):
         """ When a new Door is added, create a corresponding Permission, if it does not exist already """
-        print colored("SAVING-Door", "magenta")
 
         super(Door,self).save(*args,**kwargs)
 
@@ -37,7 +36,6 @@ class Door(models.Model):
             content_type = ContentType.objects.get(app_label='djock_app',model='door')
 
             # todo:  IntegrityError: columns content_type_id, codename are not unique
-            print colored("SAVING-Permission", "magenta")
             # create() saves as well
             Permission.objects.create( \
                     codename='can_manage_door_%d' % self.pk, \
@@ -90,6 +88,7 @@ class NewKeycardScan(models.Model):
     #time_initiated = models.DateTimeField(auto_now_add=True)
     # auto_now_add and time zone stuff do not play well together sometimes...
     time_initiated = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))
+    #time_initiated = models.DateTimeField(default=datetime.datetime.now)
     waiting_for_scan = models.BooleanField(default=True) 
     doorid = models.CharField(max_length=50)   # doorid as in the requesting url
     rfid = models.CharField(max_length=10)   # rfid as in the requesting url
@@ -183,7 +182,8 @@ class RFIDkeycard(models.Model):
         #else:   
         #    return None
 
-    """ Staff user door management is not a current use case 
+    """ 
+    Staff user door management is not a current use case 
     def prettify_get_allowed_doors(self):
         if self.lockuser:
             return self.lockuser.prettify_get_allowed_doors()
@@ -198,7 +198,6 @@ class RFIDkeycard(models.Model):
     # Django will HTML-escape the output by default. If you'd rather not escape the output of the method,
     # give the method an allow_tags attribute whose value is True.
     get_allowed_doors_html_links.allow_tags = True
-
     """
 
     def is_active(self):
@@ -235,7 +234,6 @@ class AccessTime(models.Model):
     """
     def get_data_point(self):
         #  Return data point dict to JSONify for highchart 
-        print colored("----- getting data point ----", "red")
         data_point = {}
         data_point['x'] = 'Date.UTC(%d,%d,%d)' % (self.access_time.year, self.access_time.month, self.access_time.day)
         data_point['y'] = 'Date.UTC(0,0,0, %d,%d,%d)' % (self.access_time.hour, self.access_time.minute, self.access_time.second)
@@ -266,11 +264,12 @@ class LockUser(models.Model):
     #  Contact info 
     ####################################################################
     # todo:  which explicitly required......
-    first_name      = models.CharField(max_length=50)
-    last_name       = models.CharField(max_length=50)
+    first_name      = models.CharField(max_length=50,null=False)
+    last_name       = models.CharField(max_length=50, null=False)
+    email           = models.EmailField(null=False,unique=True) 
     address         = models.CharField(max_length=100,blank=True)
-    email           = models.EmailField(blank=True,unique=True)  # todo: blank okay for NOW, later - required
-    phone_number    = models.IntegerField(max_length=30,null=True,blank=True) # todo: later - required ; string...?
+    #phone_number    = models.IntegerField(max_length=20,null=True,blank=True) # todo: later - required ; string...?
+    phone_number    = models.CharField(max_length=20,null=True,blank=True) # todo: later - required ; string...?
     birthdate       = models.DateField(null=True)
 
     ################################################################################
@@ -296,7 +295,6 @@ class LockUser(models.Model):
               on the LockUser's change_form. 
             - If we're assigning a new keycard, the keycard is created and saved here. 
         """
-        print colored("SAVING-lockuser", "magenta")
         
         # Since djock_app_rfidkeycard.lockuser_id may not be NULL when saving RFIDkeycard object, we need
         # to save the LockUser object first, so we can get self.id (which is also necessary before any work
@@ -313,8 +311,9 @@ class LockUser(models.Model):
         new_scan_queryset = NewKeycardScan.objects.all()
         if new_scan_queryset:
             # get last created NewKeycardScan object
-            # todo: see expanded_comments.txt, (2) (basically -- this may not be the new scan obj we need...)
-            new_scan = new_scan_queryset.latest("time_initiated")  
+            #new_scan = new_scan_queryset.latest("time_initiated")  
+            # above may not actually return the latest created object if 'start scan' was hit a bunch of times in a row -- even microseconds won't have sufficient resolution to actually get the latest object 
+            new_scan = new_scan_queryset.latest("pk")
             if new_scan.ready_to_assign:
                 new_scan.ready_to_assign = False   
                 new_scan.save() # save new_scan before saving new_keycard! 

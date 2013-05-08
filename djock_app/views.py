@@ -11,6 +11,7 @@ from djock_app.misc import get_arg_default
 
 # todo
 # return series for chartit in JSON format
+@login_required
 def chartify(request): 
 
     #########################################################################
@@ -38,10 +39,12 @@ def chartify(request):
             #print colored("adding data point  for door %s: %s" % (door.name, at.data_point), "white","on_blue") 
             one_series['data'].append(simplejson.loads(at.data_point))  # todo: ugh with the loads'ing           
         all_series.append(one_series)
-    #extra_context = {"test_jsond": simplejson.dumps([test_d, test_d2]) } 
+
     extra_context = {'chart_data': simplejson.dumps(all_series, indent="") } 
-    print colored("----   chartify ------", "red")
-    print extra_context['chart_data']
+
+
+
+
 
     return render_to_response('chart.html', dictionary=extra_context, context_instance=RequestContext(request))
 
@@ -78,7 +81,10 @@ def check(request,doorid, rfid):
     # Is the request actually for new keycard assignment? 
     new_scan_queryset = djock_app.models.NewKeycardScan.objects.all()
     if new_scan_queryset:
-        new_scan = new_scan_queryset.latest("time_initiated")  # get the latest NewKeycardScan object, ordered by the field time_initiated (i.e. time the object was created) 
+        #new_scan = new_scan_queryset.latest("time_initiated")  # get the latest NewKeycardScan object, ordered by the field time_initiated (i.e. time the object was created) 
+        # above may not actually return the latest created object if 'start scan' was hit a bunch of times in a row -- even microseconds won't have sufficient resolution to actually get the latest object
+        new_scan = new_scan_queryset.latest("pk")  # get the latest NewKeycardScan object, as determined by pk
+
         # TODO: Things might go awry if someone else initiated a scan later... Currently verifying pk's later,  in
         # finished_keycard_scan, but do earlier. And pass pk info in a smarter way.
 
@@ -87,7 +93,6 @@ def check(request,doorid, rfid):
             new_scan.rfid = rfid
             new_scan.save()  
             return HttpResponse(response)
-    
 
     # or is the request actually for authenticating an existing keycard for this door? 
     try: 
@@ -99,22 +104,18 @@ def check(request,doorid, rfid):
     if rfidkeycard.is_active():
         for door in rfidkeycard.get_allowed_doors():
             if door.id == int(doorid): 
+                # so response will be 1 -- authenticated. 
                 response=1
+                # Before returning, though, create the data_point attribute for the current access, to build the JS chart of visitors later
 
-                #print colored("**** creating and saving accesstime *****","red","on_white")
-                #at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=rfidkeycard.lockuser, door=djock_app.models.Door.objects.get(id=int(doorid)))  # todo: access time is going to be a bit later...
-                #at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=rfidkeycard.lockuser, door=door) # todo: access time is going to be a bit later...
+                ###################################################### 
+                #create the highchart data point for this access time
+                ###################################################### 
                 lockuser = rfidkeycard.lockuser
-
-                #at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.utcnow().replace(tzinfo=utc), lockuser=lockuser, door=door ) # todo: access time is going to be a bit later...
-                # todo: time zone stuff
                 at = djock_app.models.AccessTime(the_rfid=rfid,access_time=datetime.now().replace(tzinfo=utc), lockuser=lockuser, door=door ) # todo: access time is going to be a bit later...
-
                 """
                 at.lockuser_link_html = make_lockuser_link_html(lockuser.id, lockuser.first_name, lockuser.last_name)
                 """
-                # To do: middle name
-
                 # TODO: If we reuse keycards/keycard nums, AccessTime objects'
                 # lockusers -- as seen on AccessTimes change_list, for ex -- will be
                 # incorrect, since lockuser is the CURRENT owner, so this would not 
@@ -122,32 +123,31 @@ def check(request,doorid, rfid):
                 # associate AccessTimes with lockusers at creation time. I.e. determine
                 # the current lockuser in *views.py* (check() ) and assign there.
 
-
-                    
-                # create the highchart data point for this access time
-
-                # todo - see sticky (x) 
                 # todo:  this may be interim....
                 data_point_dict = {}
                 # data point dict to JSONify for the access times highchart  
+
+                # todo: need this line:? 
                 data_point = {}
-                data_point_dict['x'] = 'Date.UTC(%d,%d,%d)' % (at.access_time.year, at.access_time.month, at.access_time.day)
+
+
+                # todo:  double check -- subtracting 1 to month because Javascript starts month count at 0, I think
+                data_point_dict['x'] = 'Date.UTC(%d,%d,%d)' % (at.access_time.year, at.access_time.month-1, at.access_time.day)
                 data_point_dict['y'] = 'Date.UTC(0,0,0, %d,%d,%d)' % (at.access_time.hour, at.access_time.minute, at.access_time.second)
                 data_point_dict['user'] = '"%s %s"' % (at.lockuser.first_name, at.lockuser.last_name)  
+
                 at.data_point = simplejson.dumps(data_point_dict)
                 at.save()
+
     return HttpResponse(response)
 
 
 @login_required
 def initiate_new_keycard_scan(request,lockuser_object_id):
     """ Try start waiting for new keycard scan; return success/fail message """
-#def initiate_new_keycard_scan(request):
-
     # If this lockuser already has a current keycard, don't proceed
     # (This should have been prevented at template level also)
     try: 
-        #lu = djock_app.models.LockUser.objects.filter(id=lockuser_object_id)
         lu = djock_app.models.LockUser.objects.get(id=lockuser_object_id)
     except:
         response_data = {'success':False, "error_mess":"WTF? There's no lock user?"}
@@ -157,9 +157,11 @@ def initiate_new_keycard_scan(request,lockuser_object_id):
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
     else:
         n = djock_app.models.NewKeycardScan()
+
         n.waiting_for_scan = True
         n.assigner_user = request.user
         n.save()   
+
         response_data = {'success':True, 'new_scan_pk':n.pk}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
     
@@ -189,22 +191,25 @@ def finished_new_keycard_scan(request,new_scan_pk):
     new_scan_right_pk_qs = new_scan_queryset.filter(pk = new_scan_pk)  # make sure we have the newKeycardScan object we started with, not one that another staff user initiated *after* us. 
 
     if not new_scan_right_pk_qs:
-        response_data = {'success':False, 'error_mess':"No NewKeycardScan obj with pk " + new_scan_pk}
+        response_data = {'success':False, 'error_mess':"No NewKeycardScan obj with pk " + new_scan_pk + "."}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
     new_scan = new_scan_right_pk_qs[0]
     #min_till_timeout = 2
     #timed_out, time_diff_minutes = new_scan.timed_out(minutes=min_till_timeout)
-    default_timeout_minutes = get_arg_default(djock_app.models.NewKeycardScan.timed_out,'minutes')
     timed_out, time_diff_minutes = new_scan.timed_out()  # defaults to two minutes
+
+
+
     if timed_out:
     #if new_scan.timed_out(minutes=min_till_timeout):
         #response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done'.... So don't take %f minutes next time, please, fatty. Run to that lock! You could use the exercise." % (min_till_timeout,time_diff_minutes)}
-        response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done'.... "  % default_timeout_minutes}
+        default_timeout_minutes = get_arg_default(djock_app.models.NewKeycardScan.timed_out,'minutes')
+        response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done.' "  % default_timeout_minutes}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
     if not new_scan.rfid:  
-        response_data = {'success':False, 'error_mess':"NewKeycardScan does not have rfid"}
+        response_data = {'success':False, 'error_mess':"NewKeycardScan does not have RFID."}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
     # if waiting for new keycard to be scanned, but timed out
 

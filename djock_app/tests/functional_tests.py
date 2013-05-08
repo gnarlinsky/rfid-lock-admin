@@ -75,6 +75,78 @@ from djock_app.admin import LockUserAdmin
 #######################################################################################
 """
 
+
+
+# class AccessTimeList(LiveServerTestCase):
+#     fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
+# 
+#     def setUp(self):
+#         """ Start up Selenium WebDriver browser instance """
+#         print colored("\nLiveServerTestCase RenameLaterFunctionalTests", "white","on_green")
+#         print colored(self._testMethodName + ": " + self._testMethodDoc, "green")
+# 
+#         #################################################################
+#         # set up browser
+#         #################################################################
+#         self.browser = webdriver.Firefox()
+#         self.browser.implicitly_wait(3)  # tells webdriver to use a max timeout of 3 seconds
+# 
+#         #################################################################
+#         # open browser and log in
+#         #################################################################
+#         print colored("\tOpening browser to get to lockuser's change_form (login first).......", "cyan")
+#         self.browser.get(self.live_server_url + '/lockadmin') # user opens web browser; goes to main admin page
+#         self.browser.maximize_window()
+#         print colored("\tBut login first..........", "cyan")
+#         username_field = self.browser.find_element_by_name('username')
+#         username_field.send_keys('staff_user_1')
+#         password_field = self.browser.find_element_by_name('password')
+#         password_field.send_keys('staff_user_1')
+#         password_field.send_keys(Keys.RETURN)
+# 
+#     def tearDown(self):
+#         """ Shut down Selenium WebDriver browser instance """
+#         print colored("\n(tearing down - quit browser after every test)", "green")
+#         self.browser.quit()
+# 
+# 
+#     def test_access_time_change_list(self):
+#         """ """
+#         print colored("\tOpening browser to get to room access log page......", "cyan")
+#         self.browser.get(self.live_server_url + '/lockadmin/djock_app/accesstime/')
+#         self.browser.maximize_window()
+# 
+# 
+#         print colored("logging in as staff user....","cyan")
+#         client = Client()
+#         #self.client.login(username='staff_user_1',password='staff_user_1')
+#         client.login(username='staff_user_1',password='staff_user_1')
+#         #response = self.client.get("/lockadmin/djock_app/lockuser/%d/" % object_id)
+#         response = client.get("/lockadmin/djock_app/lockuser/%d/" % object_id)
+#         request = response.context['request']
+# 
+# 
+#         #######################################################################
+#         # todo: using client here as well as browser.. so logging in two 
+#         # different ways..but need request, with user.  Better way to do that?
+#         #######################################################################
+# 
+#         # Login the same user 
+#         #staff_only_user = User.objects.get(username="staff_user_1")
+#         #client.login(username='staff_user_1',password='staff_user_1')
+# 
+#         
+#         #############################################################
+#         # Non-form-field things
+
+
+
+
+
+
+
+
+
 # todo:  class LoginStuff........ to separate from stuff where ... already logged in? so can just setUp logging in? If required..............
 
 # LiveServerTestCase starts up a test web server in a separate thread
@@ -102,8 +174,9 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         #################################################################
         # open browser and log in
         #################################################################
-        print colored("\tOpening browser to get to lockuser's change_form.......", "cyan")
+        print colored("\tOpening browser to login first.......", "cyan")
         self.browser.get(self.live_server_url + '/lockadmin') # user opens web browser; goes to main admin page
+        self.browser.maximize_window()
         print colored("\tBut login first..........", "cyan")
         username_field = self.browser.find_element_by_name('username')
         username_field.send_keys('staff_user_1')
@@ -120,6 +193,9 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
     def test_no_delete_button_lockuser_change_form(self):
         """ Check that staff users do not see a 'delete' button/link on the form page for an individual Lock User. (This is for an existing LockUser -- when *adding* a LockUser there would not be a 'delete' link/button in any case.) """
         
+        object_id=2
+        self.browser.get(self.live_server_url + '/lockadmin/djock_app/lockuser/%d' % object_id)
+        self.browser.maximize_window()
 
         """ 
         staff_user_1 = User.objects.get(username="staff_user_1")
@@ -127,7 +203,7 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         print staff_user_1.__dict__
 
         # todo:   this?  or... put browser login code below into setup.....
-        client = Client()
+        self.client = Client()
         print colored("\tLogging in as staff user via client.login....","cyan")
         return_val = client.login(username=staff_user_1.username, password='staff_user_1')
         print colored("return val ===========>", "white", "on_red")
@@ -173,21 +249,17 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         # # and what about logging in !!!!!
         # make sure the lockuser with pk 2 exists  (?)
 
-        fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json',]
 
         # will be looking at change form for this lockuser 
         object_id = 2
         lockuser = LockUser.objects.get(pk=object_id)
 
+
+
         print colored("\tOpening browser to get to lockuser's change_form.......", "cyan")
+        #self.browser.get(self.live_server_url + '/lockadmin/' )
         self.browser.get(self.live_server_url + '/lockadmin/djock_app/lockuser/%d' % object_id)
-
-
-        print colored("logging in as staff user....","cyan")
-        client = Client()
-        self.client.login(username='staff_user_1',password='staff_user_1')
-        response = self.client.get("/lockadmin/djock_app/lockuser/%d/" % object_id)
-        request = response.context['request']
+        self.browser.maximize_window()
 
 
         #######################################################################
@@ -216,11 +288,27 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
 
         print colored("\t\tIs the staff user able to see -- but not interact with (not radio button!) -- the doors that this lock user has access to that the staff user doesn't?", "magenta")
         # create LockUserAdmin object so we can get other doors 
-        lua = LockUserAdmin(LockUser, AdminSite())
 
         # now get the other doors as page displays them 
         field = self.browser.find_element_by_id('other_doors')
+        #print "**************************"*3
+        #print LockUser.objects.get(pk=object_id)
+        #print "**************************"*3
+        #print "field", field
+        #print "field.text", field.text
+        lua = LockUserAdmin(LockUser, AdminSite())
+        """
+        print colored("logging in as staff user....","cyan")
+        self.client = Client()
+        #self.client.login(username='staff_user_1',password='staff_user_1')
+        self.client.login(username='staff_user_1',password='staff_user_1')
+        """
+        client = Client()
+        client.login(username='staff_user_1',password='staff_user_1')
+        response =client.get("/lockadmin/djock_app/lockuser/%d/" % object_id)
+        request = response.context['request']
         actual_other_doors = lua.get_other_doors(request, object_id)
+        #print "actual_toherj_doors", actual_other_doors
         door_names = [door.name for door in list(actual_other_doors)]
         actual_other_doors_str = ", ".join(door_names)
         self.assertEqual(field.text, actual_other_doors_str) # test that we see the same thing the admin function would return
@@ -233,7 +321,44 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         print colored("\t\tComparing the value of the relevant text input field with the lockuser's actual email.", "magenta")
         field = self.browser.find_element_by_name('email')  # yes, find_element_by_name is really useful for form input fields
         self.assertEqual(field.get_attribute('value'), lockuser.email)
-        self.fail()   # todo:  same as above for the rest of the fields
+
+        field = self.browser.find_element_by_name('first_name')
+        self.assertEqual(field.get_attribute('value'), lockuser.first_name)
+
+        field = self.browser.find_element_by_name('last_name')
+        self.assertEqual(field.get_attribute('value'), lockuser.last_name)
+
+
+        field = self.browser.find_element_by_name('address')
+        self.assertEqual(field.get_attribute('value'), lockuser.address)
+
+        field = self.browser.find_element_by_name('phone_number')
+        self.assertEqual(field.get_attribute('value'), lockuser.phone_number)
+
+        field = self.browser.find_element_by_name('phone_number')
+        self.assertEqual(field.get_attribute('value'), lockuser.phone_number)
+        
+        # todo: see sticky - pseudocode
+        doors_pk_tuples = lockuser.doors.values_list('pk')
+        doors_pk_list = [ t[0] for t in doors_pk_tuples]  # make list of str, not list of tuples
+
+        door_checkboxes = self.browser.find_elements_by_css_selector("input[name='doors']")
+        for door_checkbox in door_checkboxes:
+            if door_checkbox.is_selected():
+                self.assertIn(int(door_checkbox.get_attribute('value')), doors_pk_list)
+
+
+
+        deact_checkbox = self.browser.find_element_by_css_selector("input[id='id_deactivate_current_keycard']")
+        self.assertEqual(deact_checkbox.is_selected(), lockuser.deactivate_current_keycard)
+
+        current_rfid_field = self.browser.find_element_by_css_selector('.form-row.field-prettify_get_current_rfid')
+        current_rfid_field = current_rfid_field.find_element_by_tag_name('p')
+        self.assertEqual(current_rfid_field.text, lockuser.prettify_get_current_rfid())
+
+        last_access_time_field = self.browser.find_element_by_css_selector('.form-row.field-last_access_time_and_link_to_more')
+        last_access_field = last_access_time_field.find_element_by_tag_name('p')
+        self.assertIn(lockuser.prettify_get_last_access_time(), last_access_time_field.text)
         
 
     def test_keycard_deactivation_but_some_doors_permitted(self):
@@ -242,14 +367,12 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         print colored("\tOpening browser to get to lockuser's change_form.......", "cyan")
         lockuser_id = 1  
         self.browser.get(self.live_server_url + '/lockadmin/djock_app/lockuser/%d' % lockuser_id)   # in fixture, lock user 1  assigned a keycard and is permitted Space 1 and Space 4 access; the logged in staff user is not permitted access to either of those
+        self.browser.maximize_window()
 
         # todo: is it appropriate to have these double-checking things (so checking state BEFORE making the changes that testing)? As in, I don't trust the fixture? Answer applies to other tests as well.......
         print colored("\tBefore any changes/saving, 'Current RFID' should be something (but not None and not nothing)", "blue") # probably pointless double checking.....
         #current_rfid_field = self.browser.find_element_by_class_name('form-row field-prettify_get_current_rfid')
         # above throws WebDriverException: Message: u'Compound class names not permitted' 
-        #print colored("************************************"*10, "white", "on_blue")
-        #print self.browser.find_element_by_tag_name('body').text
-        #print colored("************************************"*10, "white", "on_blue")
         current_rfid_field = self.browser.find_element_by_css_selector('.form-row.field-prettify_get_current_rfid')
         current_rfid_field = current_rfid_field.find_element_by_tag_name('p')
         self.assertNotEqual(current_rfid_field.text, 'None')
@@ -260,8 +383,8 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         # a key difference between this test and _test_keycard_deactivation
         print colored("\tCheck that no doors are selected","blue")
         door_checkboxes = self.browser.find_elements_by_css_selector("input[name='doors']")
-        print colored("************************************"*10, "green", "on_white")
-        print [ door_checkbox.is_selected() for door_checkbox in door_checkboxes] 
+        #print colored("************************************"*10, "green", "on_white")
+        #print [ door_checkbox.is_selected() for door_checkbox in door_checkboxes] 
         door_checkbox_statuses = [ door_checkbox.is_selected() for door_checkbox in door_checkboxes]
         self.assertFalse(any(door_checkbox_statuses))
             
@@ -288,11 +411,6 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         #self.assertEqual(other_doors_field.text, actual_other_doors_str) 
 
         other_doors_field = self.browser.find_element_by_id('other_doors')
-        print colored("*"*20, "white", "on_red")
-        print colored("  wtf ?????  "*20, "white", "on_red")
-        print other_doors_field.text
-        print colored("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<", "white", "on_red")
-        print colored("*"*20, "white", "on_red")
 
         # note - strip out whitespace in case template formatting introduces extra white space
         other_doors_text = other_doors_field.text
@@ -326,32 +444,14 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         # todo: consistent quotes pls
         message1 = 'The lock user "%s %s" was changed successfully.' % (test_lockuser.first_name, test_lockuser.last_name)
 
-        print colored("*"*10+"     locals   " + "*"*10, "white", "on_red")
-        print locals()
-        print colored("*"*20, "white", "on_red")
         # message 2: a key difference between this test and _test_keycard_deactivation
-        print colored("*"*10+"    doors not permit   " + "*"*10, "white", "on_red")
-    
-        print colored("*"*20, "white", "on_red")
-        #print doors_not_permit
-        #doors_not_permit = ', '.join(other_doors_text.split(" "))
-        #message2 = "%s %s's keycard was not deactivated because you do not have permission to manage %s."\
-        #            % (test_lockuser.first_name, test_lockuser.last_name, doors_not_permit)
         message2 = "%s %s's keycard was not deactivated because you do not have permission to manage %s."\
                     % (test_lockuser.first_name, test_lockuser.last_name, other_doors_text)  
                     # todo:  note that using earlier result from body of change form to compare with messages on change list... 
-
-        print colored("*"*10+"     message 2   " + "*"*10, "white", "on_red")
-
-        print message2
-        print colored("*"*20, "white", "on_red")
-
         info_messages_elements = self.browser.find_elements_by_class_name('info')
         info_messages = [mess.text for mess in info_messages_elements]
         self.assertIn(message1, info_messages)
         self.assertIn(message2, info_messages)
-
-
 
         # a key difference between this test and _test_keycard_deactivation
         print colored("\tBack on change list, lockuser should still have keycard (active: True).", "blue")
@@ -397,6 +497,7 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         print colored("\tOpening browser to get to lockuser's change_form.......", "cyan")
         lockuser_id = 3
         self.browser.get(self.live_server_url + '/lockadmin/djock_app/lockuser/%d' % lockuser_id)   # in fixture, lock user 2  assigned a keycard
+        self.browser.maximize_window()
 
         # todo: is it appropriate to have these double-checking things (so checking state BEFORE making the changes that testing)? As in, I don't trust the fixture? Answer applies to other tests as well.......
         print colored("\tBefore any changes/saving, 'Current RFID' should be something", "blue") # probably pointless double checking.....
@@ -445,7 +546,6 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         print colored("\tBack on change list, lockuser should no longer have keycard and active status is now False", "blue")
         rows = self.browser.find_elements_by_tag_name('tr')
         rows_text = [row.text for row in rows]
-        print rows_text
 
         self.assertIn( 'Lisa Simpson smartgirl63@yahoo.com False None Space 2 None', rows_text) # todo:  note hardcoded.....  
 
@@ -471,9 +571,9 @@ class RenameLaterFunctionalTests(LiveServerTestCase):
         self.assertTrue(deact_checkbox.is_selected())
 
 
-    """ Not currently a use case
+    """ 
+    Not currently a use case
     def test_can_create_new_door(self):
-        """ """
         print colored("\tCan user create a new Door using the site?", "blue")
         # to do:  now create a LockUser, using the site, not like the unit tests below
         self.assertFalse("not done yet...  same thing for the other Models")
@@ -511,18 +611,16 @@ class LogIn(LiveServerTestCase):
         print colored("\tOpening browser to get to the log in screen at /lockadmin.......", "cyan")
         # todo:  learn more about live_server_url
         self.browser.get(self.live_server_url + '/lockadmin') # user opens web browser; goes to main admin page
+        self.browser.maximize_window()
 
         print colored("\tDoes it say RFID Lock Administration?", "blue")
         login_page_body = self.browser.find_element_by_tag_name('body') # returns WebElement object
         self.assertIn("RFID Lock Administration", login_page_body.text)  # .text strips out the HTML markup
 
         print colored("\tCan user actually log in via website?", "blue")
-        # The user "test" was created when we loaded the fixture 
         # User types in username and password and hits return
-        #################################################################
-        print colored("\tOpening browser to get to lockuser's change_form.......", "cyan")
-        self.browser.get(self.live_server_url + '/lockadmin/djock_app/lockuser/1')
-        print colored("\tBut login first..........", "cyan")
+        #print colored("\tOpening browser to get to lockuser's change_form.......", "cyan")
+        #self.browser.get(self.live_server_url + '/lockadmin/djock_app/lockuser/1')
         username_field = self.browser.find_element_by_name('username')
         username_field.send_keys('staff_user_1')
         password_field = self.browser.find_element_by_name('password')
@@ -532,11 +630,11 @@ class LogIn(LiveServerTestCase):
 
         # todo:  the welcome text has changed (top nav bar); also, don't hardcode in the user name
         #  see docstring below 
-        print colored("\tAfter username and password accepted, is the user taken to the admin page", "blue")
+        print colored("\tAfter username and password accepted, is the user taken to the main page", "blue")
         base_page_body = self.browser.find_element_by_tag_name('body')
         # todo: change
         #  see docstring below 
-        self.assertIn("Welcome, test. Change password / Log out", base_page_body.text)
+        self.assertIn("Logged in as staff_user_1", base_page_body.text)
         # now we can check if top header nav contains "Logged in as staff_user_1" if that's the staff user's login
         # base below on this... note the two imp lines
         """
@@ -557,7 +655,11 @@ class LogIn(LiveServerTestCase):
         # todo: change
         print colored("\tDoes user see the links in the top navigation bar?","blue")
         base_page_body = self.browser.find_element_by_tag_name('body')
-        self.assertIn("main | lock users | door locks | access logs | staff users", base_page_body.text)
+        #self.assertIn("Lock users Room access log Create user and assign new keycard", base_page_body.text)
+        navbar_links = "Lock users\nRoom access log\nCreate user and assign new keycard"
+        self.assertIn(navbar_links, base_page_body.text)
+
+        #self.assertIn("main | lock users | door locks | access logs | staff users", base_page_body.text)
 
         
         # To do -- does user see the other links...

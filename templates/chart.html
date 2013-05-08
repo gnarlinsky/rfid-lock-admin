@@ -58,10 +58,8 @@ $(document).ready(function() {
                     day: '%b %e',    // Mon, Feb 8
                     week: '%b %e',   // Feb 8
                     hour: '%b %e',   // Feb 8
-
                 },
             },
-
 
             yAxis: {
                 type: 'datetime',
@@ -103,202 +101,7 @@ $(document).ready(function() {
                 }
             },
                                                                                                        
-     /*series: {{ test_jsond|fix_json_string }}*/
      series: {{ chart_data|fix_json_string  }}
-    /* series: [
-    {
-        data: [
-            {
-                y: Date.UTC(0,0,0, 1,56,21),
-                x: Date.UTC(2013,4,10),
-                user: 'anonymous'
-            },
-            {
-                y: Date.UTC(0,0,0, 4,56,11),
-                x: Date.UTC(2013,4,11),
-                user: 'homer simpson'
-            },
-            {
-                y: Date.UTC(0,0,0, 2,16,11),
-                x: Date.UTC(2013,4,19),
-                user: 'homer simpson'
-            },
-            {
-                y: Date.UTC(0,0,0, 0,26,11),
-                x: Date.UTC(2013,5,11),
-                user: 'homer simpson'
-            },
-        ],
-        name: 'Makerspace',
-        tooltip: {
-            followPointer: "false",
-            pointFormat:  "{point.user}"
-            }
-
-    }, 
-    {
-        data: [
-            {
-                y: Date.UTC(0,0,0, 1,56,21),
-                x: Date.UTC(2013,4,10),
-                user: 'anonymous'
-            },
-            {
-                y: Date.UTC(0,0,0, 4,56,11),
-                x: Date.UTC(2013,4,11),
-                user: 'homer simpson'
-            },
-            {
-                y: Date.UTC(0,0,0, 2,16,11),
-                x: Date.UTC(2013,4,19),
-                user: 'homer simpson'
-            },
-            {
-                y: Date.UTC(0,0,0, 0,26,11),
-                x: Date.UTC(2013,5,11),
-                user: 'homer simpson'
-            },
-        ],
-        name: 'Makerspace',
-        tooltip: {
-            followPointer: "false",
-            pointFormat:  "{point.user}"
-            }
-
-    }, 
-    {
-        data: [
-            {
-                y: Date.UTC(0,0,0, 1,56,21),
-                x: Date.UTC(2013,4,10),
-                user: 'anonymous'
-            },
-            {
-                y: Date.UTC(0,0,0, 4,56,11),
-                x: Date.UTC(2013,4,11),
-                user: 'homer simpson'
-            },
-            {
-                y: Date.UTC(0,0,0, 2,16,11),
-                x: Date.UTC(2013,4,19),
-                user: 'homer simpson'
-            },
-            {
-                y: Date.UTC(0,0,0, 0,26,11),
-                x: Date.UTC(2013,5,11),
-                user: 'homer simpson'
-            },
-        ],
-        name: 'Makerspace',
-        tooltip: {
-            followPointer: "false",
-            pointFormat:  "{point.user}"
-            }
-
-    }, 
-    {
-        data: [
-            {
-                y: Date.UTC(0,0,0, 1,56,21),
-                x: Date.UTC(2013,4,10),
-                user: 'anonymous'
-            },
-            {
-                y: Date.UTC(0,0,0, 4,56,11),
-                x: Date.UTC(2013,4,11),
-                user: 'homer simpson'
-            },
-            {
-                y: Date.UTC(0,0,0, 2,16,11),
-                x: Date.UTC(2013,4,19),
-                user: 'homer simpson'
-            },
-            {
-                y: Date.UTC(0,0,0, 0,26,11),
-                x: Date.UTC(2013,5,11),
-                user: 'homer simpson'
-            },
-        ],
-        name: 'Makerspace',
-        tooltip: {
-            followPointer: "false",
-            pointFormat:  "{point.user}"
-            }
-
-    }, 
-    {
-        data: [
-            {
-                y: Date.UTC(0,0,0, 1,56,21),
-                x: Date.UTC(2013,4,10),
-                user: 'anonymous'
-            },
-            {
-                y: Date.UTC(0,0,0, 4,56,11),
-                x: Date.UTC(2013,4,11),
-                user: 'homer simpson'
-            },
-            {
-                y: Date.UTC(0,0,0, 2,16,11),
-                x: Date.UTC(2013,4,19),
-                user: 'homer simpson'
-            },
-            {
-                y: Date.UTC(0,0,0, 0,26,11),
-                x: Date.UTC(2013,5,11),
-                user: 'homer simpson'
-            },
-        ],
-        name: 'Makerspace',
-        tooltip: {
-            followPointer: "false",
-            pointFormat:  "{point.user}"
-            }
-
-    }, 
-    {
-        data: [
-            {
-                y: Date.UTC(0,0,0, 0,66,21),
-                x: Date.UTC(2013,4,10),
-                user: 'lisa simpson'
-            },
-            {
-                y: Date.UTC(0,0,0, 0,56,11),
-                x: Date.UTC(2013,4,11),
-                user: 'homer simpson'
-            },
-            {
-                y: Date.UTC(0,0,0, 0,16,11),
-                x: Date.UTC(2013,4,19),
-                user: 'homer simpson'
-            },
-            {
-                y: Date.UTC(0,0,0, 0,26,11),
-                x: Date.UTC(2013,5,11),
-                user: 'homer simpson'
-            },
-        ],
-        name: 'Bike Project',
-        tooltip: {
-            followPointer: "false",
-            pointFormat:  "{point.user}"
-            }
-
-    },
-
-
-
-
-
-
-
-
-
-
-
-]
-    */ 
         });
     });
         </script> 
@@ -307,7 +110,7 @@ $(document).ready(function() {
 
 <body>
 <div style="margin:20px; " >
-        <a href="/lockadmin/djock_app/accesstime/">Back to list of access times</a>
+<div><a href='{{request.META.HTTP_REFERER}}' class='btn'>&lt;&lt; Back</a></div>
     <div class="hero-unit" style="margin-top:10px; padding:20px; width:900px;  " id="chart_here"> chart go here</div>
 
         </div>

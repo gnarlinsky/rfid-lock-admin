@@ -244,7 +244,7 @@ class LockUserModelTests(TestCase):
         lockuser.last_name = "Simpson"
         lockuser.email =  "chunkylover53@aol.com"
         lockuser.address = "742 Evergreen Terrace, Springfield, USA"
-        lockuser.phone_number = 9395555555   # to do: actually change phone_number to char field in the code
+        lockuser.phone_number = "(939) 555-5555"   
 
         lockuser.save()  # i.e., INSERT
 
@@ -259,7 +259,7 @@ class LockUserModelTests(TestCase):
         self.assertEqual(the_only_lockuser_in_db.last_name,"Simpson")
         self.assertEqual(the_only_lockuser_in_db.email,"chunkylover53@aol.com")
         self.assertEqual(the_only_lockuser_in_db.address,"742 Evergreen Terrace, Springfield, USA")
-        self.assertEqual(the_only_lockuser_in_db.phone_number,9395555555)
+        self.assertEqual(the_only_lockuser_in_db.phone_number,"(939) 555-5555")
 # TO DO: same as above for the other models
 
     def test_unicode(self):

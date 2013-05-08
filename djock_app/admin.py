@@ -330,44 +330,11 @@ class LockUserAdmin(admin.ModelAdmin):
         }
 
 
-    ####################################################################
-    # Switching to Foreign Key relationship for RFIDkeycard/LockUser,
-    #   so need a change in the interface (which makes more sense
-    #   anyways):
-    #       - "Assign new keycard" is a primary action, accessible from main
-    #       - Goes to rfidkeycard/add -- same "go scan in, I'm waiting" deal as before
-    #       - Can't create an RFIDkeycard without ****assigning it a LockUser -- which
-    #           can be done from the RFIDkeycard change_form****
-    #       - But can create a LockUser without assigning a keycard, same as before
-    #       - Eliminating: create a new RFIDkeycard from LockUser page as a popup/inline
-    #       - But "assign new keycard"/"deactivate keycard" (fieldset.html) should
-    #           still behave the same way for the user.
-    ####################################################################
-
-
-    # todo:  don't need ? 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        """ 'Like the formfield_for_foreignkey method, the formfield_for_manytomany method can be overridden to change the default formfield for a many to many field. '  - django docs;
-        Here, need specific behavior for rfid keycards and Doors"""
-        ################
-        #  rfids
-        ################
-        # todo:  not showing that/not use case
-        # if the field name is rfids, don't show any -- only the "+" should be there,
-        #   i.e. "assign new keycard"
-        if db_field.name == "rfids":
-            # No existing rfid keycard/number should be shown on the LockUser's change form, 
-            # at least not to non-superusers
-            #kwargs["queryset"] = RFIDkeycard.objects.none()  # creates an EmptyQueryset  
-            # temporarily show some keycards there, for debugging
-            kwargs["queryset"] = RFIDkeycard.objects.all()  
-
-
     # TO DO: refactor these func....
     def get_doors_to_show(self,request):
         #(todo/temp) object_id is currently only used for debugging
         # superuser will always see all doors (doors_to_show)
-        if request.user.is_superuser: # pragma: no cover (exclude from coverage report - development-only feature)
+        if request.user.is_superuser: # pragma: no cover (exclude from coverage report - superuser distinction is a development-only feature)
             return Door.objects.all()
         # otherwise filter on permissions
         doors_to_show = Door.objects.none()  # creates an EmptyQuerySet
@@ -392,19 +359,20 @@ class LockUserAdmin(admin.ModelAdmin):
 
 
         # superuser will always see all doors (doors_to_show)
-        if request.user.is_superuser: # pragma: no cover (exclude from coverage report - development-only feature)
+        if request.user.is_superuser: # pragma: no cover (exclude from coverage report - superuser distinction is a development-only feature)
             return None 
         # otherwise filter on permissions
         doors_not_permitted_to_this_staff_user = Door.objects.none()  # creates an EmptyQuerySet
         for door in Door.objects.all():
             perm = "djock_app.can_manage_door_%d" % door.pk   # put in proper format for has_perm
+
             if not request.user.has_perm(perm):
                 doors_not_permitted_to_this_staff_user = doors_not_permitted_to_this_staff_user | Door.objects.filter(pk=door.pk)  # concatenating QuerySets
-
         # todo:  no sets please
         doors_not_permitted_to_this_staff_user_but_for_lockuser = set(this_lu.get_allowed_doors()).intersection(set(doors_not_permitted_to_this_staff_user))
         # all elem that are in this set but not the other. i.e. all doors 
         #return doors_not_permitted_to_this_staff_user
+
         return doors_not_permitted_to_this_staff_user_but_for_lockuser
         # todo: umm... rename these...
 
@@ -497,37 +465,9 @@ class AccessTimeAdmin(admin.ModelAdmin):
         super(AccessTimeAdmin, self).__init__(*args, **kwargs) # todo: is this appropriate here? 
 
     def changelist_view(self, request, extra_context=None):
-        """ Don't show links for any item; send extra context for values for the access times JS chart """
-
-        # No need to show the page for an individual AccessTime, so no field should link to it.
+        """ Don't show links for any item  """
+        # No need to show the link to  page for an individual AccessTime, so no field should link to it.
         self.list_display_links = (None, )
-        """
-        from django.utils import simplejson
-        # todo: tool tip stays same....
-        tooltip_dict = {}
-        tooltip_dict['followPointer']='false'
-        tooltip_dict['pointFormat']='"{point.user}"'
-
-        all_series = []
-
-        # a series is the access times for one door
-        for door in Door.objects.all(): 
-            one_series = {}
-            one_series['name'] = '"%s"' % door.name
-            one_series['tooltip'] = tooltip_dict
-            # get all AccessTimes for this door
-            #this_door_access_times = AccessTime.objects.filter(door_id=door.id)
-            this_door_access_times = AccessTime.objects.filter(door=door)
-            one_series['data'] = []
-            for at in this_door_access_times:
-                #print colored("adding data point  for door %s: %s" % (door.name, at.data_point), "white","on_blue")
-                one_series['data'].append(simplejson.loads(at.data_point))  # todo: ugh with the loads'ing
-            all_series.append(one_series)
-        #extra_context = {"test_jsond": simplejson.dumps([test_d, test_d2]) } 
-        extra_context = {"test_jsond": simplejson.dumps(all_series, indent="") } 
-
-
-        """
         return super(AccessTimeAdmin, self).changelist_view(request, extra_context=extra_context)
 
 
@@ -538,17 +478,17 @@ class AccessTimeAdmin(admin.ModelAdmin):
     #list_per_page = 100
     # # field names to display, as columns
     #list_display = ('access_time','get_this_lockuser_html','get_this_door')
-    list_display = ('access_time','_lockuser_html_heading','door')   # if just 'lockuser', won't get html for link... todo: but I think there's an easier way to do this
+    list_display = ('access_time','lockuser_html_heading','door')   # if just 'lockuser', won't get html for link... todo: but I think there's an easier way to do this
 
     # todo: method names 
-    def _lockuser_html_heading(self, obj):
+    def lockuser_html_heading(self, obj):
         """ Returns the HTML with link to lock user's change_form to display on
             the Access Times change list page """
         #return obj.get_this_lockuser_html()
         return "<a href='../lockuser/%d/'>%s</a>" %  (obj.lockuser.id, obj.lockuser)
-    _lockuser_html_heading.short_description = 'User'
+    lockuser_html_heading.short_description = 'User'
     # Django will HTML-escape the output by default. If you'd rather not escape the output of the method, give the method an allow_tags attribute whose value is True.
-    _lockuser_html_heading.allow_tags = True
+    lockuser_html_heading.allow_tags = True
 
     actions=None  # don't provide the actions dropdown
     date_hierarchy = 'access_time' # Set date_hierarchy to the name of a DateField or DateTimeField in model, and the

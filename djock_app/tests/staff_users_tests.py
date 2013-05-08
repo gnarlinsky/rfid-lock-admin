@@ -187,42 +187,6 @@ class StaffUserTests(TestCase):
         # self.user.user_permissions.add(Permission.objects.get(codename='change_user'))
         #self.fail("getting to this.....")
 
-    # Actually, staff-only users should not be able to delete anything, only deactivate
-    def test_deleting_lockuser(self):
-        """ """
-        # Do I have to create and save a lockuser again like above?
-        # Only the superuser should be able to actually delete a user object; regular, staff users
-        #   should only have the power to deactivate, not delete. (Right?)
-        
-        #   How to specify the permissions of the user that would be doing this stuff, 
-        #   deleting, creating, etc? 
-        #       This?  get a user from a fixture or create one. Explicitly set its staff to false and
-        #       superuser to false for a staff-only user;  then set superuser to true (staff status
-        #       doesn't matter) to test the other side of the coin.
-
-        print colored("\tOnly superuser can delete?","blue")
-        # if user has superuser status (but can also have staff status): 
-        #   lockuser.delete()
-        #   (note also that this is a permission can set for users... So when creating a new staff user,
-        #   various permissions specific to my app should be set, e.g. permission to delete *certain*
-        #   objects, etc. ? Then test here for each one..... 
-        #  Currently, the only permissions explicitly/automatically adding to staff-only users: 
-        #       - add LockUser
-        #       - change LockUser
-        #       - add RFIDkeycard
-        #       - change RFIDkeycard
-        #       (pk's 3, 7 4, 8)
-        # 
-        #   now test that cannot find in the db
-        print colored("\tSuperuser, so we can't find the LockUser in database?","blue")
-        #   all_lockusers_in_db = LockUser.objects.all()
-        #   self.assertEqual(len(all_lockusers_in_db),0)
-        # else: 
-        #   test that can still find in db
-        print colored("\tStaff user, so can we still find the LockUser in database?","blue")
-        #all_lockusers_in_db = LockUser.objects.all()
-        #self.assertEqual(len(all_lockusers_in_db),1)
-        self.fail("(to do)")
 
     #def test_can_change_non_staff_users(self):
     #    self.assertFalse(self.user.has_perm('logical_change_user', self.non_staff.profile)) # can't change non staff users without permission

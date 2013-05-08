@@ -18,7 +18,10 @@ def make_access_times(min_num_times=10, max_num_times=10):
     for keycard in RFIDkeycard.objects.all():
         for i in range(random.randint(min_num_times,max_num_times)):
             #AccessTime(the_rfid=keycard.the_rfid, access_time=get_random_time()).save()
-            door = random.choice(keycard.lockuser.doors.all())
+            try:
+                door = random.choice(keycard.lockuser.doors.all())
+            except IndexError:
+                return "no doors, so no access times"
             if door.id == 1:   # door 1:  only certain days of the week
                 j = 0
                 while j<1:
@@ -97,7 +100,8 @@ def assign_data_point_dict(at):
     data_point_dict = {}
     # data point dict to JSONify for the access times highchart  
     data_point = {}
-    data_point_dict['x'] = 'Date.UTC(%d,%d,%d)' % (at.access_time.year, at.access_time.month, at.access_time.day)
+     # note:  double check -- subtracting 1 to month because Javascript starts month count at 0, I think
+    data_point_dict['x'] = 'Date.UTC(%d,%d,%d)' % (at.access_time.year, at.access_time.month-1, at.access_time.day)
     data_point_dict['y'] = 'Date.UTC(0,0,0, %d,%d,%d)' % (at.access_time.hour, at.access_time.minute, at.access_time.second)
     data_point_dict['user'] = '"%s %s"' % (at.lockuser.first_name, at.lockuser.last_name)
     at.data_point = simplejson.dumps(data_point_dict)

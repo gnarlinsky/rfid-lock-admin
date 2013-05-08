@@ -9,6 +9,8 @@ from djock_app.models import LockUser, AccessTime, RFIDkeycard, Door
 from djock_app.admin import LockUserForm, LockUserAdmin, AccessTimeAdmin
 from termcolor import colored 
 from django import forms 
+from django.contrib.admin.sites import AdminSite
+
 
 # todo:  a number of tests
 
@@ -21,12 +23,6 @@ class LockUserFormTests(TestCase):
 
     def tearDown(self):
         pass
-
-    """
-    def test__init__(self):
-        """ """
-        pass
-    """
 
     # todo: make sure comprehensive
     def test_clean(self):
@@ -64,34 +60,72 @@ class LockUserFormTests(TestCase):
         #   have to create perms and the staff user???
         # 
         ##################################################################
-
         lu_form.clean()
         self.assertTrue(lu_form.cleaned_data.get('doors'), {'doors':[door1,door2]})
 
 
 class LockUserAdminTests(TestCase):
+    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
 
-        def setUp(self):
-            print colored("\nTestCase LockUserAdminTests", "white","on_green")
-            print colored(self._testMethodName + ": " + self._testMethodDoc, "green") 
+    def setUp(self):
+        print colored("\nTestCase LockUserAdminTests", "white","on_green")
+        print colored(self._testMethodName + ": " + self._testMethodDoc, "green") 
+        self.client = Client()
+        self.client.login(username='staff_user_1',password='staff_user_1')
 
-        def tearDown(self):
-            pass
+    def tearDown(self):
+        pass
 
-        def test_deactivate(self):
-            """ """
-            pass
+    def test_deactivate(self):
+        """ Deactiving selected lock users (admin action) """
+        response = self.client.get("/lockadmin/djock_app/lockuser/")
+        request = response.context['request']
+
+        # deactivate all LockUsers
+        lua = LockUserAdmin(LockUser, AdminSite())
+        queryset = LockUser.objects.all()
+        lua.deactivate(request, queryset)
+
+        # In the fixture, only one LockUser (id 3) is not permitted the same 
+        # doors that the staff user is not permitted, so only LockUser 3 would
+        # be deactivated if all are selected. 
+        self.assertTrue(LockUser.objects.get(pk=1).is_active())
+        self.assertTrue(LockUser.objects.get(pk=2).is_active())
+        self.assertFalse(LockUser.objects.get(pk=3).is_active())
+        # todo:  questions again about how (hard) to code the correct values
+
 
 class AccessTimeAdminTests(TestCase):
+    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
 
-        def setUp(self):
-            print colored("\nTestCase LockUserFormTests", "white","on_green")
-            print colored(self._testMethodName + ": " + self._testMethodDoc, "green") 
+    def setUp(self):
+        print colored("\nTestCase AccessTimeAdminTests", "white","on_green")
+        print colored(self._testMethodName + ": " + self._testMethodDoc, "green") 
+        self.client = Client()
+        self.client.login(username='staff_user_1',password='staff_user_1')
 
-        def tearDown(self):
-            pass
+    def tearDown(self):
+        pass
 
 
-        def test__lockuser_html_heading(self):
-            """ """
-            pass
+    def test_lockuser_html_heading(self):
+        """ Does the AccessTime change list page display LockUsers as links to their change pages? """
+        #response = self.client.get("/lockadmin/djock_app/accesstime/")
+        #request = response.context['request']
+
+        ata = AccessTimeAdmin(AccessTime, AdminSite())   
+
+        all_at = AccessTime.objects.all()
+        some_at = all_at[0:10]
+
+        # using the actual function
+        for at in some_at: 
+            compare_string = "<a href='../lockuser/%d/'>%s</a>" %  (at.lockuser.id, at.lockuser)
+            self.assertEqual( ata.lockuser_html_heading(at),compare_string)
+
+        # looking at the page, i.e. more functional
+        response = self.client.get("/lockadmin/djock_app/accesstime/")
+        for lu in LockUser.objects.all():
+            if lu.get_last_access_time():
+                link = "<a href='../lockuser/%d/'>%s</a>" %  (lu.id, lu)
+                self.assertIn(link, response.content)

@@ -20,7 +20,7 @@
 
             {% if field.field.name == "lockuser" and is_popup %}
             {% comment %}  todo
-                <select name="lockuser" id="id_lockuser" style="display:none;">   {% comment %}  display:none because want this hidden {% endcomment %}
+                <select name="lockuser" id="id_lockuser" style="display:none;">   
                     <option value="{{ request.META.HTTP_REFERER|get_original_id }}" selected="selected">{{ request.META.HTTP_REFERER|get_original_id }}</option>
                 </select>
             {% endcomment %}

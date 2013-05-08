@@ -37,6 +37,35 @@
 <script src="{{ STATIC_URL }}divshot_jquery.min.js"></script>
 
 
+<script>
+$(function($) {
+    $(document).ready(function($) {
+        var info_mess = document.getElementsByClassName("messagelist"); 
+        info_mess[0].setAttribute("class", "messagelist alert alert-success"); 
+    });
+}); 
+
+
+$(document).ready(function() {
+    var submit_buttons = document.getElementsByTagName('input');
+    for(var i=0; i<submit_buttons.length; i++){
+        if(submit_buttons[i].getAttribute('type')=='submit'){
+            submit_buttons[i].setAttribute("class","btn"); 
+        }
+    } 
+
+   /* var submit_row = document.getElementsByClassName("submit-row"); 
+    for(var i=0; i<submit_row.length; i++){
+       submit_row[i].setAttribute("class","pull-right"); 
+    }
+    */
+
+    
+}); 
+
+</script>
+
+
 
 {% block extrastyle %} {% endblock %}
 {% block extrahead %}
@@ -67,8 +96,16 @@ ul li {
 text-align:center;
 margin:0 auto; 
 margin-bottom:20px; 
-width:70%; 
+margin-top:20px; 
+/* width:70%;  */
 }
+
+.nice_button { 
+    padding:0;
+    width:90%; 
+}
+/*a#lock_user_button.btn.btn-success.btn-large { background-color: black !important; }
+*/
 
 #navbarRow { 
 margin:0 20px 0 20px;  
@@ -99,12 +136,6 @@ margin-bottom:0px;
 padding-bottom:0px;  
 }
 
-#keycard_assignment_scan_message { 
-    color:red; 
-    font-size: .8em; 
-    text-align:center; 
-    } 
-
 #assign_new_keycard { 
     text-align:center; 
 }
@@ -130,22 +161,62 @@ background-color: lightblue;
 {% endcomment %}
 
 
-      #footer {
-        height: 60px;
-        background-color: #f5f5f5;
-        margin:20px; 
-        text-align:center; 
-      }
+#footer {
+    height: 60px;
+    background-color: #f5f5f5;
+    margin:20px; 
+    text-align:center; 
+}
 
-      /* Lastly, apply responsive CSS fixes as necessary */
-      @media (max-width: 767px) {
-        #footer {
-          margin-left: -20px;
-          margin-right: -20px;
-          padding-left: 20px;
-          padding-right: 20px;
-        }
-      }
+.messagelist { 
+    width:60%; 
+    margin: 0 auto; 
+    margin-bottom:20px; 
+    text-align:center; 
+    padding-left:5px; 
+    padding-right:5px; 
+    padding-top:0px; 
+    padding-bottom:10px; 
+} 
+
+li.info {
+    padding-top:10px; 
+    padding-bottom:0px; 
+}
+
+.login .submit-row { 
+    padding: 0; 
+    text-align:center; 
+    } 
+
+.login .form-row #id_password { 
+    margin-bottom:20px; 
+    }
+
+
+/* for hover/tooltips/popovers over disabled elements */
+#overlay{
+    position: absolute;        
+    top: 0;
+    left: 0;
+
+    opacity: .1;
+    /*background-color: blue;*/
+    height: 35px;
+    width: 140px;
+}
+
+
+
+/* Lastly, apply responsive CSS fixes as necessary */
+@media (max-width: 767px) {
+#footer {
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+}
 </style>
 {% endblock %}
 
@@ -205,8 +276,7 @@ background-color: lightblue;
         {% endcomment %}
 
 
-        {% comment %} Don't show navbar if not logged in {% endcomment %}
-
+{% comment %} Don't show navbar if not logged in {% endcomment %}
 {% if user.is_authenticated %}
 
 
@@ -224,7 +294,7 @@ background-color: lightblue;
         </form>
     </div>
     <div id="navbarRow" class="row"> 
-                <ul class = "nav">
+        <ul class = "nav">
             <li> <a href='/lockadmin/djock_app/lockuser/'>Lock users</a> </li>
             <li> <a href='/lockadmin/djock_app/accesstime/'>Room access log</a> </li>
             <li> <a href='/lockadmin/djock_app/lockuser/add/'>Create user and assign new keycard</a> </li>
@@ -235,9 +305,7 @@ background-color: lightblue;
 
 {% comment %}
 <div class="navbar navbar-fixed-top">
-
   <div class="navbar-inner">
-
           <a class="brand" href="#"><b>IMC/Makerspace RFID Lock Admin</b></a>
           <div class="navbar-content">
               <div class="row">
@@ -255,11 +323,8 @@ background-color: lightblue;
                     </ul>
               </div>
     </div>
-
   </div>
-
 </div>
-
 {% endcomment %}
 
 
@@ -365,6 +430,14 @@ background-color: lightblue;
     <!-- Content -->
     <div id="content" class="{% block coltype %}colM{% endblock %}">
 
+            <! -- login page navbar --> 
+            {% if not user.is_authenticated %}
+            <div class="navbar" style="text-align:center">
+            <!-- <div class="navbar-inner"> -->
+                   <a class="brand" style="float:center; font-size:200%; margin:auto; margin-top:30px; margin-bottom:20px;   " href="/lock/">RFID Lock Administration</a>
+            </div><!-- /.navbar -->
+            {% endif %}
+
         {% comment %} todo
         {% block pretitle %{% endblock %}
         {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %} {% endcomment %}
@@ -379,13 +452,15 @@ background-color: lightblue;
     </div>
     <!-- END Content -->
 
-{% comment %} Just testing some form styles with bootstrap...............
-{% endcomment %}
+{% comment %} Don't show footer if not logged in {% endcomment %}
+{% if user.is_authenticated %}
+
 {% block footer %}
     <div id="footer">
-        <p class="muted">Footer things ...........  </p>
+        <p class="muted">IMC RFID Lock Administration &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; Bugs? Suggestions? <a href="mailto:gnadia@gmail.com">Email me.</a> &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; Copyright © 2013 Me</p>
     </div>
 {% endblock footer %}
+{% endif %}
 
 
 

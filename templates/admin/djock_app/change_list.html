@@ -39,7 +39,7 @@
             table.setAttribute("class","table");
 
             var info_mess = document.getElementsByClassName("messagelist"); 
-            info_mess[0].setAttribute("class", "messagelist alert alert-info"); 
+            info_mess[0].setAttribute("class", "messagelist alert alert-success"); 
 
         });
     }); 
@@ -92,7 +92,7 @@
         {% comment %}
             <div><button id="show_chart_button" name="Show Highchart" />show chart</div>
         {% endcomment %}
-            <div><p><a href="/chart/" id="show_chart_link">Scatter plot of access times</a></p></div>
+        <div><a href="/chart/" id="show_chart_link" class="btn" style="margin:15px;">Scatter plot of access times and visitors &gt;&gt;</a></div>
         {% comment %}
             <div id="hidden_access_times_chart">hidden!</div>
             <div id="access_times_chart">!!!!!!!!!!  access times chart rendered here</div>
