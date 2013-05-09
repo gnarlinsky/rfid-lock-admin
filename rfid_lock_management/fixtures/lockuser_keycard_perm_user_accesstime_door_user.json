@@ -985,7 +985,7 @@
     "pk": 2,
     "model": "auth.user",
     "fields": {
-      "username": "staff_user_1",
+      "username": "moe",
       "first_name": "",
       "last_name": "",
       "is_active": true,
@@ -1000,7 +1000,7 @@
         38,
         39
       ],
-      "password": "pbkdf2_sha256$10000$W2uEagcVzmoL$2qdN5HltYiFbuShxH1TH54lqYOIZ90/zR6nVebSuKAU=",
+      "password": "pbkdf2_sha256$10000$CXyQ714GlGYt$PltE5WBfMggLFs90R9A2/YH1uX7tTDjFVj+h4lxfSp8=",
       "email": "",
       "date_joined": "2013-04-11T00:44:38Z"
     } 
