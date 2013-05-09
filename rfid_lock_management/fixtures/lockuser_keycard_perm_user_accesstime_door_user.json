@@ -572,35 +572,35 @@
     }
   },
   {
-    "pk": 1,
+    "pk": 4,
     "model": "rfid_lock_management.door",
     "fields": {
-      "name": "Space 1",
-      "description": "Space 1!!!1!!"
-    }
+      "name": "Junior Achievers Club", 
+      "description":  "Up... with business!" 
+      }
   },
   {
     "pk": 2,
     "model": "rfid_lock_management.door",
     "fields": {
-      "name": "Space 2",
-      "description": null
+      "name": "Community Theater",
+      "description": "Musicals and more musicals. Llewellyn Sinclair current resident director."
     }
   },
   {
     "pk": 3,
     "model": "rfid_lock_management.door",
     "fields": {
-      "name": "Space 3",
-      "description": "Blah blah door 3 blah"
+      "name": "Seminar Room",
+      "description": "Seminars, workshops, and more."
     }
   },
   {
-    "pk": 4,
+    "pk": 1,
     "model": "rfid_lock_management.door",
     "fields": {
-      "name": "Space 4",
-      "description": null
+      "name": "Springfield Mafia Secret Meeting Room",
+      "description": "What secret meeting room for the Springfield mafia?"
     }
   },
   {
