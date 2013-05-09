@@ -778,8 +778,8 @@
     "pk": 37,
     "model": "auth.permission",
     "fields": {
-      "codename": "can_manage_door_1",
-      "name": "Can manage door to Space 1",
+      "codename": "can_manage_door_4",
+      "name": "Can manage door to Junior Achievers Club",
       "content_type": 8
     }
   },
@@ -788,7 +788,7 @@
     "model": "auth.permission",
     "fields": {
       "codename": "can_manage_door_2",
-      "name": "Can manage door to Space 2",
+      "name": "Can manage door to Community Theater",
       "content_type": 8
     }
   },
@@ -797,7 +797,16 @@
     "model": "auth.permission",
     "fields": {
       "codename": "can_manage_door_3",
-      "name": "Can manage door to Space 3",
+      "name": "Can manage door to Seminar Room",
+      "content_type": 8
+    }
+  },
+  {
+    "pk": 40,
+    "model": "auth.permission",
+    "fields": {
+      "codename": "can_manage_door_1",
+      "name": "Can manage door to Springfield Mafia Secret Meeting Room",
       "content_type": 8
     }
   },
