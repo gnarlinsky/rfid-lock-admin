@@ -8,6 +8,7 @@ from termcolor import colored   # temp
 from django.utils.timezone import utc
 from django.contrib.auth.decorators import login_required
 from rfid_lock_management.misc import get_arg_default
+from rfid_lock_management.models import Door, NewKeycardScan, AccessTime, RFIDkeycard, LockUser
 
 # todo
 # return series for chartit in JSON format
@@ -17,8 +18,6 @@ def chartify(request):
     #########################################################################
     # building array of access times/lockusers/rfids to give the javascript
     #########################################################################
-    from django.utils import simplejson
-    from rfid_lock_management.models import Door, AccessTime
     # todo: tool tip stays same....
     tooltip_dict = {}
     tooltip_dict['followPointer']='false'
@@ -50,16 +49,24 @@ def chartify(request):
 
 
 
-# return list of rfid's allowed for all doors, or a particular door,
-#   as json list 
 def get_allowed_rfids(request, doorid):
     """ Returns list of allowed rfid's for the specified door in JSON format """
     # check that door id is valid. 
     #   Int of a certain length: taken care of in the urlconf
-    #   Check that there even is a such 
+    #   Check that there even is such a door 
     # if door id not valid, return ""
-    # todo:  return JSON
-    door = rfid_lock_management.models.Door.objects.filter(pk=doorid)    # doorid should not be pk; note, get returns an rror if no such door; filter returns an empty list
+    try:
+        door = Door.objects.get(pk=doorid)
+        allowed_rfids = door.get_allowed_rfids()  # list of Keycard objects
+        alloweds = [keycard_obj.the_rfid for keycard_obj in allowed_rfids]
+    except:  # door may not exist or any other error . . . 
+        alloweds = ""   # but still need to respond
+
+    to_json = {"doorid": int(doorid), "allowed_rfids": alloweds}
+    return HttpResponse(simplejson.dumps(to_json), content_type='application/json')
+
+   """ 
+    door = Door.objects.filter(pk=doorid)    # doorid should not be pk; note, get returns an rror if no such door; filter returns an empty list
     if door:
         allowed_rfids = door[0].get_allowed_rfids()  # list of Keycard objects
         #alloweds = ",".join([keycard_obj.the_rfid for keycard_obj in allowed_rfids])
@@ -68,6 +75,7 @@ def get_allowed_rfids(request, doorid):
         alloweds = ""
     to_json = {"doorid": int(doorid), "allowed_rfids": alloweds}
     return HttpResponse(simplejson.dumps(to_json), content_type="application/json")
+    """
 
 # TO DO: refactor below.. to return more immediately; 
 #           clean up the conditional logic
@@ -79,7 +87,7 @@ def check(request,doorid, rfid):
     # if door id not valid or rfid not valid, return ""
 
     # Is the request actually for new keycard assignment? 
-    new_scan_queryset = rfid_lock_management.models.NewKeycardScan.objects.all()
+    new_scan_queryset = NewKeycardScan.objects.all()
     if new_scan_queryset:
         #new_scan = new_scan_queryset.latest("time_initiated")  # get the latest NewKeycardScan object, ordered by the field time_initiated (i.e. time the object was created) 
         # above may not actually return the latest created object if 'start scan' was hit a bunch of times in a row -- even microseconds won't have sufficient resolution to actually get the latest object
@@ -96,9 +104,10 @@ def check(request,doorid, rfid):
 
     # or is the request actually for authenticating an existing keycard for this door? 
     try: 
-        rfidkeycard = rfid_lock_management.models.RFIDkeycard.objects.get(the_rfid=rfid)
+        rfidkeycard = RFIDkeycard.objects.get(the_rfid=rfid)
     except:
         # no such keycard, so return response of 0
+        # (or something else went wrong, but still send back no)
         return HttpResponse(0)
     # keycard exists, so moving on to check if it's active and get allowed doors (the latter is called on lockuser, so need to check if keycard is active first)
     if rfidkeycard.is_active():
@@ -112,7 +121,7 @@ def check(request,doorid, rfid):
                 #create the highchart data point for this access time
                 ###################################################### 
                 lockuser = rfidkeycard.lockuser
-                at = rfid_lock_management.models.AccessTime(the_rfid=rfid,access_time=datetime.now().replace(tzinfo=utc), lockuser=lockuser, door=door ) # todo: access time is going to be a bit later...
+                at = AccessTime(the_rfid=rfid,access_time=datetime.now().replace(tzinfo=utc), lockuser=lockuser, door=door ) # todo: access time is going to be a bit later...
                 """
                 at.lockuser_link_html = make_lockuser_link_html(lockuser.id, lockuser.first_name, lockuser.last_name)
                 """
@@ -148,15 +157,21 @@ def initiate_new_keycard_scan(request,lockuser_object_id):
     # If this lockuser already has a current keycard, don't proceed
     # (This should have been prevented at template level also)
     try: 
-        lu = rfid_lock_management.models.LockUser.objects.get(id=lockuser_object_id)
+        lu = LockUser.objects.get(id=lockuser_object_id)
     except:
-        response_data = {'success':False, "error_mess":"WTF? There's no lock user?"}
+        response_data = {'success':False, "error_mess":"This lock user was probably not found in the system."}
+        # Probably the error is DoesNotExist: LockUser matching query does not exist.
+        #   but send this response on ANY type of exception
+        # todo: include an error code? and log? 
+
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
+
+
     if lu.get_current_rfid():
-        response_data = {'success':False, 'error_mess':"This lock user is already assigned a keycard! You shouldn't have even gotten this far!"} # Todo: So when stuff like this happens in production...  Should it sent some kind of automated error report to whomever is developing/maintaining the site? 
+        response_data = {'success':False, 'error_mess':"This lock user is already assigned a keycard."} # Todo: So when stuff like this happens in production...  Should it sent some kind of automated error report to whomever is developing/maintaining the site? 
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
     else:
-        n = rfid_lock_management.models.NewKeycardScan()
+        n = NewKeycardScan()
 
         n.waiting_for_scan = True
         n.assigner_user = request.user
@@ -181,7 +196,7 @@ def finished_new_keycard_scan(request,new_scan_pk):
     """
     # TODO:  raise exceptions.   
     # TODO:  Error codes to aid developers. So Staff user sees "ERROR (code 2). Try again," not "ERROR (scary message  about the exact error). Try again." 
-    new_scan_queryset = rfid_lock_management.models.NewKeycardScan.objects.all()
+    new_scan_queryset = NewKeycardScan.objects.all()
 
     #if not new_scan_queryset:
     #    response_data = {'success':False, 'error_mess':"No NewKeycardScan objects at all"}
@@ -204,7 +219,7 @@ def finished_new_keycard_scan(request,new_scan_pk):
     if timed_out:
     #if new_scan.timed_out(minutes=min_till_timeout):
         #response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done'.... So don't take %f minutes next time, please, fatty. Run to that lock! You could use the exercise." % (min_till_timeout,time_diff_minutes)}
-        default_timeout_minutes = get_arg_default(rfid_lock_management.models.NewKeycardScan.timed_out,'minutes')
+        default_timeout_minutes = get_arg_default(NewKeycardScan.timed_out,'minutes')
         response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done.' "  % default_timeout_minutes}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
@@ -214,7 +229,7 @@ def finished_new_keycard_scan(request,new_scan_pk):
     # if waiting for new keycard to be scanned, but timed out
 
     # Verify that the rfid is not the same as that of another ACTIVE keycard
-    keycards_with_same_rfid_qs = rfid_lock_management.models.RFIDkeycard.objects.filter(the_rfid=new_scan.rfid)
+    keycards_with_same_rfid_qs = RFIDkeycard.objects.filter(the_rfid=new_scan.rfid)
     for k in keycards_with_same_rfid_qs:
         if k.is_active():
             response_data = {'success':False, 'error_mess':"A keycard with the same RFID is already assigned to %s." % k.lockuser} # to do:  include actual link to this lockuser
