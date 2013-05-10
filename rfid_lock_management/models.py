@@ -328,7 +328,7 @@ class LockUser(models.Model):
         except:
             current_keycard = None
         """
-        current_keycard = self.get_current_rfid()   # self or lu? 
+        current_keycard = self.get_current_rfid()   # todo: self or lu? 
         
 
         # We'll deactivate a LockUser's current keycard here, if deactivate_current_keycard is checked on the LockUser's change_form, or if no doors were selected. 
@@ -615,15 +615,35 @@ class LockUser(models.Model):
 
     def last_access_time_and_link_to_more(self):  
         """ including link to all access times (for change form) """
-        last = self.get_last_access_time()
+        last_time = self.get_last_access_time()
         link = self.all_access_times_link()
-        if last:
-            return "%s (%s)" % (last.strftime("%B %d, %Y, %I:%M %p") , link)
+        if last_time:
+            return "%s (%s)" % (last_time.strftime("%B %d, %Y, %I:%M %p") , link)
         else:
             return None
     last_access_time_and_link_to_more.allow_tags = True
-    last_access_time_and_link_to_more.short_description = "Last access"
 
+    def last_access_time_and_door_and_link_to_more(self):  
+        """ including link to all access times (for change form) """
+        at_query_set = AccessTime.objects.filter(lockuser=self)  # todo: note - a different appraoch than similar methods
+        last = at_query_set.latest('access_time')
+        link = self.all_access_times_link()
+        """
+        if last:
+            return "%s (%s) (%s)" % (last.access_time.strftime("%B %d, %Y, %I:%M %p"), last.door.name, link)
+        else:
+            return None
+        """
+        # todo (see __B__)
+        return_val = None
+        if last:
+            return_val =  "%s (%s) (%s)" % (last.access_time.strftime("%B %d, %Y, %I:%M %p"), last.door.name, link)
+        return return_val
+
+    last_access_time_and_door_and_link_to_more.allow_tags = True
+    last_access_time_and_door_and_link_to_more.short_description = "Last access"
+    
+    
     def __unicode__(self):
         """ In the list of AcessTimes, for example, LockUsers will be represented with their first and last names """
         return u'%s %s' % (self.first_name, self.last_name)

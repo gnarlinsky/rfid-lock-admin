@@ -65,16 +65,16 @@ def get_allowed_rfids(request, doorid):
     to_json = {"doorid": int(doorid), "allowed_rfids": alloweds}
     return HttpResponse(simplejson.dumps(to_json), content_type='application/json')
 
-   """ 
-    door = Door.objects.filter(pk=doorid)    # doorid should not be pk; note, get returns an rror if no such door; filter returns an empty list
-    if door:
-        allowed_rfids = door[0].get_allowed_rfids()  # list of Keycard objects
-        #alloweds = ",".join([keycard_obj.the_rfid for keycard_obj in allowed_rfids])
-        alloweds = [keycard_obj.the_rfid for keycard_obj in allowed_rfids]
-    else: # no such door
-        alloweds = ""
-    to_json = {"doorid": int(doorid), "allowed_rfids": alloweds}
-    return HttpResponse(simplejson.dumps(to_json), content_type="application/json")
+""" 
+door = Door.objects.filter(pk=doorid)    # doorid should not be pk; note, get returns an rror if no such door; filter returns an empty list
+if door:
+    allowed_rfids = door[0].get_allowed_rfids()  # list of Keycard objects
+    #alloweds = ",".join([keycard_obj.the_rfid for keycard_obj in allowed_rfids])
+    alloweds = [keycard_obj.the_rfid for keycard_obj in allowed_rfids]
+else: # no such door
+    alloweds = ""
+to_json = {"doorid": int(doorid), "allowed_rfids": alloweds}
+return HttpResponse(simplejson.dumps(to_json), content_type="application/json")
     """
 
 # TO DO: refactor below.. to return more immediately; 
@@ -94,7 +94,7 @@ def check(request,doorid, rfid):
         new_scan = new_scan_queryset.latest("pk")  # get the latest NewKeycardScan object, as determined by pk
 
         # TODO: Things might go awry if someone else initiated a scan later... Currently verifying pk's later,  in
-        # finished_keycard_scan, but do earlier. And pass pk info in a smarter way.
+        # finished_keycard_scan, but do earlier in code. And pass pk info in a smarter way.
 
         if new_scan.waiting_for_scan == True:
             new_scan.doorid = doorid  # record the door the new scan request came from (not necessary so far) 
@@ -195,27 +195,26 @@ def finished_new_keycard_scan(request,new_scan_pk):
         The new RFIDkeycard object is created upon LockUser save, after change_form form has been submitted.
     """
     # TODO:  raise exceptions.   
-    # TODO:  Error codes to aid developers. So Staff user sees "ERROR (code 2). Try again," not "ERROR (scary message  about the exact error). Try again." 
-    new_scan_queryset = NewKeycardScan.objects.all()
+    # TODO:  Error codes to aid developers? So Staff user sees "ERROR (code 2). Try again," not "ERROR (scary message  about the exact error). Try again." ....Or just quietly log the error. 
 
     #if not new_scan_queryset:
     #    response_data = {'success':False, 'error_mess':"No NewKeycardScan objects at all"}
     #    return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
-    # Verify that the scan object is the one we need, not one initiated later by someone else, for example.
-    new_scan_right_pk_qs = new_scan_queryset.filter(pk = new_scan_pk)  # make sure we have the newKeycardScan object we started with, not one that another staff user initiated *after* us. 
-
-    if not new_scan_right_pk_qs:
+    # Verify that the scan object is the one we need - that we have the 
+    #   NewKeycardScan object we started with, not one that another staff
+    #   user initiated *after* us, for ex.  
+    #new_scan_queryset = NewKeycardScan.objects.all()
+    #new_scan_right_pk_qs = new_scan_queryset.filter(pk = new_scan_pk)  # 
+    new_scan_qs = NewKeycardScan.objects.filter(pk = new_scan_pk)  
+    if not new_scan_qs:
         response_data = {'success':False, 'error_mess':"No NewKeycardScan obj with pk " + new_scan_pk + "."}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
-    new_scan = new_scan_right_pk_qs[0]
+    new_scan = new_scan_qs[0]
     #min_till_timeout = 2
     #timed_out, time_diff_minutes = new_scan.timed_out(minutes=min_till_timeout)
     timed_out, time_diff_minutes = new_scan.timed_out()  # defaults to two minutes
-
-
-
     if timed_out:
     #if new_scan.timed_out(minutes=min_till_timeout):
         #response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done'.... So don't take %f minutes next time, please, fatty. Run to that lock! You could use the exercise." % (min_till_timeout,time_diff_minutes)}

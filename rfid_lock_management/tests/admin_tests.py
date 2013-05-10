@@ -14,6 +14,9 @@ from django.http import HttpResponsePermanentRedirect
 
 
 
+
+
+
 # todo:  a number of tests
 
 
@@ -25,6 +28,7 @@ class LockUserFormTests(TestCase):
 
     def tearDown(self):
         pass
+
 
     # todo: make sure comprehensive
     def test_clean(self):
@@ -65,7 +69,7 @@ class LockUserFormTests(TestCase):
         lu_form.clean()
         self.assertTrue(lu_form.cleaned_data.get('doors'), {'doors':[door1,door2]})
 
-
+"""
 class LockUserAdminTests(TestCase):
     fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
 
@@ -73,13 +77,92 @@ class LockUserAdminTests(TestCase):
         print colored("\nTestCase LockUserAdminTests", "white","on_green")
         print colored(self._testMethodName + ": " + self._testMethodDoc, "green") 
         self.client = Client()
-        self.client.login(username='staff_user_1',password='staff_user_1')
+        self.client.login(username='moe', password='moe')
+
+    def tearDown(self):
+        pass
+
+    def test_get_other_doors(self):
+        # Test the exception if there is no LockUser with the id in this method's object_id argument.
+        object_id = 1
+        print colored("\tVerify that the LockUser with this object_id exists.", "blue")
+        #lu = LockUser.objects.create(first_name="Jane", last_name="Doe", email="jdoe@jmail.com")
+        self.assertTrue(LockUser.objects.get(pk=object_id))
+
+        
+        print colored("\tGo to lock user's change form....", "cyan")
+        response = self.client.get("/lockadmin/rfid_lock_management/lockuser/%d" % object_id)
+        request = response.context['request']
+
+        # todo: doesn't this seem sort of... tortured?
+        print colored("\tBut now that we got here, delete this lock user so we can force this exception to happen....","cyan")
+        lu = LockUser.objects.get(pk=object_id)
+        lu.delete()
+
+        print colored("\tNow check that there is no lock user with this id....", "blue")
+        self.assertFalse(LockUser.objects.filter(pk=object_id))
+
+        print colored("\t....then check exception if there's no lock user with the object id in the argument", "blue")
+        # need LockUserAdmin to call get_other_doors() on 
+        lua = LockUserAdmin(LockUser, AdminSite())
+        self.assertRaise(DoesNotExist, lua.get_other_doors(request, object_id))
+
+
+class wtf(TestCase):
+    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
+
+    def setUp(self):
+        print colored("\nTestCase LockUserAdminTests", "white","on_green")
+        print colored(self._testMethodName + ": " + self._testMethodDoc, "green") 
+        self.client = Client()
+        self.client.login(username='moe',password='moe')
+
+    def tearDown(self):
+        pass
+
+    def test_get_other_doors(self):
+        # Deactiving selected lock users (admin action) 
+        object_id = 1
+        print colored("\tVerify that the LockUser with this object_id exists.", "blue")
+        #lu = LockUser.objects.create(first_name="Jane", last_name="Doe", email="jdoe@jmail.com")
+        self.assertTrue(LockUser.objects.get(pk=object_id))
+
+        print colored("\tGo to lock user's change form....", "cyan")
+        response = self.client.get("/lockadmin/rfid_lock_management/lockuser/")
+        request = response.context['request']
+
+        # todo: doesn't this seem sort of... tortured?
+        print colored("\tBut now that we got here, delete this lock user so we can force this exception to happen....","cyan")
+        lu = LockUser.objects.get(pk=object_id)
+        lu.delete()
+
+        print colored("\tNow check that there is no lock user with this id....", "blue")
+        self.assertFalse(LockUser.objects.filter(pk=object_id))
+
+        print colored("\t....then check exception if there's no lock user with the object id in the argument", "blue")
+        # need LockUserAdmin to call get_other_doors() on 
+        lua = LockUserAdmin(LockUser, AdminSite())
+        with self.assertRaises(lua.DoesNotExist):
+            get_other_doors(lua, request, object_id)
+        self.assertRaises(DoesNotExist, lua.get_other_doors(request, object_id))
+        with self.assertRaises(DoesNotExist):
+            get_other_doors(lua, request, object_id)
+"""
+
+class LockUserAdminActionsTests(TestCase):
+    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
+
+    def setUp(self):
+        print colored("\nTestCase LockUserAdminTests", "white","on_green")
+        print colored(self._testMethodName + ": " + self._testMethodDoc, "green") 
+        self.client = Client()
+        self.client.login(username='moe',password='moe')
 
     def tearDown(self):
         pass
 
     def test_deactivate(self):
-        """ Deactiving selected lock users (admin action) """
+        """ Deactivating selected lock users (admin action) """
         response = self.client.get("/lockadmin/rfid_lock_management/lockuser/")
         request = response.context['request']
 
@@ -104,7 +187,7 @@ class AccessTimeAdminTests(TestCase):
         print colored("\nTestCase AccessTimeAdminTests", "white","on_green")
         print colored(self._testMethodName + ": " + self._testMethodDoc, "green") 
         self.client = Client()
-        self.client.login(username='staff_user_1',password='staff_user_1')
+        self.client.login(username='moe',password='moe')
 
     def tearDown(self):
         pass

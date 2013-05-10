@@ -36,7 +36,7 @@ class ChartTests(TestCase):
     def test_chartify(self):
         """ Does chartify() return response with the correct(ly formatted) data for HighChart plot of access times? """
         # login as staff user in fixture
-        self.client.login(username='staff_user_1',password='staff_user_1')
+        self.client.login(username='moe',password='moe')
         response = self.client.get("/chart/") 
         response.context['chart_data']
 
@@ -77,7 +77,6 @@ class NewKeycardScanTests(TestCase):
 
         print colored("Creating staff user doing this......","cyan")
         self.staff_only_user = User.objects.create_user('johnny_staff', 'js@jmail.com', 'my_password')
-        # todo:   user tests
 
         print colored("logging in as staff user....","cyan")
         self.client.login(username='johnny_staff',password='my_password')
@@ -122,8 +121,7 @@ class NewKeycardScanTests(TestCase):
 
         print colored("\tCheck response content","blue")
         self.assertFalse(simplejson.loads(response.content)['success'])
-        self.assertEqual(simplejson.loads(response.content)['error_mess'],"WTF? There's no lock user?")
-
+        self.assertEqual(simplejson.loads(response.content)['error_mess'],"This lock user was probably not found in the system.") 
 
     def test_initiate_new_keycard_scan_but_lockuser_has_keycard(self):
         """  Lockuser with specified id already has an assigned keycard: 
@@ -170,7 +168,7 @@ class NewKeycardScanTests(TestCase):
 
         print colored("\tCheck response content","blue")
         self.assertFalse(simplejson.loads(response.content)['success'])
-        self.assertEqual(simplejson.loads(response.content)['error_mess'],"This lock user is already assigned a keycard! You shouldn\'t have even gotten this far!")
+        self.assertEqual(simplejson.loads(response.content)['error_mess'],"This lock user is already assigned a keycard.")
 
 
 

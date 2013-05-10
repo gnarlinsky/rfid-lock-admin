@@ -27,7 +27,7 @@ SCREENSHOTS = True
 # Indicate how many seconds to pause at key points to slow down walkthrough.
 # Set to 0 to turn off 
 # ~.5 for screenshots
-SLOWER = .5
+SLOWER = 2
 
 # LiveServerTestCase starts up a test web server in a separate thread
 class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
@@ -110,10 +110,10 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         if SCREENSHOTS: sc_counter += 1; time.sleep(SLOWER); os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
 
         username_field = self.browser.find_element_by_name('username')
-        username_field.send_keys('staff_user_1')
+        username_field.send_keys('moe')
         time.sleep(SLOWER)  
         password_field = self.browser.find_element_by_name('password')
-        password_field.send_keys('staff_user_1')
+        password_field.send_keys('moe')
         time.sleep(SLOWER)  
 
         if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
@@ -166,6 +166,8 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         # scroll to bottom of page (useful for screenshot)
         if SCREENSHOTS: self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
+        if SCREENSHOTS: time.sleep(SLOWER)
+
 
         """
         - clicks 'Save and continue' 
@@ -175,6 +177,7 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         # scroll to bottom of page (useful for screenshot)
         if SCREENSHOTS: self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
+        if SCREENSHOTS: time.sleep(SLOWER)
 
 
         """
@@ -247,7 +250,7 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         self.assertEqual(td_cells[2].text, email) 
         self.assertEqual(td_cells[3].text, 'True')  # is active
         # don't check the "activated on" date in the current RFID cell, but check other info
-        self.assertIn('staff_user_1', td_cells[4].text)
+        self.assertIn('moe', td_cells[4].text)
         self.assertIn(rfid, td_cells[4].text)
-        self.assertEqual(td_cells[5].text, 'Space 2') 
+        self.assertEqual(td_cells[5].text, 'Community Theater') 
         self.assertEqual(td_cells[6].text, '(None)')

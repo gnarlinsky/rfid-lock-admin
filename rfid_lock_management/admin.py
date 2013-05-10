@@ -19,7 +19,8 @@ from django.http import HttpResponseRedirect
 
 
 
-""" Staff user door management is not a current use case
+""" 
+Staff user door management is not a current use case
 class DoorAdmin(admin.ModelAdmin):
     ###########################################################################
     # Page listing all Doors:
@@ -71,15 +72,14 @@ class DoorAdmin(admin.ModelAdmin):
 """
 
 
-""" has_perm(perm, obj=None) / has_perms(perm_list, obj=None)
+""" 
+has_perm(perm, obj=None) / has_perms(perm_list, obj=None)
         Returns True if the user has the specified permission, where perm is in the format "<app label>.<permission codename>". (see documentation on permissions). If the user is inactive, this method will always return False.
 
         If obj is passed in, this method won't check for a permission for the model, but for this specific object.
-        """
             # permission codenames are named can_manage_door_x, where x is the pk num
         # else... return nothing and/or exception? 
 
-"""
 class RFIDkeycardForm(ModelForm):
     #the_rfid = IntegerField(help_text="help text")
 
@@ -108,23 +108,6 @@ class RFIDkeycardForm(ModelForm):
             errors = forms.util.ErrorList()
             errors = forms._errors.setdefault(django.forms.forms.NON_FIELD_ERRORS, errors)
             errors.append('Sorry, this RFID already exists.')
-
-
-    # playing with# trying to override save
-#    def save(self, commit=True, force_insert=False, force_update=False, *args, **kwargs):
-        # If anything overrides your form, or wants to modify what it's saving,
-        # it will do save(commit=False), modify the output, and then save it itself.
-#        rfcard = super(RFIDkeycardForm, self).save(commit=False, *args, **kwargs)
-        #################################################
-        # do my custom stuff - 
-        # (rfidkeycard actually will be saved same as always.  But before it does so, I want to actually change the associated lockuser -- just to
-        # associate it with this keycard, so that after a page refresh of the original change_form, we
-        # should be able to see this change. /save
-
-#        if commit: 
-#            rfcard.save()
-#        return rfcard
-#
 
 """
 
@@ -266,7 +249,6 @@ class LockUserAdmin(admin.ModelAdmin):
                     #'prettify_get_last_access_time',
                     '_last_access_heading',
     )
-    readonly_fields = ("prettify_get_current_rfid", "get_all_rfids_html","last_access_time_and_link_to_more","prettify_get_last_access_time",)  
 
     list_filter = ('doors',)
 
@@ -314,7 +296,7 @@ class LockUserAdmin(admin.ModelAdmin):
                             # will error if the below are not set as read_only...  which makes sense; these are methods and
                             # things I can't edit from the form.. 
                             'prettify_get_current_rfid',\
-                            'last_access_time_and_link_to_more',  \
+                            'last_access_time_and_door_and_link_to_more',  \
                             #'is_active', \
                             'doors',
                             'deactivate_current_keycard',
@@ -325,6 +307,7 @@ class LockUserAdmin(admin.ModelAdmin):
             }),
         )
 
+    readonly_fields = ("prettify_get_current_rfid", "last_access_time_and_door_and_link_to_more","prettify_get_last_access_time",)  
 
     # display options as checkboxes, not default as selection list
     formfield_overrides = {
@@ -357,26 +340,29 @@ class LockUserAdmin(admin.ModelAdmin):
 
         todo: do the check for whether lockuser actually has perms for the non-permitted door here
         """
-        this_lu = LockUser.objects.filter(id=object_id)[0]
 
 
         # superuser will always see all doors (doors_to_show)
         if request.user.is_superuser: # pragma: no cover (exclude from coverage report - superuser distinction is a development-only feature)
             return None 
+
         # otherwise filter on permissions
         doors_not_permitted_to_this_staff_user = Door.objects.none()  # creates an EmptyQuerySet
         for door in Door.objects.all():
             perm = "rfid_lock_management.can_manage_door_%d" % door.pk   # put in proper format for has_perm
-
             if not request.user.has_perm(perm):
                 doors_not_permitted_to_this_staff_user = doors_not_permitted_to_this_staff_user | Door.objects.filter(pk=door.pk)  # concatenating QuerySets
-        # todo:  no sets please
-        doors_not_permitted_to_this_staff_user_but_for_lockuser = set(this_lu.get_allowed_doors()).intersection(set(doors_not_permitted_to_this_staff_user))
-        # all elem that are in this set but not the other. i.e. all doors 
-        #return doors_not_permitted_to_this_staff_user
 
+        # all elem that are in this set but not the other. i.e. all doors 
+        # todo:  no sets please
+        # todo:  get/exception or filter or ... 
+        this_lu = LockUser.objects.get(pk=object_id)
+        ok_for_user_set = set(this_lu.get_allowed_doors())
+        not_for_staff_set = set(doors_not_permitted_to_this_staff_user)
+        doors_not_permitted_to_this_staff_user_but_for_lockuser = not_for_staff_set.intersection(ok_for_user_set)
+        #doors_not_permitted_to_this_staff_user_but_for_lockuser = set(this_lu.get_allowed_doors()).intersection(set(doors_not_permitted_to_this_staff_user))
         return doors_not_permitted_to_this_staff_user_but_for_lockuser
-        # todo: umm... rename these...
+
 
     # The queryset() method in DoorAdmin restricts a staff user's ability to 
     #   view/change Doors that they do not have permission for (individual objects and change list).

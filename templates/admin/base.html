@@ -206,6 +206,10 @@ li.info {
     width: 140px;
 }
 
+#other_doors { 
+    color: #0A8F5A;
+    font-style: italic;
+    }
 
 
 /* Lastly, apply responsive CSS fixes as necessary */
@@ -284,7 +288,7 @@ li.info {
 <div class="navbar">
 <!-- <div class="navbar-inner"> -->
     <div id="navbarRow" class="row"> 
-       <a class="brand" href="/lock/">RFID Lock Administration</a>
+       <a class="brand" href="/lockadmin/">RFID Lock Administration</a>
         <form class="navbar-search pull-right" action="">
             <ul class = "nav">
             <li><p class="navbar-text pull-right">Logged in as {% firstof user.first_name user.username %} </p> </li>
@@ -457,7 +461,7 @@ li.info {
 
 {% block footer %}
     <div id="footer">
-        <p class="muted">IMC RFID Lock Administration &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; Bugs? Suggestions? <a href="mailto:gnadia@gmail.com">Email me.</a> &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; Copyright © 2013 Me</p>
+        <p class="muted">CU IMC RFID Lock Administration &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; Bugs? Suggestions? <a href="mailto:gnadia@gmail.com">Email me.</a> &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; Copyright © 2013 Me</p>
     </div>
 {% endblock footer %}
 {% endif %}

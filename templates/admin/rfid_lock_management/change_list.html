@@ -5,6 +5,17 @@
 {% load url from future %}
 {% load admin_urls %}
 
+
+{% block title %}
+    {% if module_name == 'access times' %}
+        {% trans 'Room access log | RFID Lock Administration' %}
+    {% elif module_name == 'lock users' %}
+        {% trans 'Manage lock users | RFID Lock Administration' %} 
+    {% endif %}
+{% endblock title %}
+
+
+
 {% block extrastyle %}
 {% comment %}
       <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}" />
@@ -64,6 +75,7 @@
         padding-bottom:0px; 
         }
     </style>
+
 {% endblock extrahead %}
 
 

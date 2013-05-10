@@ -99,9 +99,9 @@ from rfid_lock_management.admin import LockUserAdmin
 #         self.browser.maximize_window()
 #         print colored("\tBut login first..........", "cyan")
 #         username_field = self.browser.find_element_by_name('username')
-#         username_field.send_keys('staff_user_1')
+#         username_field.send_keys('moe')
 #         password_field = self.browser.find_element_by_name('password')
-#         password_field.send_keys('staff_user_1')
+#         password_field.send_keys('moe')
 #         password_field.send_keys(Keys.RETURN)
 # 
 #     def tearDown(self):
@@ -119,8 +119,8 @@ from rfid_lock_management.admin import LockUserAdmin
 # 
 #         print colored("logging in as staff user....","cyan")
 #         client = Client()
-#         #self.client.login(username='staff_user_1',password='staff_user_1')
-#         client.login(username='staff_user_1',password='staff_user_1')
+#         #self.client.login(username='moe',password='moe')
+#         client.login(username='moe',password='moe')
 #         #response = self.client.get("/lockadmin/rfid_lock_management/lockuser/%d/" % object_id)
 #         response = client.get("/lockadmin/rfid_lock_management/lockuser/%d/" % object_id)
 #         request = response.context['request']
@@ -132,8 +132,8 @@ from rfid_lock_management.admin import LockUserAdmin
 #         #######################################################################
 # 
 #         # Login the same user 
-#         #staff_only_user = User.objects.get(username="staff_user_1")
-#         #client.login(username='staff_user_1',password='staff_user_1')
+#         #staff_only_user = User.objects.get(username="moe")
+#         #client.login(username='moe',password='moe')
 # 
 #         
 #         #############################################################
@@ -179,9 +179,9 @@ class GeneralFunctionalTests(LiveServerTestCase):
         self.browser.maximize_window()
         print colored("\tBut login first..........", "cyan")
         username_field = self.browser.find_element_by_name('username')
-        username_field.send_keys('staff_user_1')
+        username_field.send_keys('moe')
         password_field = self.browser.find_element_by_name('password')
-        password_field.send_keys('staff_user_1')
+        password_field.send_keys('moe')
         password_field.send_keys(Keys.RETURN)
 
     def tearDown(self):
@@ -198,14 +198,14 @@ class GeneralFunctionalTests(LiveServerTestCase):
         self.browser.maximize_window()
 
         """ 
-        staff_user_1 = User.objects.get(username="staff_user_1")
+        moe = User.objects.get(username="moe")
         print colored("our user: ","white","on_red")
-        print staff_user_1.__dict__
+        print moe.__dict__
 
         # todo:   this?  or... put browser login code below into setup.....
         self.client = Client()
         print colored("\tLogging in as staff user via client.login....","cyan")
-        return_val = client.login(username=staff_user_1.username, password='staff_user_1')
+        return_val = client.login(username=moe.username, password='moe')
         print colored("return val ===========>", "white", "on_red")
         print return_val
         """
@@ -268,8 +268,8 @@ class GeneralFunctionalTests(LiveServerTestCase):
         #######################################################################
 
         # Login the same user 
-        #staff_only_user = User.objects.get(username="staff_user_1")
-        #client.login(username='staff_user_1',password='staff_user_1')
+        #staff_only_user = User.objects.get(username="moe")
+        #client.login(username='moe',password='moe')
 
         
         #############################################################
@@ -300,11 +300,11 @@ class GeneralFunctionalTests(LiveServerTestCase):
         """
         print colored("logging in as staff user....","cyan")
         self.client = Client()
-        #self.client.login(username='staff_user_1',password='staff_user_1')
-        self.client.login(username='staff_user_1',password='staff_user_1')
+        #self.client.login(username='moe',password='moe')
+        self.client.login(username='moe',password='moe')
         """
         client = Client()
-        client.login(username='staff_user_1',password='staff_user_1')
+        client.login(username='moe',password='moe')
         response =client.get("/lockadmin/rfid_lock_management/lockuser/%d/" % object_id)
         request = response.context['request']
         actual_other_doors = lua.get_other_doors(request, object_id)
@@ -356,7 +356,7 @@ class GeneralFunctionalTests(LiveServerTestCase):
         current_rfid_field = current_rfid_field.find_element_by_tag_name('p')
         self.assertEqual(current_rfid_field.text, lockuser.prettify_get_current_rfid())
 
-        last_access_time_field = self.browser.find_element_by_css_selector('.form-row.field-last_access_time_and_link_to_more')
+        last_access_time_field = self.browser.find_element_by_css_selector('.form-row.field-last_access_time_and_door_and_link_to_more')
         last_access_field = last_access_time_field.find_element_by_tag_name('p')
         self.assertIn(lockuser.prettify_get_last_access_time(), last_access_time_field.text)
         
@@ -437,7 +437,7 @@ class GeneralFunctionalTests(LiveServerTestCase):
         #self.assertTemplateUsed(response, 'change_list.html')
         # determine change list title
         title = self.browser.find_element_by_tag_name('title')
-        self.assertEqual(title.text, 'Select lock user to change | RFID Lock Administration')
+        self.assertEqual(title.text, 'Manage lock users | RFID Lock Administration')
 
         print colored("\tBack on change list, change message(s) correct", "blue")
         test_lockuser = LockUser.objects.get(pk=lockuser_id)
@@ -458,7 +458,7 @@ class GeneralFunctionalTests(LiveServerTestCase):
         rows = self.browser.find_elements_by_tag_name('tr')
         rows_text = [row.text for row in rows]
 
-        self.assertIn('C. M. Burns mr.burns@springfieldnuclearpowerplant.com True RFID: 1122135122 (activated on April 10, 2013, 12:52 AM by superuser) Space 1, Space 4 April 10, 2013, 12:57 AM (Space 1)', rows_text) # todo:  note hardcoded.....  
+        self.assertIn('C. M. Burns mr.burns@springfieldnuclearpowerplant.com True RFID: 1122135122 (activated on April 10, 2013, 12:52 AM by superuser) Springfield Mafia Secret Meeting Room, Junior Achievers Club April 10, 2013, 12:57 AM (Springfield Mafia Secret Meeting Room)', rows_text) # todo:  note hardcoded.....  
 
         print colored("\tHit back to go back to the change form", "cyan")
         self.browser.back()
@@ -530,7 +530,7 @@ class GeneralFunctionalTests(LiveServerTestCase):
         #self.assertTemplateUsed(response, 'change_list.html')
         # determine change list title
         title = self.browser.find_element_by_tag_name('title')
-        self.assertEqual(title.text, 'Select lock user to change | RFID Lock Administration')
+        self.assertEqual(title.text, 'Manage lock users | RFID Lock Administration')
 
         print colored("\tBack on change list, change message(s) correct", "blue")
         test_lockuser = LockUser.objects.get(pk=lockuser_id)
@@ -548,7 +548,7 @@ class GeneralFunctionalTests(LiveServerTestCase):
         rows = self.browser.find_elements_by_tag_name('tr')
         rows_text = [row.text for row in rows]
 
-        self.assertIn( 'Lisa Simpson smartgirl63@yahoo.com False None Space 2 (None)', rows_text) # todo:  note hardcoded.....  
+        self.assertIn( 'Lisa Simpson smartgirl63@yahoo.com False None Community Theater (None)', rows_text) # todo:  note hardcoded.....  
 
 
         print colored("\tHit back to go back to the change form", "cyan")
@@ -622,9 +622,9 @@ class LogIn(LiveServerTestCase):
         #print colored("\tOpening browser to get to lockuser's change_form.......", "cyan")
         #self.browser.get(self.live_server_url + '/lockadmin/rfid_lock_management/lockuser/1')
         username_field = self.browser.find_element_by_name('username')
-        username_field.send_keys('staff_user_1')
+        username_field.send_keys('moe')
         password_field = self.browser.find_element_by_name('password')
-        password_field.send_keys('staff_user_1')
+        password_field.send_keys('moe')
         password_field.send_keys(Keys.RETURN)
 
 
@@ -634,8 +634,8 @@ class LogIn(LiveServerTestCase):
         base_page_body = self.browser.find_element_by_tag_name('body')
         # todo: change
         #  see docstring below 
-        self.assertIn("Logged in as staff_user_1", base_page_body.text)
-        # now we can check if top header nav contains "Logged in as staff_user_1" if that's the staff user's login
+        self.assertIn("Logged in as moe", base_page_body.text)
+        # now we can check if top header nav contains "Logged in as moe" if that's the staff user's login
         # base below on this... note the two imp lines
         """
         <div id="navbarRow" class="row"> 
@@ -644,7 +644,7 @@ class LogIn(LiveServerTestCase):
             <form class="navbar-search pull-right" action="">
                 <ul class="nav">
                 <!--  LINE BELOW IMPORTANT!!!! -->
-                <li><p class="navbar-text pull-right">Logged in as staff_user_1 </p> </li>
+                <li><p class="navbar-text pull-right">Logged in as moe </p> </li>
                 <li><a href="/lockadmin/password_change/">Change password</a> </li>
                 <li><a href="/lockadmin/logout/">Log out</a></li>
                 </ul>
