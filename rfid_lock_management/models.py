@@ -56,7 +56,8 @@ class Door(models.Model):
         return return_list 
         #return [lu.get_current_rfid() for lu in self.lockuser_set.all()]
 
-    """ Staff user door management is not a current use case 
+    """ 
+    #Staff user door management is not a current use case 
     def prettify_get_allowed_rfids(self):
         return ", ".join(self.get_allowed_rfids())
 
@@ -80,7 +81,6 @@ class Door(models.Model):
     def get_all_access_times(self):
         door_access_times = AccessTime.objects.filter(id=self.id)
         return door_access_times
-
     """
 
 class NewKeycardScan(models.Model):

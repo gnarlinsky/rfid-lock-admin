@@ -229,11 +229,17 @@ def finished_new_keycard_scan(request,new_scan_pk):
 
     # Verify that the rfid is not the same as that of another ACTIVE keycard
     keycards_with_same_rfid_qs = RFIDkeycard.objects.filter(the_rfid=new_scan.rfid)
-    for k in keycards_with_same_rfid_qs:
+
+    #for k in keycards_with_same_rfid_qs:
+    for k in keycards_with_same_rfid_qs.select_related():
         if k.is_active():
             response_data = {'success':False, 'error_mess':"A keycard with the same RFID is already assigned to %s." % k.lockuser} # to do:  include actual link to this lockuser
             return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
             
+    #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
     # OK, so far so good. Set waiting and ready-to-assign status,
     # grab the assigner, and save NewKeycardScan object
     new_scan.waiting_for_scan = False

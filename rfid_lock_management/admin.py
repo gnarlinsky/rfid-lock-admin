@@ -210,7 +210,14 @@ class LockUserAdmin(admin.ModelAdmin):
     # Actions dropdown
     #------------------
     def deactivate(self, request, queryset):
-        """ Staff should not have the ability to delete LockUsers, only to DEACTIVATE them. """
+        """ Staff should not have the ability to delete LockUsers, only to 
+        DEACTIVATE them. 
+
+        Before deactivating, this checks if the LockUser is permitted doors 
+        that the staff user is not.  This would mean that the staff user is 
+        not allowed to revoke the keycard, and the lock user would remain active.
+        """
+
         for obj in queryset:
             doors_not_permitted_to_this_staff_user_but_for_lockuser = self.get_other_doors(request,obj.id)
             if not doors_not_permitted_to_this_staff_user_but_for_lockuser:
