@@ -9,52 +9,6 @@ from datetime import datetime, timedelta
 from django.utils.timezone import utc
 
 
-"""
-# to run only some tests: 
-#   $ ./manage.py test rfid_lock_management.LockUserModelTest
-
-#######################################################################################
-# TO DO: 
-#######################################################################################
-#  Note - update relevant to various test to-do's: getting rid of the concept of lockuser deactivation
-#######################################################################################
-# - Separate functional tests and unit tests into separate .py's? 
-# - check if rfid not exactly 10 digits long and reject right away
-# - If some aspect of an object is updated, does that change cascade through... 
-# - on writing use cases: http://breathingtech.com/2009/writing-use-cases-for-agile-scrum-projects/
-#
-# - what happens when you have a lockuser with a specific door perm, but you delete the door? 
-# - what happens to an rfidkeycard when its active or not active lockuser has been deleted? 
-#
-# - RFIDkeycard: if date_revoked is not None, deactivate field should be False; otherwise, deactivate
-# should be True
-#
-# - Deactivating a LockUser:  should deactivate LockUser's RFIDkeycard
-# - Deactivating RFIDkeycard: should NOT deactivate its LockUser
-#
-# ----------------------------------------
-#  post fk/m2m change: 
-# ----------------------------------------
-# - can't add a lockuser that already has an active keycard
-# - can't add a lockuser/create a lockuser with no door permissions. 
-#
-# - After deactivating keycard from LockUser's change_form, do we come back to the change_form?
-#
-# - In the inline form for RFIDkeycards (on LockUser change_form):
-#       - show date_created (along with some other fields?) only on
-#       existing keycards, not at creation time.
-#       - never show date_revoked and certain other fields to staff users
-#
-# ----------------------------------------
-# stuff having to do with overriding save()'s
-# ----------------------------------------
-# - When assign new keycard, if the LockUser was inactive before, they will automatically become active.
-# - If the Lockuser has been deactivated, its current keycard should be deactivated as well.
-# - We'll deactivate a LockUser's current keycard here, if deactivate_current_keycard is checked
-#   on the LockUser's change_form. 
-
-"""
-
 
 
 #######################################################################################

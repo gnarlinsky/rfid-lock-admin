@@ -16,7 +16,7 @@ from rfid_lock_management.admin import LockUserAdmin
 
 
 
-    # LiveServerTestCase starts up a test web server in a separate thread
+# LiveServerTestCase starts up a test web server in a separate thread
 class AccessTimeList(LiveServerTestCase):
     fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
 

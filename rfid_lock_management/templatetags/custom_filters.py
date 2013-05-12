@@ -11,7 +11,6 @@ register = template.Library()
 
 
 @register.filter
-#@stringfilter # Convert an object to its string value before being passed to function
 def get_doors_you_manage(request):
     """ Give template the list of door names that the staff user can manage, or 'None' """
     lua = LockUserAdmin(LockUser, AdminSite())
@@ -24,7 +23,6 @@ def get_doors_you_manage(request):
 
 
 @register.filter
-#@stringfilter # Convert an object to its string value before being passed to function
 def fix_json_string(string):
     """ Marks a string as not requiring further HTML escaping prior to output. """
     string = safe(string)

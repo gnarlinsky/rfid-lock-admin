@@ -4,11 +4,6 @@ from django.test.client import Client
 import simplejson
 from rfid_lock_management.models import NewKeycardScan, AccessTime
 
-###################
-# TO DO: 
-###################
-# smarter logging/info printing! http://stackoverflow.com/questions/284043/outputting-data-from-unit-test-in-python
-
 
 class LockCommunicationTests(TestCase):  
 
