@@ -2,16 +2,31 @@ from django import template
 from rfid_lock_management.models import LockUser
 from django.contrib.contenttypes.models import ContentType
 from django.template.defaultfilters import stringfilter, safe, cut
+#from django.contrib.auth.models import User
+from rfid_lock_management.admin import LockUserAdmin
+from django.contrib.admin.sites import AdminSite
 
 # All the tags and filters are registered in this variable
 register = template.Library()
 
 
-#todo
 @register.filter
-@stringfilter # Convert an object to its string value before being passed to function
+#@stringfilter # Convert an object to its string value before being passed to function
+def get_doors_you_manage(request):
+    """ Give template the list of door names that the staff user can manage, or 'None' """
+    lua = LockUserAdmin(LockUser, AdminSite())
+    doors_to_show_qs = lua.get_doors_to_show(request)
+    return_val = 'None'  # avoiding a test for 'None'...
+    if doors_to_show_qs: 
+        return_val = ', '.join([door.name for door in doors_to_show_qs])
+    return return_val
+
+
+
+@register.filter
+#@stringfilter # Convert an object to its string value before being passed to function
 def fix_json_string(string):
-    # Marks a string as not requiring further HTML escaping prior to output.
+    """ Marks a string as not requiring further HTML escaping prior to output. """
     string = safe(string)
     string = string.replace('"\\"',"'").replace('\\"\"', "'") # fix quotes
     string = cut(string,"\"") # keep fixing

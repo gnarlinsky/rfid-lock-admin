@@ -10,14 +10,6 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
 
-#########################  TO DO ##########################################
-#  - Get rid of "delete" action for all except superuser, including not showing the button on change_list
-# - (maybe?): When a user is modified or added (in terms of being active at all or more/fewer doors access), e-mail all the staff. 
-# - search bar for lockusers/accesstimes/doors change lists
-# -  # the field labeled "rfids" should not be required.  
-###########################################################################
-
-
 
 """ 
 Staff user door management is not a current use case
@@ -495,6 +487,8 @@ class AccessTimeAdmin(admin.ModelAdmin):
         # change list page will include a date-based drilldown navigation by that field. (i.e. shows months or days or
         # years or whatever at the top)
     list_filter = ('lockuser','door')  # show filters by RFID and active/inactive on the right
+    search_field = ['lockuser']  # include search box for lock users 
+
     
     #########################################################################
     # Individual TimeAccess page

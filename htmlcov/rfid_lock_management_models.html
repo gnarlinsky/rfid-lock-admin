@@ -831,31 +831,31 @@
 <p id='t56' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>return</span> <span class='nam'>return_list</span><span class='strut'>&nbsp;</span></p>
 <p id='t57' class='pln'>&nbsp; &nbsp; &nbsp; &nbsp; <span class='com'>#return [lu.get_current_rfid() for lu in self.lockuser_set.all()]</span><span class='strut'>&nbsp;</span></p>
 <p id='t58' class='pln'><span class='strut'>&nbsp;</span></p>
-<p id='t59' class='stm run hide_run'>&nbsp; &nbsp; <span class='str'>&quot;&quot;&quot; Staff user door management is not a current use case </span><span class='strut'>&nbsp;</span></p>
-<p id='t60' class='pln'><span class='str'>&nbsp; &nbsp; def prettify_get_allowed_rfids(self):</span><span class='strut'>&nbsp;</span></p>
-<p id='t61' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; return &quot;, &quot;.join(self.get_allowed_rfids())</span><span class='strut'>&nbsp;</span></p>
-<p id='t62' class='pln'><span class='strut'>&nbsp;</span></p>
-<p id='t63' class='pln'><span class='str'>&nbsp; &nbsp; def get_allowed_lockusers(self):</span><span class='strut'>&nbsp;</span></p>
-<p id='t64' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; # Get the LockUsers with access to this Door </span><span class='strut'>&nbsp;</span></p>
-<p id='t65' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; return &quot;, &quot;.join([str(lu) for lu in self.lockuser_set.all()])</span><span class='strut'>&nbsp;</span></p>
-<p id='t66' class='pln'><span class='strut'>&nbsp;</span></p>
-<p id='t67' class='pln'><span class='str'>&nbsp; &nbsp; def get_allowed_lockusers_html_links(self):</span><span class='strut'>&nbsp;</span></p>
-<p id='t68' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; #Returns the HTML (which will have to escape) with links to /lockuser/the_id/ to display on the Door change list page </span><span class='strut'>&nbsp;</span></p>
-<p id='t69' class='pln'><span class='strut'>&nbsp;</span></p>
-<p id='t70' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; lockuser_links_list = []</span><span class='strut'>&nbsp;</span></p>
-<p id='t71' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; for lockuser in self.lockuser_set.all():</span><span class='strut'>&nbsp;</span></p>
-<p id='t72' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lockuser_link_html =&nbsp; &quot;&lt;a href=&#39;../lockuser/%d/&#39;&gt;%s&lt;/a&gt;&quot; %&nbsp; (lockuser.id, lockuser)</span><span class='strut'>&nbsp;</span></p>
-<p id='t73' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lockuser_links_list.append(lockuser_link_html)</span><span class='strut'>&nbsp;</span></p>
-<p id='t74' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; return &quot;, &quot;.join(lockuser_links_list)</span><span class='strut'>&nbsp;</span></p>
-<p id='t75' class='pln'><span class='str'>&nbsp; &nbsp; # Django will HTML-escape the output by default. If you&#39;d rather not escape the output of the method,</span><span class='strut'>&nbsp;</span></p>
-<p id='t76' class='pln'><span class='str'>&nbsp; &nbsp; # give the method an allow_tags attribute whose value is True.</span><span class='strut'>&nbsp;</span></p>
-<p id='t77' class='pln'><span class='str'>&nbsp; &nbsp; get_allowed_lockusers_html_links.allow_tags = True</span><span class='strut'>&nbsp;</span></p>
-<p id='t78' class='pln'><span class='strut'>&nbsp;</span></p>
-<p id='t79' class='pln'><span class='str'>&nbsp; &nbsp; # to do:</span><span class='strut'>&nbsp;</span></p>
-<p id='t80' class='pln'><span class='str'>&nbsp; &nbsp; def get_all_access_times(self):</span><span class='strut'>&nbsp;</span></p>
-<p id='t81' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; door_access_times = AccessTime.objects.filter(id=self.id)</span><span class='strut'>&nbsp;</span></p>
-<p id='t82' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; return door_access_times</span><span class='strut'>&nbsp;</span></p>
-<p id='t83' class='pln'><span class='strut'>&nbsp;</span></p>
+<p id='t59' class='stm run hide_run'>&nbsp; &nbsp; <span class='str'>&quot;&quot;&quot; </span><span class='strut'>&nbsp;</span></p>
+<p id='t60' class='pln'><span class='str'>&nbsp; &nbsp; #Staff user door management is not a current use case </span><span class='strut'>&nbsp;</span></p>
+<p id='t61' class='pln'><span class='str'>&nbsp; &nbsp; def prettify_get_allowed_rfids(self):</span><span class='strut'>&nbsp;</span></p>
+<p id='t62' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; return &quot;, &quot;.join(self.get_allowed_rfids())</span><span class='strut'>&nbsp;</span></p>
+<p id='t63' class='pln'><span class='strut'>&nbsp;</span></p>
+<p id='t64' class='pln'><span class='str'>&nbsp; &nbsp; def get_allowed_lockusers(self):</span><span class='strut'>&nbsp;</span></p>
+<p id='t65' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; # Get the LockUsers with access to this Door </span><span class='strut'>&nbsp;</span></p>
+<p id='t66' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; return &quot;, &quot;.join([str(lu) for lu in self.lockuser_set.all()])</span><span class='strut'>&nbsp;</span></p>
+<p id='t67' class='pln'><span class='strut'>&nbsp;</span></p>
+<p id='t68' class='pln'><span class='str'>&nbsp; &nbsp; def get_allowed_lockusers_html_links(self):</span><span class='strut'>&nbsp;</span></p>
+<p id='t69' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; #Returns the HTML (which will have to escape) with links to /lockuser/the_id/ to display on the Door change list page </span><span class='strut'>&nbsp;</span></p>
+<p id='t70' class='pln'><span class='strut'>&nbsp;</span></p>
+<p id='t71' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; lockuser_links_list = []</span><span class='strut'>&nbsp;</span></p>
+<p id='t72' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; for lockuser in self.lockuser_set.all():</span><span class='strut'>&nbsp;</span></p>
+<p id='t73' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lockuser_link_html =&nbsp; &quot;&lt;a href=&#39;../lockuser/%d/&#39;&gt;%s&lt;/a&gt;&quot; %&nbsp; (lockuser.id, lockuser)</span><span class='strut'>&nbsp;</span></p>
+<p id='t74' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; lockuser_links_list.append(lockuser_link_html)</span><span class='strut'>&nbsp;</span></p>
+<p id='t75' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; return &quot;, &quot;.join(lockuser_links_list)</span><span class='strut'>&nbsp;</span></p>
+<p id='t76' class='pln'><span class='str'>&nbsp; &nbsp; # Django will HTML-escape the output by default. If you&#39;d rather not escape the output of the method,</span><span class='strut'>&nbsp;</span></p>
+<p id='t77' class='pln'><span class='str'>&nbsp; &nbsp; # give the method an allow_tags attribute whose value is True.</span><span class='strut'>&nbsp;</span></p>
+<p id='t78' class='pln'><span class='str'>&nbsp; &nbsp; get_allowed_lockusers_html_links.allow_tags = True</span><span class='strut'>&nbsp;</span></p>
+<p id='t79' class='pln'><span class='strut'>&nbsp;</span></p>
+<p id='t80' class='pln'><span class='str'>&nbsp; &nbsp; # to do:</span><span class='strut'>&nbsp;</span></p>
+<p id='t81' class='pln'><span class='str'>&nbsp; &nbsp; def get_all_access_times(self):</span><span class='strut'>&nbsp;</span></p>
+<p id='t82' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; door_access_times = AccessTime.objects.filter(id=self.id)</span><span class='strut'>&nbsp;</span></p>
+<p id='t83' class='pln'><span class='str'>&nbsp; &nbsp; &nbsp; &nbsp; return door_access_times</span><span class='strut'>&nbsp;</span></p>
 <p id='t84' class='pln'><span class='str'>&nbsp; &nbsp; &quot;&quot;&quot;</span><span class='strut'>&nbsp;</span></p>
 <p id='t85' class='pln'><span class='strut'>&nbsp;</span></p>
 <p id='t86' class='stm run hide_run'><span class='key'>class</span> <span class='nam'>NewKeycardScan</span><span class='op'>(</span><span class='nam'>models</span><span class='op'>.</span><span class='nam'>Model</span><span class='op'>)</span><span class='op'>:</span><span class='strut'>&nbsp;</span></p>

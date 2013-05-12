@@ -10,20 +10,6 @@ from django.utils.timezone import utc
 from rfid_lock_management.misc import get_arg_default
 
 
-
-# todo:  concerning testing tautologies........
-
-# to do: No tests for getallowed and check views, right?  The lock_comm_tests.py test these more indirectly/without using the actual view method names....
-#url(r'checkdoor/(?P<doorid>\d+)/checkrfid/(?P<rfid>\w{10})/$',views.check
-#url(r'door/(?P<doorid>\d+)/getallowed/$', views.get_allowed_rfids )
-
-# todo:  see 12, 13 in todo.rtfd
-
-
-# todo:  chartify view
-#class ChartifyTests(TestCase):
-#    def setUp(self):
-#        print colored("\nTestCase ChartifyTests", "white", "on_green")
 class ChartTests(TestCase):
     fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
     
@@ -433,6 +419,7 @@ class NewKeycardScanTests(TestCase):
 
         print colored("\tCreating new RFIDkeycard and assigning to our LockUser..........","cyan")
         rk = RFIDkeycard.objects.create(the_rfid=duplicate_rfid,lockuser=lu,assigner=self.staff_only_user)
+
 
         print colored("\tMake sure this LockUser has this keycard", "blue")
         self.assertTrue(lu.is_active())   # or lu.get_current_rfid()...

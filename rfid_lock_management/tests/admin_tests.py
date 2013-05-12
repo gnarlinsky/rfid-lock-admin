@@ -12,11 +12,6 @@ from django import forms
 from django.contrib.admin.sites import AdminSite
 from django.http import HttpResponsePermanentRedirect
 
-
-
-
-
-
 # todo:  a number of tests
 
 

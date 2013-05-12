@@ -188,6 +188,8 @@
                       {% if cl.date_hierarchy %}
                             <h3>By date</h3> 
                            {% date_hierarchy cl %}
+                           <h3>search </h3>
+{% search_form cl %}
                       {% endif %}
                   {% endblock %}
                 {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}

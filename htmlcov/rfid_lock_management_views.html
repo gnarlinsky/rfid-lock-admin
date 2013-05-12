@@ -292,20 +292,26 @@
 <p id='n229' class='pln'><a href='#n229'>229</a></p>
 <p id='n230' class='pln'><a href='#n230'>230</a></p>
 <p id='n231' class='stm run hide_run'><a href='#n231'>231</a></p>
-<p id='n232' class='stm run hide_run'><a href='#n232'>232</a></p>
-<p id='n233' class='stm run hide_run'><a href='#n233'>233</a></p>
+<p id='n232' class='pln'><a href='#n232'>232</a></p>
+<p id='n233' class='pln'><a href='#n233'>233</a></p>
 <p id='n234' class='stm run hide_run'><a href='#n234'>234</a></p>
 <p id='n235' class='stm run hide_run'><a href='#n235'>235</a></p>
-<p id='n236' class='pln'><a href='#n236'>236</a></p>
-<p id='n237' class='pln'><a href='#n237'>237</a></p>
+<p id='n236' class='stm run hide_run'><a href='#n236'>236</a></p>
+<p id='n237' class='stm run hide_run'><a href='#n237'>237</a></p>
 <p id='n238' class='pln'><a href='#n238'>238</a></p>
-<p id='n239' class='stm run hide_run'><a href='#n239'>239</a></p>
-<p id='n240' class='stm run hide_run'><a href='#n240'>240</a></p>
-<p id='n241' class='stm run hide_run'><a href='#n241'>241</a></p>
-<p id='n242' class='stm run hide_run'><a href='#n242'>242</a></p>
+<p id='n239' class='pln'><a href='#n239'>239</a></p>
+<p id='n240' class='pln'><a href='#n240'>240</a></p>
+<p id='n241' class='pln'><a href='#n241'>241</a></p>
+<p id='n242' class='pln'><a href='#n242'>242</a></p>
 <p id='n243' class='pln'><a href='#n243'>243</a></p>
-<p id='n244' class='stm run hide_run'><a href='#n244'>244</a></p>
+<p id='n244' class='pln'><a href='#n244'>244</a></p>
 <p id='n245' class='stm run hide_run'><a href='#n245'>245</a></p>
+<p id='n246' class='stm run hide_run'><a href='#n246'>246</a></p>
+<p id='n247' class='stm run hide_run'><a href='#n247'>247</a></p>
+<p id='n248' class='stm run hide_run'><a href='#n248'>248</a></p>
+<p id='n249' class='pln'><a href='#n249'>249</a></p>
+<p id='n250' class='stm run hide_run'><a href='#n250'>250</a></p>
+<p id='n251' class='stm run hide_run'><a href='#n251'>251</a></p>
                 
             </td>
             <td class='text' valign='top'>
@@ -540,20 +546,26 @@
 <p id='t229' class='pln'><span class='strut'>&nbsp;</span></p>
 <p id='t230' class='pln'>&nbsp; &nbsp; <span class='com'># Verify that the rfid is not the same as that of another ACTIVE keycard</span><span class='strut'>&nbsp;</span></p>
 <p id='t231' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>keycards_with_same_rfid_qs</span> <span class='op'>=</span> <span class='nam'>RFIDkeycard</span><span class='op'>.</span><span class='nam'>objects</span><span class='op'>.</span><span class='nam'>filter</span><span class='op'>(</span><span class='nam'>the_rfid</span><span class='op'>=</span><span class='nam'>new_scan</span><span class='op'>.</span><span class='nam'>rfid</span><span class='op'>)</span><span class='strut'>&nbsp;</span></p>
-<p id='t232' class='stm run hide_run'>&nbsp; &nbsp; <span class='key'>for</span> <span class='nam'>k</span> <span class='key'>in</span> <span class='nam'>keycards_with_same_rfid_qs</span><span class='op'>:</span><span class='strut'>&nbsp;</span></p>
-<p id='t233' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>if</span> <span class='nam'>k</span><span class='op'>.</span><span class='nam'>is_active</span><span class='op'>(</span><span class='op'>)</span><span class='op'>:</span><span class='strut'>&nbsp;</span></p>
-<p id='t234' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class='nam'>response_data</span> <span class='op'>=</span> <span class='op'>{</span><span class='str'>&#39;success&#39;</span><span class='op'>:</span><span class='nam'>False</span><span class='op'>,</span> <span class='str'>&#39;error_mess&#39;</span><span class='op'>:</span><span class='str'>&quot;A keycard with the same RFID is already assigned to %s.&quot;</span> <span class='op'>%</span> <span class='nam'>k</span><span class='op'>.</span><span class='nam'>lockuser</span><span class='op'>}</span> <span class='com'># to do:&nbsp; include actual link to this lockuser</span><span class='strut'>&nbsp;</span></p>
-<p id='t235' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>return</span> <span class='nam'>HttpResponse</span><span class='op'>(</span><span class='nam'>simplejson</span><span class='op'>.</span><span class='nam'>dumps</span><span class='op'>(</span><span class='nam'>response_data</span><span class='op'>)</span><span class='op'>,</span> <span class='nam'>content_type</span><span class='op'>=</span><span class='str'>&quot;application/json&quot;</span><span class='op'>)</span><span class='strut'>&nbsp;</span></p>
-<p id='t236' class='pln'><span class='strut'>&nbsp;</span></p>
-<p id='t237' class='pln'>&nbsp; &nbsp; <span class='com'># OK, so far so good. Set waiting and ready-to-assign status,</span><span class='strut'>&nbsp;</span></p>
-<p id='t238' class='pln'>&nbsp; &nbsp; <span class='com'># grab the assigner, and save NewKeycardScan object</span><span class='strut'>&nbsp;</span></p>
-<p id='t239' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>new_scan</span><span class='op'>.</span><span class='nam'>waiting_for_scan</span> <span class='op'>=</span> <span class='nam'>False</span><span class='strut'>&nbsp;</span></p>
-<p id='t240' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>new_scan</span><span class='op'>.</span><span class='nam'>ready_to_assign</span> <span class='op'>=</span> <span class='nam'>True</span><span class='strut'>&nbsp;</span></p>
-<p id='t241' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>new_scan</span><span class='op'>.</span><span class='nam'>assigner_user</span> <span class='op'>=</span> <span class='nam'>request</span><span class='op'>.</span><span class='nam'>user</span>&nbsp; <span class='com'># todo:&nbsp; wasn&#39;t assigner_user already set? </span><span class='strut'>&nbsp;</span></p>
-<p id='t242' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>new_scan</span><span class='op'>.</span><span class='nam'>save</span><span class='op'>(</span><span class='op'>)</span><span class='strut'>&nbsp;</span></p>
-<p id='t243' class='pln'><span class='strut'>&nbsp;</span></p>
-<p id='t244' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>response_data</span> <span class='op'>=</span> <span class='op'>{</span><span class='str'>&#39;success&#39;</span><span class='op'>:</span><span class='nam'>True</span><span class='op'>,</span> <span class='str'>&#39;rfid&#39;</span><span class='op'>:</span><span class='nam'>new_scan</span><span class='op'>.</span><span class='nam'>rfid</span><span class='op'>}</span><span class='strut'>&nbsp;</span></p>
-<p id='t245' class='stm run hide_run'>&nbsp; &nbsp; <span class='key'>return</span> <span class='nam'>HttpResponse</span><span class='op'>(</span><span class='nam'>simplejson</span><span class='op'>.</span><span class='nam'>dumps</span><span class='op'>(</span><span class='nam'>response_data</span><span class='op'>)</span><span class='op'>,</span> <span class='nam'>content_type</span><span class='op'>=</span><span class='str'>&quot;application/json&quot;</span><span class='op'>)</span><span class='strut'>&nbsp;</span></p>
+<p id='t232' class='pln'><span class='strut'>&nbsp;</span></p>
+<p id='t233' class='pln'>&nbsp; &nbsp; <span class='com'>#for k in keycards_with_same_rfid_qs:</span><span class='strut'>&nbsp;</span></p>
+<p id='t234' class='stm run hide_run'>&nbsp; &nbsp; <span class='key'>for</span> <span class='nam'>k</span> <span class='key'>in</span> <span class='nam'>keycards_with_same_rfid_qs</span><span class='op'>.</span><span class='nam'>select_related</span><span class='op'>(</span><span class='op'>)</span><span class='op'>:</span><span class='strut'>&nbsp;</span></p>
+<p id='t235' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>if</span> <span class='nam'>k</span><span class='op'>.</span><span class='nam'>is_active</span><span class='op'>(</span><span class='op'>)</span><span class='op'>:</span><span class='strut'>&nbsp;</span></p>
+<p id='t236' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class='nam'>response_data</span> <span class='op'>=</span> <span class='op'>{</span><span class='str'>&#39;success&#39;</span><span class='op'>:</span><span class='nam'>False</span><span class='op'>,</span> <span class='str'>&#39;error_mess&#39;</span><span class='op'>:</span><span class='str'>&quot;A keycard with the same RFID is already assigned to %s.&quot;</span> <span class='op'>%</span> <span class='nam'>k</span><span class='op'>.</span><span class='nam'>lockuser</span><span class='op'>}</span> <span class='com'># to do:&nbsp; include actual link to this lockuser</span><span class='strut'>&nbsp;</span></p>
+<p id='t237' class='stm run hide_run'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class='key'>return</span> <span class='nam'>HttpResponse</span><span class='op'>(</span><span class='nam'>simplejson</span><span class='op'>.</span><span class='nam'>dumps</span><span class='op'>(</span><span class='nam'>response_data</span><span class='op'>)</span><span class='op'>,</span> <span class='nam'>content_type</span><span class='op'>=</span><span class='str'>&quot;application/json&quot;</span><span class='op'>)</span><span class='strut'>&nbsp;</span></p>
+<p id='t238' class='pln'><span class='strut'>&nbsp;</span></p>
+<p id='t239' class='pln'>&nbsp; &nbsp; <span class='com'>#&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span><span class='strut'>&nbsp;</span></p>
+<p id='t240' class='pln'><span class='strut'>&nbsp;</span></p>
+<p id='t241' class='pln'><span class='strut'>&nbsp;</span></p>
+<p id='t242' class='pln'><span class='strut'>&nbsp;</span></p>
+<p id='t243' class='pln'>&nbsp; &nbsp; <span class='com'># OK, so far so good. Set waiting and ready-to-assign status,</span><span class='strut'>&nbsp;</span></p>
+<p id='t244' class='pln'>&nbsp; &nbsp; <span class='com'># grab the assigner, and save NewKeycardScan object</span><span class='strut'>&nbsp;</span></p>
+<p id='t245' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>new_scan</span><span class='op'>.</span><span class='nam'>waiting_for_scan</span> <span class='op'>=</span> <span class='nam'>False</span><span class='strut'>&nbsp;</span></p>
+<p id='t246' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>new_scan</span><span class='op'>.</span><span class='nam'>ready_to_assign</span> <span class='op'>=</span> <span class='nam'>True</span><span class='strut'>&nbsp;</span></p>
+<p id='t247' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>new_scan</span><span class='op'>.</span><span class='nam'>assigner_user</span> <span class='op'>=</span> <span class='nam'>request</span><span class='op'>.</span><span class='nam'>user</span>&nbsp; <span class='com'># todo:&nbsp; wasn&#39;t assigner_user already set? </span><span class='strut'>&nbsp;</span></p>
+<p id='t248' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>new_scan</span><span class='op'>.</span><span class='nam'>save</span><span class='op'>(</span><span class='op'>)</span><span class='strut'>&nbsp;</span></p>
+<p id='t249' class='pln'><span class='strut'>&nbsp;</span></p>
+<p id='t250' class='stm run hide_run'>&nbsp; &nbsp; <span class='nam'>response_data</span> <span class='op'>=</span> <span class='op'>{</span><span class='str'>&#39;success&#39;</span><span class='op'>:</span><span class='nam'>True</span><span class='op'>,</span> <span class='str'>&#39;rfid&#39;</span><span class='op'>:</span><span class='nam'>new_scan</span><span class='op'>.</span><span class='nam'>rfid</span><span class='op'>}</span><span class='strut'>&nbsp;</span></p>
+<p id='t251' class='stm run hide_run'>&nbsp; &nbsp; <span class='key'>return</span> <span class='nam'>HttpResponse</span><span class='op'>(</span><span class='nam'>simplejson</span><span class='op'>.</span><span class='nam'>dumps</span><span class='op'>(</span><span class='nam'>response_data</span><span class='op'>)</span><span class='op'>,</span> <span class='nam'>content_type</span><span class='op'>=</span><span class='str'>&quot;application/json&quot;</span><span class='op'>)</span><span class='strut'>&nbsp;</span></p>
                 
             </td>
         </tr>

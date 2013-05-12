@@ -1,4 +1,5 @@
 {% load admin_static %}
+{% load custom_filters %}
 {% load url from future %}<!DOCTYPE html>
 
 {% comment %}
@@ -302,6 +303,9 @@ li.info {
             <li> <a href='/lockadmin/rfid_lock_management/lockuser/'>Lock users</a> </li>
             <li> <a href='/lockadmin/rfid_lock_management/accesstime/'>Room access log</a> </li>
             <li> <a href='/lockadmin/rfid_lock_management/lockuser/add/'>Create user and assign new keycard</a> </li>
+        </ul>
+        <ul>
+            <li><p class="navbar-text pull-right">Doors you manage: {{ request|get_doors_you_manage }}</p> </li>
         </ul>
     </div>
    <!--  </div> --> 
