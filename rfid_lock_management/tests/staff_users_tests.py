@@ -1,38 +1,35 @@
 from django.contrib.auth.models import User
 from django.test import TestCase, LiveServerTestCase
 from django.test.client import Client
-from rfid_lock_management.models import RFIDkeycard, LockUser, Door, AccessTime
 from termcolor import colored
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-
+from rfid_lock_management.models import RFIDkeycard, LockUser, Door, AccessTime
 
 class StaffUserTests(TestCase):
     def setUp(self):
         print colored("\nTestCase StaffUserTests", "white", "on_green")
-        print colored(self._testMethodName + ": " + self._testMethodDoc, "green") # or you could just set verbosity=2 with manage.py...
-
-        self.client = Client()
+        print colored(self._testMethodName + ": " + self._testMethodDoc, "green") 
+        # Note: can also get additional information by setting  verbosity=2 with manage.py
 
         print colored("Creating staff user......","cyan")
         self.staff_only_user = User.objects.create_user('johnny_staff', 'js@jmail.com', 'my_password')
 
         print colored("logging in as staff user....","cyan")
+        self.client = Client()
         self.client.login(username='johnny_staff',password='my_password')
 
-
     def tearDown(self):
-        # Clean up after each test
         self.staff_only_user.delete()
 
     # - when active staff users add/update a lock user they should only see doors
     #   for which they themselves have permissions
     def test_staff_only_user_can_only_see_doors_they_have_permission_for(self):
-        # todo: .... right now it's just test_can_add_and_check_for_random_permission(self): """
-        """ staff-only user can only see the doors they have permission to see? """
-
+        """ 
+        Check that staff users can only see the doors they have permission to see. 
+        """
         print colored("\tAssign permissions (only superuser should be able to).......", "cyan") # todo: doing this as superuser? 
         perm_codename = "some_permission_x"
         perm_name = "Permission Number X"
@@ -45,15 +42,10 @@ class StaffUserTests(TestCase):
         self.assertFalse(self.staff_only_user.has_perm(perm_codename))
 
         # now add the permission
-        #self.staff_only_user.user_permissions.add(perm, self.staff_only_user.profile)
         self.staff_only_user.user_permissions.add(perm)
-
-        # Django does cache user permissions, which screws with things. So 
-        # refetch user from the database (http://stackoverflow.com/a/10103291)
+        # Django does cache user permissions, so refetch user from the database (http://stackoverflow.com/a/10103291)
         self.staff_only_user = User.objects.get(pk=self.staff_only_user.pk)  # should now have the assigned permission
 
-        # Testing whether user has the permission now
         print colored("\tTesting whether user has the permission now", "blue")
         #self.assertTrue(self.staff_only_user.has_perm(perm_codename), self.staff_only_user.profile)  
         self.assertTrue(self.staff_only_user.has_perm('rfid_lock_management.'+perm_codename))  
-

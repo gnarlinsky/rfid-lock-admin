@@ -6,16 +6,6 @@ from rfid_lock_management.models import NewKeycardScan, AccessTime
 
 
 class LockCommunicationTests(TestCase):  
-
-#     print colored("\n\tTESTS: checking correct response/status for a particular URL - Given URL with door and rfid id's, is the response/status (whether the rfid is good for that door) correct?; given the get_allowed URL with door id, is the status and response (JSON with all allowed rfid's for that door) correct?","green")
-#     print colored("\t(In fixture: \
-#                     \n\t- door with doorid 2 does exist; but no doors with id's aaaaa or 10 \
-#                     \n\t- rfid 1122135122  does exist; but not abc123, not 9123456789\
-#                     \n\t- door 2 is associated with 9999999992  and 1122135199  but not with 1122135122 (which does exist, but is associated with a different door) \
-#                     \n\t- 9999999992  is active \
-#                     \n\t- 9999999991 is associated with door 2 but is NOT active", \
-#                 "green")
-
     fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
 
     def setUp(self):
@@ -24,7 +14,7 @@ class LockCommunicationTests(TestCase):
         print colored(self._testMethodName + ": " + self._testMethodDoc, "green") # or you could just set verbosity=2 with manage.py...
 
     #############################################################
-    #  _authent_rfid_ tests: RFID authentication
+    #  test_authent_rfid* tests: RFID authentication
     #############################################################
     def test_authent_rfid(self):
         """ rfid associated with door, is active """
@@ -69,9 +59,9 @@ class LockCommunicationTests(TestCase):
         self.assertEqual(response.content,"")
 
     def test_authent_but_waiting_for_scan(self):
-        """ Since the latest NewKeycardScan object is waiting_for_scan, don't attempt to authenticate, just return 0/no; 
-        do not create an AccessTime """
-
+        """ Check: since the latest NewKeycardScan object is waiting_for_scan, 
+        don't attempt to authenticate, just return 0/no; do not create an AccessTime 
+        """
         # create NewKeycardScan object, making up the assigning user id
         # using assigner_user_id vs assigner_user only because we're using a fixture!
         nks_obj = NewKeycardScan.objects.create(assigner_user_id=1,waiting_for_scan=True)
@@ -88,10 +78,8 @@ class LockCommunicationTests(TestCase):
         len_after = len(AccessTime.objects.all())
         self.assertEqual(len_before,len_after)  
 
-    # todo: check that all but test_authent_rfid do NOT create AccessTimes (or does it make more sense to check that in other tests(like the test for the involved view method?) 
-
     #############################################################
-    #  _all_allowed_ tests: get all allowed for a particular door
+    #  test_all_allowed* tests: get all allowed for a particular door
     #############################################################
     def test_all_allowed_non_existing_door(self):
         """ get all allowed rfids for door that does not exist """

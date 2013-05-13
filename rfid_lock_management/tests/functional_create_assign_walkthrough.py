@@ -19,7 +19,8 @@ import os
 import shutil
 
 
-# Take screenshot at certain points (and create dir to store images; also scrolls page to get elements into view)? 
+# Take screenshot at certain points -- useful for documentation walking through the process of 
+#   creating a new lock user and assigning a keycard.
 # (Note - uses screencapture, which is OS X only [the results are higher quality than using selenium's save_screenshot])
 SCREENSHOTS = True
 # note:  -C option captures the cursor on the screen
@@ -33,13 +34,12 @@ SLOWER = 2
 class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
     fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
 
-
     def setUp(self):
         #################################################################
         # print test info 
         #################################################################
         print colored("\nLiveServerTestCase CreateLockUserAssignKeycardWalkthrough", "white","on_green")
-        print colored(self._testMethodName + ": " + self._testMethodDoc, "green")
+        print colored(self._testMethodName, "green")
 
         #################################################################
         # Set up browser and mouse
@@ -116,7 +116,7 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         password_field.send_keys('moe')
         time.sleep(SLOWER)  
 
-        if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
+        if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) 
 
         password_field.send_keys(Keys.RETURN)
 
@@ -124,20 +124,20 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         """
         - (main page loads (currently /lockadmin/rfid_lock_management/))
         """
-        if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
+        if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) 
 
 
         """
         - clicks 'New user' button
         """
         add_lockuser_button = self.browser.find_element_by_id('new_user_button')
-        if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
+        if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) 
         add_lockuser_button.click()
 
         """
         - (lock user add form loads (/lockadmin/rfid_lock_management/lockuser/add/) )
         """
-        if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
+        if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) 
         
 
         """
@@ -155,7 +155,7 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         self.browser.find_element_by_name('phone_number').send_keys(phone_number)
         self.browser.find_element_by_name('address').send_keys(address)
 
-        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
+        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) 
 
 
         """
@@ -176,7 +176,7 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         save_and_continue_button.click()
         # scroll to bottom of page (useful for screenshot)
         if SCREENSHOTS: self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
+        if SCREENSHOTS: sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) 
         if SCREENSHOTS: time.sleep(SLOWER)
 
 
@@ -187,7 +187,7 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         assign_keycard_button.click()
         # scroll to bottom of page (useful for screenshot)
         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
+        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) 
 
 
         """
@@ -195,7 +195,7 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         """
         scan_new_card_button = self.browser.find_element_by_css_selector("input[value='Scan new card']")
         scan_new_card_button.click()
-        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
+        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) 
 
         
         """
@@ -203,17 +203,17 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         """
         rfid = 'abcde12345'
         scan_keycard_url = self.live_server_url + '/checkdoor/1/checkrfid/' + rfid
-        # ... Actually, opening another browser instance, because dealing with selenium windows is getting ridiculous
+        # Opening another browser instance, because dealing with selenium opening additional windows in Firefox is getting ridiculous
         browser2 =  webdriver.Firefox()
         browser2.get(scan_keycard_url)
-        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
+        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) 
         browser2.quit()
 
         
         """
         - back to previous window
         """
-        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
+        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) 
 
 
         """
@@ -221,7 +221,7 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         """
         done_button = self.browser.find_element_by_css_selector("input[value='Done']")
         done_button.click()
-        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
+        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) 
 
 
         """
@@ -233,7 +233,7 @@ class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
         """
         - (change list loads)
         """
-        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) # %02d pads to 2 characters
+        if SCREENSHOTS: time.sleep(SLOWER); sc_counter += 1; os.system('screencapture  %s/%02d.png' % (self.screenshots_dir, sc_counter)) 
 
         """
         - * change list table should have the correct line with the lock user's information, status, RFID, etc. *

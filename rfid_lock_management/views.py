@@ -7,54 +7,33 @@ from django.utils import simplejson
 from termcolor import colored   # temp
 from django.utils.timezone import utc
 from django.contrib.auth.decorators import login_required
-from rfid_lock_management.misc import get_arg_default
+from rfid_lock_management.misc_helpers import get_arg_default
 from rfid_lock_management.models import Door, NewKeycardScan, AccessTime, RFIDkeycard, LockUser
 
-# todo
-# return series for chartit in JSON format
 @login_required
 def chartify(request): 
-
-    #########################################################################
-    # building array of access times/lockusers/rfids to give the javascript
-    #########################################################################
-    # todo: tool tip stays same....
+    """
+    Return data in appropriate format for the HighCharts (JavaScript) AccessTime plot. 
+    Creates a series for each door.
+    """
     tooltip_dict = {}
     tooltip_dict['followPointer']='false'
     tooltip_dict['pointFormat']='"{point.user}"'
-
     all_series = []
-
-    # a series is the access times for one door
     for door in Door.objects.all(): 
         one_series = {}
         one_series['name'] = '"%s"' % door.name
         one_series['tooltip'] = tooltip_dict
-        # get all AccessTimes for this door
-        #this_door_access_times = AccessTime.objects.filter(door_id=door.id)
         this_door_access_times = AccessTime.objects.filter(door=door)
         one_series['data'] = []
         for at in this_door_access_times:
-            #print colored("adding data point  for door %s: %s" % (door.name, at.data_point), "white","on_blue") 
             one_series['data'].append(simplejson.loads(at.data_point))  # todo: ugh with the loads'ing           
         all_series.append(one_series)
-
     extra_context = {'chart_data': simplejson.dumps(all_series, indent="") } 
-
-
-
-
-
     return render_to_response('chart.html', dictionary=extra_context, context_instance=RequestContext(request))
-
-
 
 def get_allowed_rfids(request, doorid):
     """ Returns list of allowed rfid's for the specified door in JSON format """
-    # check that door id is valid. 
-    #   Int of a certain length: taken care of in the urlconf
-    #   Check that there even is such a door 
-    # if door id not valid, return ""
     try:
         door = Door.objects.get(pk=doorid)
         allowed_rfids = door.get_allowed_rfids()  # list of Keycard objects
@@ -65,37 +44,24 @@ def get_allowed_rfids(request, doorid):
     to_json = {"doorid": int(doorid), "allowed_rfids": alloweds}
     return HttpResponse(simplejson.dumps(to_json), content_type='application/json')
 
-""" 
-door = Door.objects.filter(pk=doorid)    # doorid should not be pk; note, get returns an rror if no such door; filter returns an empty list
-if door:
-    allowed_rfids = door[0].get_allowed_rfids()  # list of Keycard objects
-    #alloweds = ",".join([keycard_obj.the_rfid for keycard_obj in allowed_rfids])
-    alloweds = [keycard_obj.the_rfid for keycard_obj in allowed_rfids]
-else: # no such door
-    alloweds = ""
-to_json = {"doorid": int(doorid), "allowed_rfids": alloweds}
-return HttpResponse(simplejson.dumps(to_json), content_type="application/json")
-    """
-
-# TO DO: refactor below.. to return more immediately; 
-#           clean up the conditional logic
 def check(request,doorid, rfid): 
-    """ In addition to checking whether the given rfid is valid for the given door, 
-    also check whether we're actually trying to assign a new keycard rather than 
-    authenticating. If not doing a new keycard scan, create and save an AccessTime """
+    """ 
+    In addition to checking whether the given rfid is valid for the given door, 
+    this checks whether we're actually trying to assign a new keycard rather than 
+    authenticating. If not doing a new keycard scan, create and save an AccessTime. 
+    """
     response = 0
-    # if door id not valid or rfid not valid, return ""
 
     # Is the request actually for new keycard assignment? 
     new_scan_queryset = NewKeycardScan.objects.all()
     if new_scan_queryset:
-        #new_scan = new_scan_queryset.latest("time_initiated")  # get the latest NewKeycardScan object, ordered by the field time_initiated (i.e. time the object was created) 
-        # above may not actually return the latest created object if 'start scan' was hit a bunch of times in a row -- even microseconds won't have sufficient resolution to actually get the latest object
-        new_scan = new_scan_queryset.latest("pk")  # get the latest NewKeycardScan object, as determined by pk
+        # Note - getting latest NewKeycardScan object by ordering by the field 
+        # time_initiated may not actually return the latest created object if 
+        # 'start scan' was hit many times in a row -- even microseconds don't 
+        # seem to have sufficient resolution to actually get the latest object. 
+        new_scan = new_scan_queryset.latest("pk")  # get the latest NewKeycardScan object, 
 
-        # TODO: Things might go awry if someone else initiated a scan later... Currently verifying pk's later,  in
-        # finished_keycard_scan, but do earlier in code. And pass pk info in a smarter way.
-
+        # Issue #e
         if new_scan.waiting_for_scan == True:
             new_scan.doorid = doorid  # record the door the new scan request came from (not necessary so far) 
             new_scan.rfid = rfid
@@ -109,7 +75,9 @@ def check(request,doorid, rfid):
         # no such keycard, so return response of 0
         # (or something else went wrong, but still send back no)
         return HttpResponse(0)
-    # keycard exists, so moving on to check if it's active and get allowed doors (the latter is called on lockuser, so need to check if keycard is active first)
+
+    # keycard exists, so moving on to check if it's active and get allowed doors
+    # (the latter is called on lockuser, so need to check if keycard is active first)
     if rfidkeycard.is_active():
         for door in rfidkeycard.get_allowed_doors():
             if door.id == int(doorid): 
