@@ -69,46 +69,39 @@ def check(request,doorid, rfid):
             return HttpResponse(response)
 
     # Or is the request actually for authenticating an existing keycard for this door? 
-    try: 
-        rfidkeycard = RFIDkeycard.objects.get(the_rfid=rfid)
-    except:
+    # Note -- RFIDkeycard.objects.get(the_rfid=rfid) fails if there
+    # is more than one item returned. Only one item would be active.
+    # Issue #i
+    rfidkeycards_with_same_rfid = RFIDkeycard.objects.filter(the_rfid=rfid)
+    if not rfidkeycards_with_same_rfid: 
         # no such keycard, so return response of 0
-        # (or something else went wrong, but still send back no)
         return HttpResponse(0)
+    else: 
+        for rfidkeycard in rfidkeycards_with_same_rfid:
+        # Keycard exists, so moving on to check if it's active and get allowed
+        # doors (the latter is called on lockuser, so need to check if keycard is
+        # active first).
+            if rfidkeycard.is_active():
+                for door in rfidkeycard.get_allowed_doors():
+                    if door.id == int(doorid): 
+                        # So response will be 1 -- authenticated. 
+                        response=1
+                        # Before returning, though, create the data_point attribute for
+                        # the current access, to build the JS chart of visitors later.
 
-    # Keycard exists, so moving on to check if it's active and get allowed
-    # doors (the latter is called on lockuser, so need to check if keycard is
-    # active first).
-    if rfidkeycard.is_active():
-        for door in rfidkeycard.get_allowed_doors():
-            if door.id == int(doorid): 
-                # So response will be 1 -- authenticated. 
-                response=1
-                # Before returning, though, create the data_point attribute for
-                # the current access, to build the JS chart of visitors later.
+                        ###################################################### 
+                        # create the highchart data point for this access time
+                        ###################################################### 
+                        lockuser = rfidkeycard.lockuser
+                        at = AccessTime(the_rfid=rfid,access_time=datetime.now().replace(tzinfo=utc), lockuser=lockuser, door=door ) # todo: access time is going to be a bit later...
 
-                ###################################################### 
-                # create the highchart data point for this access time
-                ###################################################### 
-                lockuser = rfidkeycard.lockuser
-                at = AccessTime(the_rfid=rfid,access_time=datetime.now().replace(tzinfo=utc), lockuser=lockuser, door=door ) # todo: access time is going to be a bit later...
-                """
-                at.lockuser_link_html = make_lockuser_link_html(lockuser.id, lockuser.first_name, lockuser.last_name)
-                """
-                # TODO: If we reuse keycards/keycard nums, AccessTime objects'
-                # lockusers -- as seen on AccessTimes change_list, for ex -- will be
-                # incorrect, since lockuser is the CURRENT owner of the keycard  associated with that access time, so this would not 
-                # be valid for access times of the PREVIOUS owner. It's probably best to
-                # associate AccessTimes with lockusers at creation time. I.e. determine
-                # the current lockuser in *views.py* (check() ) and assign there.
-
-                # Create and assign data point dict to JSONify for the access times highchart  
-                x_coord = 'Date.UTC(%d,%d,%d)' % (at.access_time.year, at.access_time.month-1, at.access_time.day)
-                y_coord = 'Date.UTC(0,0,0, %d,%d,%d)' % (at.access_time.hour, at.access_time.minute, at.access_time.second)
-                user_name = '"%s %s"' % (at.lockuser.first_name, at.lockuser.last_name)  
-                data_point_dict = {'x': x_coord, 'y': y_coord, 'user': user_name } 
-                at.data_point = simplejson.dumps(data_point_dict)
-                at.save()
+                        # Create and assign data point dict to JSONify for the access times highchart  
+                        x_coord = 'Date.UTC(%d,%d,%d)' % (at.access_time.year, at.access_time.month-1, at.access_time.day)
+                        y_coord = 'Date.UTC(0,0,0, %d,%d,%d)' % (at.access_time.hour, at.access_time.minute, at.access_time.second)
+                        user_name = '"%s %s"' % (at.lockuser.first_name, at.lockuser.last_name)  
+                        data_point_dict = {'x': x_coord, 'y': y_coord, 'user': user_name } 
+                        at.data_point = simplejson.dumps(data_point_dict)
+                        at.save()
     return HttpResponse(response)
 
 
@@ -176,8 +169,6 @@ def finished_new_keycard_scan(request,new_scan_pk):
     #min_till_timeout = 2
     #timed_out, time_diff_minutes = new_scan.timed_out(minutes=min_till_timeout)
     timed_out, time_diff_minutes = new_scan.timed_out()  # defaults to two minutes
-    #print colored("received tuple from new_scan.timed_out(), it's this: ", "red")
-    #print colored("(" + str(timed_out) + ", " + str(time_diff_minutes) + ")", "red")
     if timed_out:
     #if new_scan.timed_out(minutes=min_till_timeout):
         #response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done'.... So don't take %f minutes next time, please, fatty. Run to that lock! You could use the exercise." % (min_till_timeout,time_diff_minutes)}

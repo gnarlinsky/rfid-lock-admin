@@ -63,16 +63,20 @@ class LockUserForm(ModelForm):
             # deactivate_current_keycard is True (i.e. staff user checked
             # 'deactivate current keycard'), we should not allow the deactivation
             # -- since there are still doors lock user can access.
-            self.cleaned_data['deactivate_current_keycard'] = False
-            # If the user is permitted access to doors that the staff user is
-            # not permitted access, make sure lockuser still has access to door
-            # staff user is not permitted to manage, since those wouldn't be on
-            # the form. 
-            for item in self.doors_not_permitted_to_this_staff_user_but_for_lockuser:
-                if self.cleaned_data['doors']:
-                    self.cleaned_data['doors'] = self.cleaned_data['doors'] | Door.objects.filter(pk=item.pk)
-                else: 
-                    self.cleaned_data['doors'] = Door.objects.filter(pk=item.pk)
+            if self.cleaned_data['deactivate_current_keycard']:
+                self.cleaned_data['deactivate_current_keycard'] = False
+                msg = 'will not deactivate'
+                #messages.add_message(self.request, messages.INFO, msg)
+                self.cleaned_data['special_message'] = msg
+                # If the user is permitted access to doors that the staff user is
+                # not permitted access, make sure lockuser still has access to door
+                # staff user is not permitted to manage, since those wouldn't be on
+                # the form. 
+                for item in self.doors_not_permitted_to_this_staff_user_but_for_lockuser:
+                    if self.cleaned_data['doors']:
+                        self.cleaned_data['doors'] = self.cleaned_data['doors'] | Door.objects.filter(pk=item.pk)
+                    else: 
+                        self.cleaned_data['doors'] = Door.objects.filter(pk=item.pk)
 
         return self.cleaned_data
 

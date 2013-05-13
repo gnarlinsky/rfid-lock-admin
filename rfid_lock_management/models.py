@@ -77,15 +77,6 @@ class NewKeycardScan(models.Model):
         max_time = datetime.timedelta(minutes=minutes)
         delta = now - self.time_initiated
         time_diff_minutes = round( delta.total_seconds() / 60, 2)
-        """
-        print colored("*****************************************************************", "blue", "on_white")
-        print 'now', now
-        print 'maxtime', max_time
-        print 'd', delta
-        print 'timediffmin ', time_diff_minutes
-        print ' is it > ', delta>max_time
-        print colored("<<<<<<<<<<<<<*****************************************************************", "blue", "on_white")
-        """
         return (delta>max_time, time_diff_minutes)
 
 
@@ -208,7 +199,6 @@ class LockUser(models.Model):
             self.save()
 
 
-    # todo:  rethink all these
     def get_all_rfids(self):
         """ 
         Get all RFID's associated with this LockUser 
