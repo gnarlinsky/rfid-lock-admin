@@ -355,7 +355,10 @@ $(document).ready(function() {
     <div id="overlay"  rel="popover" data-content="Click 'Save and continue editing' to assign a keycard."></div>
 {% endcomment %}
     <div id="overlay"
+            {% comment %}
              {% if object_id|does_lockuser_have_active_keycard or add %} 
+            {% endcomment %}
+             {% if not object_id|does_lockuser_have_active_keycard or add %} 
                  style="display:none" 
              {%  endif  %}
     ></div>
