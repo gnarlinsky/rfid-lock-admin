@@ -123,7 +123,7 @@ class AccessTime(models.Model):
     access_time = models.DateTimeField(null=True)    # the time the rfid was used
     lockuser    = models.ForeignKey("LockUser",null=True)
     door        = models.ForeignKey("Door",null=True)
-    data_point  = models.TextField()  # todo
+    data_point  = models.TextField()  # Issue #j
 
     def __unicode__(self):
         #return u'%s' % self.access_time
@@ -193,11 +193,10 @@ class LockUser(models.Model):
         if current_keycard and self.deactivate_current_keycard: 
             current_keycard.deactivate(self.current_keycard_revoker)
             current_keycard.save()# save keycard since have changed it
-            # todo: consider putting the  following two statements actually into deactivate() 
+            # todo: consider putting the following two statements into deactivate() 
             self.deactivate_current_keycard = False   # no current keycard to deactivate anymore
             self.current_keycard_revoker = None
             self.save()
-
 
     def get_all_rfids(self):
         """ 
@@ -205,10 +204,6 @@ class LockUser(models.Model):
         """
         return self.rfidkeycard_set.all()
 
-    # todo:  get_all_rfids_html not parallel to other prettify methods....actually returns all but
-    # current, includes HTML.
-    ##  Actually this should be all rfid's but the current one???
-    # todo: rename  to indicate that getting all but CURRENT
     def get_all_rfids_html(self):
         """
         Returns HTML for displaying list of all keycards (excluding curent, if any). 
@@ -222,7 +217,6 @@ class LockUser(models.Model):
             date_assigned = keycard.date_created.strftime("%B %d, %Y, %I:%M %p")
             assigner = keycard.assigner
             try:
-                #date_revoked = keycard.date_revoked.ctime()   
                 date_revoked = keycard.date_revoked.strftime("%B %d, %Y, %I:%M %p")
                 revoker = keycard.revoker
                 info_str = "RFID: %s (activated on %s by %s; revoked on %s by %s)" % (rf,date_assigned, assigner,date_revoked, revoker)
@@ -255,14 +249,12 @@ class LockUser(models.Model):
             return False
        
     def prettify_get_current_rfid(self):
-        """ Returns results of get_current_rfid(), but as a nice pretty string.
-        Also display date assigned as well as rfid number on LockUser change form and list display
+        """ 
+        Returns results of get_current_rfid(), but as a nice pretty string.
+        Also display date assigned as well as rfid number on LockUser change form and list display.
         """
         curr_rfid = self.get_current_rfid()
-        #curr = [str(c.the_rfid) for c in curr_rfid]  # todo - again! haven't coded anythign yet 
-            #to account for there only being one current per person!/my fake data forces me to do this...  
         try:
-            #curr_keycard_info = "RFID: %s (activated on %s by %s)" % (curr_rfid.the_rfid, curr_rfid.date_created.ctime(), curr_rfid.assigner)
             curr_keycard_info = "RFID: %s (activated on %s by %s)" % (curr_rfid.the_rfid, curr_rfid.date_created.strftime("%B %d, %Y, %I:%M %p"), curr_rfid.assigner)
             return curr_keycard_info
         except:
@@ -270,7 +262,9 @@ class LockUser(models.Model):
     prettify_get_current_rfid.short_description = "Current RFID"
 
     def get_allowed_doors(self):
-        """ Get the Doors this user is allowed access to. """
+        """ 
+        Get the Doors this user is allowed access to. 
+        """
         return self.doors.all()            
 
     def prettify_get_allowed_doors(self):
@@ -279,60 +273,44 @@ class LockUser(models.Model):
         return ", ".join(door_names_list)
 
     def get_allowed_doors_html_links(self):
-        """ Returns the HTML (which will have to escape) with links to /door/the_id/ to display on the LockUser change list page """
+        """ 
+        Returns the HTML with links to /door/the_id/ to display on the LockUser
+        change list page.  
+        """
         allowed_doors = self.get_allowed_doors()
         doors_links_list = []
         for door in allowed_doors:
             door_link_html =  "<a href='../door/%d/'>%s</a>" %  (door.pk, door.name) 
             doors_links_list.append(door_link_html)
         return ", ".join(doors_links_list)
-    # Django will HTML-escape the output by default. If you'd rather not escape the output of the method, 
-    # give the method an allow_tags attribute whose value is True.
     get_allowed_doors_html_links.allow_tags = True
 
-    # TO DO here...  Hmm, something feels weird with the curr_rfid_only argument. Biggest issue is
-    # how to pass arguments to list_display and fieldsets in admin. It's technically possible but
-    # it's annoying
-    # (http://stackoverflow.com/questions/14033182/list-display-with-a-function-how-to-pass-arguments). 
-    # Wouldn't it more consistent/comprehensible/Pythonic to create *separate methods* for (1)
-    # getting all access times for all rfid's a lockuser has ever had and (2) only the current
-    # active one. 
-    #def get_all_access_times(self, curr_rfid_only=True):
     def get_all_access_times(self):
-        """ Returns list of all access times (the actual access_time field, not the objects) for this user, which means that the search should include any other
-        RFID's this LockUser ever had. In other words, the search is by *person*, not by RFID.
-        Although we're in the process of deciding whether there should only be one keycard/RFID per person. see the comment for RFIDkeycard.get_allowed_doors().
-        (TODO) 
+        """ 
+        Returns list of all access times (the actual access_time field, not the
+        objects) for this user, which means that the search should include any
+        other RFID's this LockUser ever had. In other words, the search is by
+        *person*, not by RFID.
         """
         # Get QuerySet of all AccessTime objects for this lockuser
-        at_query_set = AccessTime.objects.all().filter(lockuser=self).order_by('access_time')
+        at_query_set = AccessTime.objects.filter(lockuser=self).order_by('access_time')
         # Now get the access_time field of each AccessTime object
         all_access_times_list = [access_time_object.access_time for access_time_object in at_query_set]
         return all_access_times_list
 
-    #def prettify_get_all_access_times(self,curr_rfid_only=True):
     def all_access_times_link(self): 
-        """ prettify and sort """
         return "<a href='../../accesstime/?lockuser__id__exact=%d'>View all access times</a>" %  self.id
     all_access_times_link.allow_tags = True
         
-    # todo: 
-    #def get_last_access_time(self, curr_rfid_only=True):
     def get_last_access_time(self):
         """ Get the last time this person used the lock. 
         Same story with current RFID vs previous one as in the
         comment for get_all_access_time().
-
         """
         access_times = self.get_all_access_times()
         
         # grab the last one
         if access_times:
-            #access_times.sort()
-            #return access_times[-1]  
-            #access_times.latest('access_time')
-            # as get_all_access_times() returns a list of the access_time *fields*, not the objects, already ordered by time, we can just grab the last one in the list
-            #access_times.sort()
             return access_times[-1]  
         else:
             return None
@@ -340,25 +318,22 @@ class LockUser(models.Model):
     def prettify_get_last_access_time(self):  
         last = self.get_last_access_time()
         if last:
-            #return last.ctime()
             return last.strftime("%B %d, %Y, %I:%M %p") 
         else:
             return None
 
     def prettify_get_last_access_time_and_door(self):  
-        """ Includes the door this access time is associated with (for change list) """
+        """ 
+        Includes the door this access time is associated with (for change list) 
+        """
         at_query_set = AccessTime.objects.filter(lockuser=self)  # todo: note - a different appraoch than similar methods
         last = at_query_set.latest('access_time')
-        
-        #if last:
-        #    #return last.ctime()
-        #    return last.access_time.strftime("%B %d, %Y, %I:%M %p") + " (" + last.door.name + ")"
-        #else:
-        #    return None
         return last.access_time.strftime("%B %d, %Y, %I:%M %p") + " (" + last.door.name + ")"
 
     def last_access_time_and_link_to_more(self):  
-        """ including link to all access times (for change form) """
+        """ 
+        Including link to all access times (for change form) 
+        """
         last_time = self.get_last_access_time()
         link = self.all_access_times_link()
         if last_time:
@@ -368,7 +343,9 @@ class LockUser(models.Model):
     last_access_time_and_link_to_more.allow_tags = True
 
     def last_access_time_and_door_and_link_to_more(self):  
-        """ including link to all access times (for change form) """
+        """ 
+        Including link to all access times (for change form) 
+        """
         at_query_set = AccessTime.objects.filter(lockuser=self)  # todo: note - a different appraoch than similar methods
         last = at_query_set.latest('access_time')
         link = self.all_access_times_link()
@@ -391,7 +368,6 @@ class LockUser(models.Model):
         return u'%s %s' % (self.first_name, self.last_name)
 
 
-
 ####################################################################
 # Prevent interactive question about wanting a superuser created.
 ####################################################################
@@ -400,7 +376,7 @@ class LockUser(models.Model):
 # Prevent interactive question about wanting a superuser created.  (This code
 # has to go in this otherwise empty "models" module so that it gets processed by
 # the "syncdb" command during database creation.)
-signals.post_syncdb.disconnect(    create_superuser, sender=auth_models, dispatch_uid='django.contrib.auth.management.create_superuser') # pragma: no cover  (exclude this code from coverage)
+signals.post_syncdb.disconnect(create_superuser, sender=auth_models, dispatch_uid='django.contrib.auth.management.create_superuser') # pragma: no cover  (exclude this code from coverage)
 
 # Create our own test user automatically.
 def create_testuser(app, created_models, verbosity, **kwargs):  # pragma: no cover
