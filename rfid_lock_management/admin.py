@@ -5,11 +5,8 @@ from rfid_lock_management.models import LockUser, AccessTime, RFIDkeycard, Door
 from termcolor import colored
 from django import forms
 from django.contrib import messages
-#from chartit import DataPool, Chart
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-
-
 
 
 class LockUserForm(ModelForm):
@@ -24,18 +21,19 @@ class LockUserForm(ModelForm):
         super(LockUserForm, self).__init__(*args, **kwargs) 
 
     # todo:  clean_fieldname? (https://docs.djangoproject.com/en/1.1/ref/forms/validation/#ref-forms-validation)
-    # todo: refactor the logic
+    # todo: refactor the logic/DRYer
     def clean(self):
-        """ If no Doors were selected -- if user is not permitted to access any door 
-            -- deactivate associated keycard. 
+        """ 
+        If no Doors were selected -- if user is not permitted to access any door 
+        -- deactivate associated keycard. 
 
-            If the user is permitted access to doors that the staff user is not
-            permitted access, make sure lockuser still has access to door staff
-            user is not permitted to manage, since those wouldn't be on the
-            form. Also, if 'deactivate current keycard' was checked in this
-            situation, the keycard should NOT actually be revoked, because of
-            those other doors. 
-            """
+        If the user is permitted access to doors that the staff user is not
+        permitted access, make sure lockuser still has access to door staff
+        user is not permitted to manage, since those wouldn't be on the
+        form. Also, if 'deactivate current keycard' was checked in this
+        situation, the keycard should NOT actually be revoked, because of
+        those other doors. 
+        """
         super(forms.ModelForm, self).clean()
         # grab the cleaned fields we need
         cleaned_doors = self.cleaned_data.get("doors")
@@ -50,14 +48,21 @@ class LockUserForm(ModelForm):
             #    self.cleaned_data['deactivate_current_keycard'] = True
             #else:  # don't deactivate keycard if no doors checked, because there are still doors lock user can access
             if self.doors_not_permitted_to_this_staff_user_but_for_lockuser:
+                # If the user is permitted access to doors that the staff user is
+                # not permitted access, make sure lockuser still has access to door
+                # staff user is not permitted to manage, since those wouldn't be on
+                # the form. 
+                for item in self.doors_not_permitted_to_this_staff_user_but_for_lockuser:
+                    if self.cleaned_data['doors']:
+                        self.cleaned_data['doors'] = self.cleaned_data['doors'] | Door.objects.filter(pk=item.pk)
+                    else: 
+                        self.cleaned_data['doors'] = Door.objects.filter(pk=item.pk)
                 if cleaned_deactivate_current_keycard:
                     self.cleaned_data['deactivate_current_keycard'] = False
                     msg = 'will not deactivate'
                     #messages.add_message(self.request, messages.INFO, msg)
                     self.cleaned_data['special_message'] = msg
 
-
-        # todo:  was this supposed to be indented over one?
         if self.doors_not_permitted_to_this_staff_user_but_for_lockuser: 
             # If there ARE cleaned (i.e. selected) doors, but
             # deactivate_current_keycard is True (i.e. staff user checked
@@ -77,7 +82,6 @@ class LockUserForm(ModelForm):
                         self.cleaned_data['doors'] = self.cleaned_data['doors'] | Door.objects.filter(pk=item.pk)
                     else: 
                         self.cleaned_data['doors'] = Door.objects.filter(pk=item.pk)
-
         return self.cleaned_data
 
 
@@ -123,7 +127,6 @@ class LockUserAdmin(admin.ModelAdmin):
         ModelForm = super(LockUserAdmin, self).get_form(request, obj, **kwargs)
         class ModelFormMetaClass(ModelForm):
             def __new__(cls, *args, **kwargs):
-                #kwargs['request'] = request
                 # get doors this lockuser can access but staff user cannot, unless creating a new user
                 if obj:
                     kwargs['doors_not_permitted_to_this_staff_user_but_for_lockuser'] = self.get_other_doors(request,obj.id)
@@ -173,12 +176,11 @@ class LockUserAdmin(admin.ModelAdmin):
 
     # Issue h
     def get_other_doors(self, request,object_id):
-        """ Doors that the staff User is not allowed to administer. In
+        """ 
+        Doors that the staff User is not allowed to administer. In
         change_form template, will get a set of these Door objects from context,
         then check the lockuser_set of each to see if the current lockuser has
         access to it.  
-        
-        todo: do the check for whether lockuser actually has perms for the non-permitted door here
         """
         if request.user.is_superuser: # pragma: no cover (exclude from coverage report - superuser distinction is a development-only feature)
             # superuser will always see all doors (doors_to_show)
@@ -189,7 +191,6 @@ class LockUserAdmin(admin.ModelAdmin):
             perm = "rfid_lock_management.can_manage_door_%d" % door.pk   # put in proper format for has_perm
             if not request.user.has_perm(perm):
                 doors_not_permitted_to_this_staff_user = doors_not_permitted_to_this_staff_user | Door.objects.filter(pk=door.pk)  # concatenating QuerySets
-
         # all elem that are in this set but not the other. i.e. all doors 
         this_lu = LockUser.objects.get(pk=object_id)
         ok_for_user_set = set(this_lu.get_allowed_doors())
@@ -198,38 +199,47 @@ class LockUserAdmin(admin.ModelAdmin):
         return doors_not_permitted_to_this_staff_user_but_for_lockuser
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
-        """  The queryset() method in DoorAdmin restricts a staff user's ability
+        """  
+        The queryset() method in DoorAdmin restricts a staff user's ability
         to view/change Doors that they do not have permission for (individual
         objects and change list).  But on the listdisplay and changeform for
         LockUsers, staff users can still see Doors  -- and assign them -- that
         they don't have permission for.  So here, we need to to limit the
-        ManyToMany Door field output for the LockUser.  """ 
+        ManyToMany Door field output for the LockUser.  
+        """ 
         if db_field.name == "doors":
             kwargs["queryset"] = self.get_doors_to_show(request)
         return super(LockUserAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
       
     def change_view(self, request, object_id, form_url='', extra_context=None):
-        """  LockUser may have access to Doors that the staff user cannot admin;
+        """  
+        LockUser may have access to Doors that the staff user cannot admin;
         this must be accounted for when determining (Javascript) whether to
         disable "Assign keycard" button or select "Deactivate keycard" because
         all Doors have been unchecked.  In change_form template, will get a set
         of these Door objects from context, then check the lockuser_set of each
-        to see if the current lockuser has access to it.  """
+        to see if the current lockuser has access to it. 
+        """
         extra_context={"doors_not_permitted_to_this_staff_user":self.get_other_doors(request, object_id)}   
         return super(LockUserAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
 
     def has_delete_permission(self, request, obj=None):
-        """ Don't display "delete" button """
+        """ 
+        Don't display "delete" button 
+        """
         return False
 
     def save_model(self,request,obj,form,change):
-        """ If deactivate current keycard was checked (which may have actually
+        """
+        If deactivate current keycard was checked (which may have actually
         happened in clean, if  no Doors were selected) need to deactivate
         current keycard.  Doing this here rather than models.py because need to
         attach request.user to the RFIDkeycard object being deactivated, to
         record revoker.
         """
-        # if obj.deactivate_current_keycard or not obj.doors.exists():  # although deactivate_current_keycard should have been set to true in clean, if no doors
+        # (Note that deactivate_current_keycard should have been set to true in
+        # clean, if no doors.)
+        # if obj.deactivate_current_keycard or not obj.doors.exists():  
         if obj.deactivate_current_keycard: 
             obj.current_keycard_revoker = request.user
             msg = "%s's keycard was deactivated successfully." % obj
@@ -248,7 +258,7 @@ class LockUserAdmin(admin.ModelAdmin):
 
 
 class AccessTimeAdmin(admin.ModelAdmin):
-    list_display = ('access_time','lockuser_html_heading','door')   # if just 'lockuser', won't get html for link... todo: but I think there's an easier way to do this
+    list_display = ('access_time','lockuser_html_heading','door')   
     actions = None  # don't provide the actions dropdown
     date_hierarchy = 'access_time' # Set date_hierarchy to the name of a
         # DateField or DateTimeField in model, and the change list page will
@@ -260,7 +270,8 @@ class AccessTimeAdmin(admin.ModelAdmin):
         """ 
         Don't show links to individual AccessTime change forms from any field. 
         (list_display_links = [] will not works - will default to linking from
-        items in AccessTime column.  """
+        items in AccessTime column.  
+        """
         self.list_display_links = (None, )
         return super(AccessTimeAdmin, self).changelist_view(request, extra_context=extra_context)
 
@@ -275,11 +286,15 @@ class AccessTimeAdmin(admin.ModelAdmin):
         return HttpResponseRedirect(reverse('admin:rfid_lock_management_accesstime_changelist'))
 
     def has_delete_permission(self, request, obj=None):
-        """ Don't display "delete" button """
+        """ 
+        Don't display "delete" button 
+        """
         return False
 
     def has_add_permission(self, request, obj=None):
-        """Don't display Save And Add button """
+        """
+        Don't display Save And Add button 
+        """
         return False
 
     def lockuser_html_heading(self, obj):
