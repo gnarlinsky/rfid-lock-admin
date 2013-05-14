@@ -27,7 +27,7 @@ def chartify(request):
         this_door_access_times = AccessTime.objects.filter(door=door)
         one_series['data'] = []
         for at in this_door_access_times:
-            one_series['data'].append(simplejson.loads(at.data_point))  # todo: ugh with the loads'ing           
+            one_series['data'].append(simplejson.loads(at.data_point))  
         all_series.append(one_series)
     extra_context = {'chart_data': simplejson.dumps(all_series, indent="") } 
     return render_to_response('chart.html', dictionary=extra_context, context_instance=RequestContext(request))
@@ -104,10 +104,12 @@ def check(request,doorid, rfid):
                         at.save()
     return HttpResponse(response)
 
-
 @login_required
+# Issue #k
 def initiate_new_keycard_scan(request,lockuser_object_id):
-    """ Try start waiting for new keycard scan; return success/fail message """
+    """ 
+    Try start waiting for new keycard scan; return success/fail message.
+    """
     # If this lockuser already has a current keycard, don't proceed
     # (This should have been prevented at template level also)
     try: 
@@ -116,90 +118,59 @@ def initiate_new_keycard_scan(request,lockuser_object_id):
         response_data = {'success':False, "error_mess":"This lock user was probably not found in the system."}
         # Probably the error is DoesNotExist: LockUser matching query does not exist.
         #   but send this response on ANY type of exception
-        # todo: include an error code? and log? 
-
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 
-
     if lu.get_current_rfid():
-        response_data = {'success':False, 'error_mess':"This lock user is already assigned a keycard."} # Todo: So when stuff like this happens in production...  Should it sent some kind of automated error report to whomever is developing/maintaining the site? 
+        response_data = {'success':False, 'error_mess':"This lock user is already assigned a keycard."} 
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
     else:
         n = NewKeycardScan()
-
         n.waiting_for_scan = True
         n.assigner_user = request.user
         n.save()   
-
         response_data = {'success':True, 'new_scan_pk':n.pk}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
     
-
-
-# todo: 
+# TODO:  raise exceptions.   
 @login_required
-#def finished_new_keycard_scan(request, lockuser_object_id):
 def finished_new_keycard_scan(request,new_scan_pk):
-    """  Verify this is the NewKeycardScan object we initiated, that the rfid
-        is not the same as that of a currently active keycard, and that we 
-        haven't timed out. Then get the rfid from the newly-scanned card. 
+    """  
+    Verify this is the NewKeycardScan object we initiated, that the rfid is not
+    the same as that of a currently active keycard, and that we haven't timed
+    out. Then get the rfid from the newly-scanned card. 
 
-        Also verifying __, ____, .........
-
-        The new RFIDkeycard object is created upon LockUser save, after change_form form has been submitted.
+    The new RFIDkeycard object is created upon LockUser save, after change_form
+    form has been submitted.  
     """
-    # TODO:  raise exceptions.   
-    # TODO:  Error codes to aid developers? So Staff user sees "ERROR (code 2). Try again," not "ERROR (scary message  about the exact error). Try again." ....Or just quietly log the error. 
-
-    #if not new_scan_queryset:
-    #    response_data = {'success':False, 'error_mess':"No NewKeycardScan objects at all"}
-    #    return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-
     # Verify that the scan object is the one we need - that we have the 
     #   NewKeycardScan object we started with, not one that another staff
     #   user initiated *after* us, for ex.  
-    #new_scan_queryset = NewKeycardScan.objects.all()
-    #new_scan_right_pk_qs = new_scan_queryset.filter(pk = new_scan_pk)  # 
     new_scan_qs = NewKeycardScan.objects.filter(pk = new_scan_pk)  
     if not new_scan_qs:
         response_data = {'success':False, 'error_mess':"No NewKeycardScan obj with pk " + new_scan_pk + "."}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-
     new_scan = new_scan_qs[0]
     #min_till_timeout = 2
     #timed_out, time_diff_minutes = new_scan.timed_out(minutes=min_till_timeout)
     timed_out, time_diff_minutes = new_scan.timed_out()  # defaults to two minutes
     if timed_out:
-    #if new_scan.timed_out(minutes=min_till_timeout):
-        #response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done'.... So don't take %f minutes next time, please, fatty. Run to that lock! You could use the exercise." % (min_till_timeout,time_diff_minutes)}
         default_timeout_minutes = get_arg_default(NewKeycardScan.timed_out,'minutes')
         response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done.' "  % default_timeout_minutes}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-
     if not new_scan.rfid:  
         response_data = {'success':False, 'error_mess':"NewKeycardScan does not have RFID."}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-    # if waiting for new keycard to be scanned, but timed out
-
     # Verify that the rfid is not the same as that of another ACTIVE keycard
     keycards_with_same_rfid_qs = RFIDkeycard.objects.filter(the_rfid=new_scan.rfid)
-
-    #for k in keycards_with_same_rfid_qs:
     for k in keycards_with_same_rfid_qs.select_related():
         if k.is_active():
             response_data = {'success':False, 'error_mess':"A keycard with the same RFID is already assigned to %s." % k.lockuser} # to do:  include actual link to this lockuser
             return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-            
-    #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-
-
     # OK, so far so good. Set waiting and ready-to-assign status,
-    # grab the assigner, and save NewKeycardScan object
+    # grab the assigner, and save NewKeycardScan object.
     new_scan.waiting_for_scan = False
     new_scan.ready_to_assign = True 
-    new_scan.assigner_user = request.user  # todo:  wasn't assigner_user already set? 
+    new_scan.assigner_user = request.user  # todo: assigner_user already set in initiate
     new_scan.save()
-
     response_data = {'success':True, 'rfid':new_scan.rfid}
     return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
