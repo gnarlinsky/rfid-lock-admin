@@ -36,6 +36,7 @@ class Door(models.Model):
         Represent Door objects with their name fields
         """
         return u'%s' % (self.name)
+        # also: return self.name
 
     def save(self, *args, **kwargs):
         """
@@ -57,7 +58,7 @@ class Door(models.Model):
         """ 
         Return the RFIDs allowed to access this Door 
         """
-        return_list = []
+        return_list = []  # I like variable name "allowed_rfids" more than "return_list", but it's your choice :-)
         for lu in self.lockuser_set.all():
             if lu.get_current_rfid():
                 return_list.append(lu.get_current_rfid())
@@ -70,7 +71,13 @@ class NewKeycardScan(models.Model):
     """
     #time_initiated = models.DateTimeField(auto_now_add=True)
     # auto_now_add and time zones do not play well together sometimes...
-    time_initiated = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))
+    time_initiated = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))  # nonono.
+    # this expression can be calculated on model defining procedure (e.q. application startup), and always be same value for all 
+    # objects in single session (from application start to end).
+    # same with functions:
+    # def myfunction(param_a, param_b=datetime.datetime.now()):
+    # will always have same param_b value.
+    # if you need complex logic here you can move it to __init__, or just use auto_now_add=True in field definition.
     waiting_for_scan = models.BooleanField(default=True) 
     doorid = models.CharField(max_length=50)   # doorid as in the request url
     rfid = models.CharField(max_length=10)   # rfid as in the request url
@@ -89,7 +96,12 @@ class NewKeycardScan(models.Model):
         now = datetime.datetime.now().replace(tzinfo=utc)
         max_time = datetime.timedelta(minutes=minutes)
         delta = now - self.time_initiated
-        time_diff_minutes = round( delta.total_seconds() / 60, 2)
+        time_diff_minutes = round( delta.total_seconds() / 60, 2)  # /60 and /60.0 will have different results if first argument is INT.
+        # >>> 30 / 60
+        # 0
+        # >>> 30 / 60.0
+        # 0.5
+
         return (delta>max_time, time_diff_minutes)
 
 
@@ -98,9 +110,10 @@ class RFIDkeycard(models.Model):
     Door access represented by a (potentially reusable) RFID keycard
     (or keyfob or whatever) assigned to a LockUser. 
     """
+    # more that 1 space before =
     the_rfid    = models.CharField(max_length=10,null=False,blank=False, editable=False) # the radio-frequency id
     date_revoked = models.DateTimeField(null=True, blank=True) 
-    date_created = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))
+    date_created = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))  # same problem as discussed before
     lockuser = models.ForeignKey("LockUser",null=False)
     # If we don't specify a related_name, User would have two reverse relations
     # to rfidkeycard_set, which is impossible. 
@@ -124,6 +137,7 @@ class RFIDkeycard(models.Model):
             return False
         else:
             return True
+        # or return not self.date_revoked?
 
     def deactivate(self,user):
         now = datetime.datetime.now().replace(tzinfo=utc)
