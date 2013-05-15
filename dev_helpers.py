@@ -19,7 +19,7 @@ def make_access_times(min_num_times=10, max_num_times=10):
     """
     counter = 0
     for keycard in RFIDkeycard.objects.all():
-        for i in range(random.randint(min_num_times,max_num_times)):
+        for i in range(random.randint(min_num_times, max_num_times)):
             try:
                 door = random.choice(keycard.lockuser.doors.all())
             except IndexError:
