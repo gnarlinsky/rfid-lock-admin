@@ -11,35 +11,48 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 
 
+# PEP8: whitespace after comma, no trailing whitespaces, no double or more spaces before =,
+# and functuions formatting:
+# call_a(
+#     1,
+#     2
+#     3
+# )
+
+# about functions: it's an optional, but I like it and it's not pep8-volatile
+
+# double lines between classes, single line inside class (also optional, but PEP8 highly recommends it)
+
+
 class Door(models.Model):
-    """ 
-    Doors with RFID locks installed. 
     """
-    name        = models.CharField(max_length=50, unique=True,null=False)  # e.g. "Makerspace," "Bike Project," etc.
+    Doors with RFID locks installed.
+    """
+    name = models.CharField(max_length=50, unique=True, null=False)  # e.g. "Makerspace," "Bike Project," etc.
     description = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
-        """ 
-        Represent Door objects with their name fields 
+        """
+        Represent Door objects with their name fields
         """
         return u'%s' % (self.name)
 
-
-    def save(self,*args,**kwargs):
-        """ 
-        When a new Door is added, create a corresponding Permission, if it does not exist already 
+    def save(self, *args, **kwargs):
+        """
+        When a new Door is added, create a corresponding Permission, if it does not exist already
         """
 
-        super(Door,self).save(*args,**kwargs)
+        super(Door, self).save(*args, **kwargs)
 
         if not Permission.objects.filter(codename='can_manage_door_%d' % self.pk): 
             content_type = ContentType.objects.get(app_label='rfid_lock_management',model='door')
 
-            Permission.objects.create( \
-                    codename='can_manage_door_%d' % self.pk, \
-                    name = 'Can manage door to %s' % self.name,\
-                    content_type = content_type)   
-        
+            Permission.objects.create(
+                codename='can_manage_door_%d' % self.pk,
+                name = 'Can manage door to %s' % self.name,
+                content_type = content_type
+            )
+
     def get_allowed_rfids(self):
         """ 
         Return the RFIDs allowed to access this Door 
