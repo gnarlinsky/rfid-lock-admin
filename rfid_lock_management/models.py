@@ -229,6 +229,7 @@ class LockUser(models.Model):
         """ 
         Get all RFID's associated with this LockUser 
         """
+        ### sometimes you are making too detailed comments, but it's ok :-)
         return self.rfidkeycard_set.all()
 
     def get_all_rfids_html(self):
@@ -249,6 +250,10 @@ class LockUser(models.Model):
                 info_str = "RFID: %s (activated on %s by %s; revoked on %s by %s)" % (rf,date_assigned, assigner,date_revoked, revoker)
             # Catching exceptions here was really only useful in development, so excluding it from coverage
             except:  # pragma: no cover
+            ### good idea use except ExceptionType instead of just except:
+            ### except ValueError: lalala
+            ### except: print "unknown excepion {}".format(str(sys.exc_info()))
+            ### because KeyboardInterrupt and SyntaxErorr also can be an exceptions :-)
                 info_str = "RFID: %s (activated on %s by %s [couldn't get revoker] )" % (rf,date_assigned,assigner)
             rfid_keycards_info_list.append(info_str)
         return ",<br>".join(rfid_keycards_info_list)
@@ -264,7 +269,14 @@ class LockUser(models.Model):
         try:
             return curr_rfid[0]  
         except:
+        ### except IndexError:
             return None
+        ### or:
+        ### if curr_rfid:
+        ###     curr_rfid[0]
+        ### else:
+        ###     return None
+        ### as you wish
 
     def is_active(self):
         """ 
@@ -274,6 +286,7 @@ class LockUser(models.Model):
             return True
         else:
             return False
+        ### return self.get_current_rfid() is not None (if curr_rfid[0] cannot be None ofc)
        
     def prettify_get_current_rfid(self):
         """ 
@@ -295,6 +308,9 @@ class LockUser(models.Model):
         return self.doors.all()            
 
     def prettify_get_allowed_doors(self):
+        ### may be Values helps here:
+        ### >>> Entry.objects.values_list('id', flat=True).order_by('id')
+        ### [1, 2, 3, ...]
         allowed_doors = self.get_allowed_doors()
         door_names_list = [door.name for door in allowed_doors] 
         return ", ".join(door_names_list)
@@ -319,6 +335,7 @@ class LockUser(models.Model):
         other RFID's this LockUser ever had. In other words, the search is by
         *person*, not by RFID.
         """
+        ### again, .values(.., flat=True)?
         # Get QuerySet of all AccessTime objects for this lockuser
         at_query_set = AccessTime.objects.filter(lockuser=self).order_by('access_time')
         # Now get the access_time field of each AccessTime object
@@ -364,7 +381,7 @@ class LockUser(models.Model):
         last_time = self.get_last_access_time()
         link = self.all_access_times_link()
         if last_time:
-            return "%s (%s)" % (last_time.strftime("%B %d, %Y, %I:%M %p") , link)
+            return "%s (%s)" % (last_time.strftime("%B %d, %Y, %I:%M %p"), link)
         else:
             return None
     last_access_time_and_link_to_more.allow_tags = True
