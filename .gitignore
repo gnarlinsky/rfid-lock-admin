@@ -12,12 +12,11 @@ expanded_comments.txt
 expanded_comments_pdfs
 todo.rtfd
 pydocs
-djgrep.sh
+grepdj.sh
 
 # Symbolic links #
 ###################
 admin_templates
-orig_admin
 djock_docs
 stockpile
 django
