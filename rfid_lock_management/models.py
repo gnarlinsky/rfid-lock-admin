@@ -79,18 +79,18 @@ class NewKeycardScan(models.Model):
 
     def timed_out(self,minutes=2):
         """ 
-        Check whether specified number of minutes have passed since staff user 
-        indicated they were going to go scan in a card in order to assign it.
-        Returns tuples with T/F as first item; second item is the time
-        differences in minutes, which is useful for including  on LockUser 
-        change form to let the staff user know how many minutes before time
-        out. 
+        Check whether specified number of minutes have passed since staff user
+        indicated they were going to go scan in a card in order to assign it,
+        and return True if so. 
         """
         now = datetime.datetime.now().replace(tzinfo=utc)
+
+        # How much time has passed since clicked 'Scan new card'
+        delta = now - self.time_initiated  
+
+        # Has it been more than specificed number of minutes?
         max_time = datetime.timedelta(minutes=minutes)
-        delta = now - self.time_initiated
-        time_diff_minutes = round( delta.total_seconds() / 60, 2)
-        return (delta>max_time, time_diff_minutes)
+        return delta>max_time
 
 
 class RFIDkeycard(models.Model):

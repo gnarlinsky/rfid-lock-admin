@@ -150,12 +150,10 @@ def finished_new_keycard_scan(request,new_scan_pk):
         response_data = {'success':False, 'error_mess':"No NewKeycardScan obj with pk " + new_scan_pk + "."}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
     new_scan = new_scan_qs[0]
-    #min_till_timeout = 2
-    #timed_out, time_diff_minutes = new_scan.timed_out(minutes=min_till_timeout)
-    timed_out, time_diff_minutes = new_scan.timed_out()  # defaults to two minutes
+    min_till_timeout = 2.0
+    timed_out = new_scan.timed_out(min_till_timeout)
     if timed_out:
-        default_timeout_minutes = get_arg_default(NewKeycardScan.timed_out,'minutes')
-        response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done.' "  % default_timeout_minutes}
+        response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done.' "  % min_till_timeout}
         return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
     if not new_scan.rfid:  
         response_data = {'success':False, 'error_mess':"NewKeycardScan does not have RFID."}
