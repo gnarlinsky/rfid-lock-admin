@@ -19,14 +19,16 @@ def make_access_times(min_num_times=10, max_num_times=10):
     """
     counter = 0
     for keycard in RFIDkeycard.objects.all():
-        for i in range(random.randint(min_num_times,max_num_times)):
+        for i in range(random.randint(min_num_times, max_num_times)):
             try:
                 door = random.choice(keycard.lockuser.doors.all())
             except IndexError:
                 return "no doors, so no access times"
+
+            # next code duplicated by 70%.
             if door.id == 1:   # door 1:  only certain days of the week
                 j = 0
-                while j<1:
+                while j < 1:  # should I write comments about PEP8? :-)
                     the_date_time = get_random_time()
                     if (the_date_time.weekday()==5 or the_date_time.weekday()==6 or the_date_time.weekday()==4):
                         lockuser = keycard.lockuser
@@ -84,6 +86,19 @@ def assign_data_point_dict(at):
     data_point = {}
     # subtract 1 from the month because months start at 0 in JavaScript, not 1 
     data_point_dict['x'] = 'Date.UTC(%d,%d,%d)' % (at.access_time.year, at.access_time.month-1, at.access_time.day)
+    # new way to format string is .format
+    data_point_dict['x'] = 'Date.UTC({},{},{})'.format(
+        at.access_time.year,
+        at.access_time.month - 1,
+        at.access_time.day
+    )
+    # or. havent checked it, but works somehow like it
+    data_point_dict['x'] = 'Date.UTC({year},{month},{day})'.format(
+        year=at.access_time.year,
+        month=at.access_time.month - 1,
+        day=at.access_time.day
+    )
+
     data_point_dict['y'] = 'Date.UTC(0,0,0, %d,%d,%d)' % (at.access_time.hour, at.access_time.minute, at.access_time.second)
     data_point_dict['user'] = '"%s %s"' % (at.lockuser.first_name, at.lockuser.last_name)
     at.data_point = simplejson.dumps(data_point_dict)

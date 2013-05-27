@@ -36,6 +36,7 @@ class Door(models.Model):
         Represent Door objects with their name fields
         """
         return u'%s' % (self.name)
+        # also: return self.name
 
     def save(self, *args, **kwargs):
         """
@@ -57,7 +58,7 @@ class Door(models.Model):
         """ 
         Return the RFIDs allowed to access this Door 
         """
-        return_list = []
+        return_list = []  # I like variable name "allowed_rfids" more than "return_list", but it's your choice :-)
         for lu in self.lockuser_set.all():
             if lu.get_current_rfid():
                 return_list.append(lu.get_current_rfid())
@@ -70,7 +71,13 @@ class NewKeycardScan(models.Model):
     """
     #time_initiated = models.DateTimeField(auto_now_add=True)
     # auto_now_add and time zones do not play well together sometimes...
-    time_initiated = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))
+    time_initiated = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))  # nonono.
+    # this expression can be calculated on model defining procedure (e.q. application startup), and always be same value for all 
+    # objects in single session (from application start to end).
+    # same with functions:
+    # def myfunction(param_a, param_b=datetime.datetime.now()):
+    # will always have same param_b value.
+    # if you need complex logic here you can move it to __init__, or just use auto_now_add=True in field definition.
     waiting_for_scan = models.BooleanField(default=True) 
     doorid = models.CharField(max_length=50)   # doorid as in the request url
     rfid = models.CharField(max_length=10)   # rfid as in the request url
@@ -92,15 +99,15 @@ class NewKeycardScan(models.Model):
         max_time = datetime.timedelta(minutes=minutes)
         return delta>max_time
 
-
 class RFIDkeycard(models.Model):
     """ 
     Door access represented by a (potentially reusable) RFID keycard
     (or keyfob or whatever) assigned to a LockUser. 
     """
+    # more that 1 space before =
     the_rfid    = models.CharField(max_length=10,null=False,blank=False, editable=False) # the radio-frequency id
     date_revoked = models.DateTimeField(null=True, blank=True) 
-    date_created = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))
+    date_created = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))  # same problem as discussed before
     lockuser = models.ForeignKey("LockUser",null=False)
     # If we don't specify a related_name, User would have two reverse relations
     # to rfidkeycard_set, which is impossible. 
@@ -124,6 +131,7 @@ class RFIDkeycard(models.Model):
             return False
         else:
             return True
+        # or return not self.date_revoked?
 
     def deactivate(self,user):
         now = datetime.datetime.now().replace(tzinfo=utc)
@@ -215,6 +223,7 @@ class LockUser(models.Model):
         """ 
         Get all RFID's associated with this LockUser 
         """
+        ### sometimes you are making too detailed comments, but it's ok :-)
         return self.rfidkeycard_set.all()
 
     def get_all_rfids_html(self):
@@ -235,6 +244,10 @@ class LockUser(models.Model):
                 info_str = "RFID: %s (activated on %s by %s; revoked on %s by %s)" % (rf,date_assigned, assigner,date_revoked, revoker)
             # Catching exceptions here was really only useful in development, so excluding it from coverage
             except:  # pragma: no cover
+            ### good idea use except ExceptionType instead of just except:
+            ### except ValueError: lalala
+            ### except: print "unknown excepion {}".format(str(sys.exc_info()))
+            ### because KeyboardInterrupt and SyntaxErorr also can be an exceptions :-)
                 info_str = "RFID: %s (activated on %s by %s [couldn't get revoker] )" % (rf,date_assigned,assigner)
             rfid_keycards_info_list.append(info_str)
         return ",<br>".join(rfid_keycards_info_list)
@@ -250,7 +263,14 @@ class LockUser(models.Model):
         try:
             return curr_rfid[0]  
         except:
+        ### except IndexError:
             return None
+        ### or:
+        ### if curr_rfid:
+        ###     curr_rfid[0]
+        ### else:
+        ###     return None
+        ### as you wish
 
     def is_active(self):
         """ 
@@ -260,6 +280,7 @@ class LockUser(models.Model):
             return True
         else:
             return False
+        ### return self.get_current_rfid() is not None (if curr_rfid[0] cannot be None ofc)
        
     def prettify_get_current_rfid(self):
         """ 
@@ -281,6 +302,9 @@ class LockUser(models.Model):
         return self.doors.all()            
 
     def prettify_get_allowed_doors(self):
+        ### may be Values helps here:
+        ### >>> Entry.objects.values_list('id', flat=True).order_by('id')
+        ### [1, 2, 3, ...]
         allowed_doors = self.get_allowed_doors()
         door_names_list = [door.name for door in allowed_doors] 
         return ", ".join(door_names_list)
@@ -305,6 +329,7 @@ class LockUser(models.Model):
         other RFID's this LockUser ever had. In other words, the search is by
         *person*, not by RFID.
         """
+        ### again, .values(.., flat=True)?
         # Get QuerySet of all AccessTime objects for this lockuser
         at_query_set = AccessTime.objects.filter(lockuser=self).order_by('access_time')
         # Now get the access_time field of each AccessTime object
@@ -350,7 +375,7 @@ class LockUser(models.Model):
         last_time = self.get_last_access_time()
         link = self.all_access_times_link()
         if last_time:
-            return "%s (%s)" % (last_time.strftime("%B %d, %Y, %I:%M %p") , link)
+            return "%s (%s)" % (last_time.strftime("%B %d, %Y, %I:%M %p"), link)
         else:
             return None
     last_access_time_and_link_to_more.allow_tags = True
