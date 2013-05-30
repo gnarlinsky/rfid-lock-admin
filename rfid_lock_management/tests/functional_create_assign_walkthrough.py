@@ -22,7 +22,7 @@ import shutil
 # Take screenshot at certain points -- useful for documentation walking through the process of 
 #   creating a new lock user and assigning a keycard.
 # (Note - uses screencapture, which is OS X only [the results are higher quality than using selenium's save_screenshot])
-SCREENSHOTS = True
+SCREENSHOTS = False
 # note:  -C option captures the cursor on the screen
 
 # Indicate how many seconds to pause at key points to slow down walkthrough.
