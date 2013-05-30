@@ -4,26 +4,23 @@ Django interface to manage RFID lock users
 
 ## Quick start
 
-To minimize dependency issues, make a new virtualenv, e.g. 
+Clone the repository. 
 
-    $ mkdir ve
+    $ git clone git@github.com:gnarlinsky/rfid-lock-admin.git
+
+To avoid dependency issues, create a virtualenv and install the required packages.
+
+    $ cd rfid-lock-admin
     $ virtualenv ve --no-site-packages
+    $ source ve/bin/activate      # activate the virtual environment
+    $ pip install -r requirements.txt
 
-activate it, 
+Create the database and load the initial data.
 
-    $ source ve/bin/activate
+    $ python manage.py syncdb
+    $ python manage.py loaddata rfid_lock_management/fixtures/lockuser_keycard_perm_user_accesstime_door_user.json
 
-and pip install the requirements.txt. 
+Run the Django development server. 
+    $ python manage.py runserver   
 
-    $ pip install -r path/to/requirements.txt
-
-
-Then fire up the development server:
-
-    $ ./manage.py syncdb
-    $ ./manage.py loaddata <fixture.json>   # if rfid_lock_management/fixtures/init_data.json exists and you want to use it, just skip this step -- syncdb will load fixtures/init_data.[json/xml/yaml] if it exists.
-    $ ./manage.py runserver         
-
-And go to 
-
-    http://localhost:8000/lock
+Go to http://localhost:8000/lockadmin to see the application in action. 
