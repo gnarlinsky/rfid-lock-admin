@@ -158,7 +158,7 @@ def finished_new_keycard_scan(request,new_scan_pk):
     if not new_scan_qs:
         #response_data = {'success':False, 'error_mess':"No NewKeycardScan obj with pk " + new_scan_pk + "."}
         #return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-        do_json_resp(False, "No NewKeycardScan obj with pk {}.".format(new_scan_pk))
+        return do_json_resp(False, "No NewKeycardScan obj with pk {}.".format(new_scan_pk))
     new_scan = new_scan_qs[0]
     min_till_timeout = 2.0
     timed_out = new_scan.timed_out(min_till_timeout)
@@ -167,23 +167,23 @@ def finished_new_keycard_scan(request,new_scan_pk):
 #        response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done.' "  % min_till_timeout}
 #        return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
 #=======
-        default_timeout_minutes = get_arg_default(NewKeycardScan.timed_out,'minutes')
+        #default_timeout_minutes = get_arg_default(NewKeycardScan.timed_out,'minutes')
         #response_data = {'success':False, 'error_mess':"Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done.' "  % default_timeout_minutes}
         #return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
         #do_json_resp(False, "Sorry, the system timed out. You have {} minutes to scan the card, then hit 'Done.' ".format(default_timeout_minutes))
-        do_json_resp(False, "Sorry, the system timed out. You have {} minutes to scan the card, then hit 'Done.' ".format(min_till_timeout))
+        return do_json_resp(False, "Sorry, the system timed out. You have {} minutes to scan the card, then hit 'Done.' ".format(min_till_timeout))
 #>>>>>>> ee7d165adc80b5dcec5f30492c634e6339bd7a05
     if not new_scan.rfid:  
         #response_data = {'success':False, 'error_mess':"NewKeycardScan does not have RFID."}
         #return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-        do_json_resp(False, "NewKeycardScan does not have RFID.")
+        return do_json_resp(False, "NewKeycardScan does not have RFID.")
     # Verify that the rfid is not the same as that of another ACTIVE keycard
     keycards_with_same_rfid_qs = RFIDkeycard.objects.filter(the_rfid=new_scan.rfid)
     for k in keycards_with_same_rfid_qs.select_related():
         if k.is_active():
             #response_data = {'success':False, 'error_mess':"A keycard with the same RFID is already assigned to %s." % k.lockuser} # to do:  include actual link to this lockuser
             #return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-            do_json_resp(False, "A keycard with the same RFID is already assigned to {}.".format(k.lockuser))
+            return do_json_resp(False, "A keycard with the same RFID is already assigned to {}.".format(k.lockuser))
     # OK, so far so good. Set waiting and ready-to-assign status,
     # grab the assigner, and save NewKeycardScan object.
     new_scan.waiting_for_scan = False
