@@ -262,8 +262,10 @@ class NewKeycardScanTests(TestCase):
         
         # get the default minutes timeout by looking at the timeout default 
         # argument in timed_out method of NewKeycardScan.
-        default_timeout_minutes = get_arg_default(NewKeycardScan.timed_out,'minutes')
-        fake_time_initiated = (datetime.now() - timedelta(minutes=default_timeout_minutes, seconds=1)).replace(tzinfo=utc)
+        #default_timeout_minutes = get_arg_default(NewKeycardScan.timed_out,'minutes')
+        #fake_time_initiated = (datetime.now() - timedelta(minutes=default_timeout_minutes, seconds=1)).replace(tzinfo=utc)
+        min_till_timeout = 2.0
+        fake_time_initiated = (datetime.now() - timedelta(minutes=min_till_timeout, seconds=1)).replace(tzinfo=utc)
         new_nks_obj.time_initiated = fake_time_initiated
         new_nks_obj.save()
 
@@ -278,7 +280,8 @@ class NewKeycardScanTests(TestCase):
 
         print colored("\tCheck response content","blue")
         self.assertEqual(simplejson.loads(response.content)['success'], False)
-        self.assertEqual(simplejson.loads(response.content)['error_mess'], "Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done.' "  % default_timeout_minutes)
+        #self.assertEqual(simplejson.loads(response.content)['error_mess'], "Sorry, the system timed out. You have %d minutes to scan the card, then hit 'Done.' "  % default_timeout_minutes)
+        self.assertEqual(simplejson.loads(response.content)['error_mess'], "Sorry, the system timed out. You have {} minutes to scan the card, then hit 'Done.' ".format(min_till_timeout))
 
     def test_finished_new_keycard_scan_keycardscan_obj_does_not_have_rfid(self):
         """ NewKeycardScan object did not get an RFID num """
