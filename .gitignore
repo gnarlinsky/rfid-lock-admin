@@ -3,34 +3,26 @@
 # So no trailing white space or comments on the same line.
 #########################################################
 
-
 ignore_me_for_readme
 NO
 generated_docum_and_coverage
 notes.txt
 .idea
-activate
-# PyCharm settings
-#.idea/* 
-*.swp
-*.swo
-# link:
-django
 expanded_comments.txt
 expanded_comments_pdfs
 todo.rtfd
 pydocs
-# bootstrap:
-demo_project
+mydjgrep.sh
+test_create_new_lockuser_and_assign_keycard_walkthrough___screenshots
+htmlcov
+.coverage
 
 # Symbolic links #
 ###################
 admin_templates
-orig_admin
 djock_docs
 stockpile
-
-
+django
 
 # Compiled source #
 ###################
@@ -73,3 +65,13 @@ stockpile
 Icon?
 ehthumbs.db
 Thumbs.db
+
+# PyCharm settings: 
+#.idea/* 
+
+# vim
+*.swp
+*.swo
+
+# ve:
+activate

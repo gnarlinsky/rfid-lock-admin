@@ -6,6 +6,8 @@ from termcolor import colored
 from django import forms
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+
+### from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 
 
@@ -109,19 +111,50 @@ class LockUserAdmin(admin.ModelAdmin):
                             ),
             }),
         )
-    readonly_fields = ("prettify_get_current_rfid", "last_access_time_and_door_and_link_to_more","prettify_get_last_access_time",)  
+    """
+    fieldsets = (
+        (None, {
+            'fields': (
+                ('first_name', 'last_name'),
+                'email',
+                'phone_number','address',
+                'prettify_get_current_rfid',
+                'last_access_time_and_door_and_link_to_more',
+                'doors',
+                'deactivate_current_keycard',
+            ),
+        }),
+    )
+
+    """
+
+    ### more readable, as I think
+    readonly_fields = (
+        "prettify_get_current_rfid",
+        "last_access_time_and_door_and_link_to_more",
+        "prettify_get_last_access_time",
+    )
 
     ###########################################################################
     # change list
     ###########################################################################
     list_display_links = ['first_name','last_name']
-    list_display = ('first_name','last_name','email',\
-                    'is_active',\
-                    '_current_rfid_heading',\
-                    '_doors_heading',
-                    '_last_access_heading',
+
+    # aaaaa = (
+    #     b,
+    #     c,
+    #     d
+    # )
+    list_display = (
+        'first_name',
+        'last_name',
+        'email',
+        'is_active',
+        '_current_rfid_heading',
+        '_doors_heading',
+        '_last_access_heading',
     )
-    list_filter = ('doors',)
+    list_filter = ('doors', )
 
     def get_form(self, request, obj=None, **kwargs):
         ModelForm = super(LockUserAdmin, self).get_form(request, obj, **kwargs)
@@ -146,7 +179,9 @@ class LockUserAdmin(admin.ModelAdmin):
             if not doors_not_permitted_to_this_staff_user_but_for_lockuser:
                 obj.deactivate_current_keycard = True
                 obj.current_keycard_revoker = request.user
-                obj.save()    #otherwise associated keycard won't become deactivated
+                obj.save()  # otherwise associated keycard won't become deactivated
+                ### comment: 2 spaces before #, 1 after
+
     deactivate.short_description = "Deactivate selected lock users/keycards"
 
     actions = (deactivate,)
