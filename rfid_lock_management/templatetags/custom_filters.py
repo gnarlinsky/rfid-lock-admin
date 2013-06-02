@@ -9,20 +9,21 @@ register = template.Library()
 
 @register.filter
 def get_doors_you_manage(request):
-    """ 
-    Give template the list of door names that the staff user can manage, or 'None' 
+    """
+    Give template the list of door names that the staff user can manage,
+    or 'None'
     """
     lua = LockUserAdmin(LockUser, AdminSite())
     doors_to_show_qs = lua.get_doors_to_show(request)
     return_val = 'None'  # avoiding a test for 'None'...
-    if doors_to_show_qs: 
+    if doors_to_show_qs:
         return_val = ', '.join([door.name for door in doors_to_show_qs])
     return return_val
 
 @register.filter
 def fix_json_string(string):
-    """ 
-    Marks a string as not requiring further HTML escaping prior to output. 
+    """
+    Marks a string as not requiring further HTML escaping prior to output.
     """
     string = safe(string)
     string = string.replace('"\\"',"'").replace('\\"\"', "'") # fix quotes
@@ -37,7 +38,7 @@ def does_lockuser_have_active_keycard(object_id):
     except:
         # No lockuser, so no keycard (i.e. can still get behavior we want
         # on add, when there is no lockuser yet).
-        return False 
+        return False
     if this_lockuser:
         if this_lockuser.get_current_rfid():
             return True
@@ -47,8 +48,8 @@ def does_lockuser_have_active_keycard(object_id):
 @register.filter
 #def get_object_type(the_object):
 def get_object_type(content_type_id):
-    """ 
-    Get class of object, based on the content type id 
+    """
+    Get class of object, based on the content type id
     """
     try:
         ct = ContentType.objects.get(id=content_type_id)

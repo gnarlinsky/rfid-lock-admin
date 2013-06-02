@@ -1,8 +1,8 @@
 import inspect
 
-# thanks, 
+# thanks,
 def get_arg_default(func, arg_name):
-    """ 
+    """
     Get the default value of the specified named argument.
     http://code.activestate.com/recipes/491272/
     """
