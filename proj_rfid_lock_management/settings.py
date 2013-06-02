@@ -2,35 +2,33 @@ import os
 # To access request variable in templates
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
 
-ONE_UP_SETTINGS_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+ONE_UP_SETTINGS_ROOT = os.path.dirname(
+    os.path.dirname(os.path.realpath(__file__)))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-     ('mmm', 'metametamad@gmail.com'),
+    ('mmm', 'metametamad@gmail.com'),
 )
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'db_rfid_lock_management.db',  # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db_rfid_lock_management.db',
+        'USER': '',  # Not used with sqlite3.
+        'PASSWORD': '',  # Not used with sqlite3.
+        'HOST': '',  # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',  # Set to empty string for default. Not used with sqlite3.
     }
 }
-
-
 
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
-# In a Windows environment this must be set to your system time zone.
 TIME_ZONE = 'America/Chicago'
 
 # Language code for this installation. All choices can be found here:
@@ -49,7 +47,7 @@ USE_L10N = True
 
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
-### Are you sure that you want timezones?)
+# Are you sure that you want timezones?)
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
@@ -75,7 +73,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ONE_UP_SETTINGS_ROOT,'static'),
+    os.path.join(ONE_UP_SETTINGS_ROOT, 'static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -83,7 +81,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -93,7 +91,7 @@ SECRET_KEY = 't3@064212j(ie7ly=tl)s^=$urza6=&amp;)x#1c!k@%8$917tgz@a'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    #     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -113,37 +111,25 @@ ROOT_URLCONF = 'proj_rfid_lock_management.urls'
 WSGI_APPLICATION = 'proj_rfid_lock_management.wsgi.application'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Put strings here, like "/home/html/django_templates"
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(ONE_UP_SETTINGS_ROOT,'templates')
+    os.path.join(ONE_UP_SETTINGS_ROOT, 'templates')
 )
 
 INSTALLED_APPS = (
-# " if you are relying on your application's templates directory, make sure to list your app
-# before django.contrib.admin in the INSTALLED_APPS setting. Arguably TEMPLATE_DIRS is the
-# better place for global overrides. "
-
-# Another note on ordering: Make sure that 'django.contrib.auth' appears on the list before the app
-#   - rfid_lock_management - that is replacing the default admin.  This means that things
-#   happen in the right order: first Django registers the User model, then
-#   the replacement app un-registers it in admin.py, then re-registers it with
-#   its own ModelAdmin. ( If the ordering is wrong, will get error like "The model
-#   User is already registered.")
     'django.contrib.auth',   # for user authentication
     'django.contrib.contenttypes',  # for user authentication
-    # provides get_profile -- run against a request, that will return the 
+    # provides get_profile -- run against a request, that will return the
     # user object of whoever is requesting the page
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.staticfiles',
     # Uncomment the next line to enable the admin:
-     'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-
-    # mine
     'rfid_lock_management',
     'debug_toolbar',
     'django_extensions',
@@ -152,7 +138,7 @@ INSTALLED_APPS = (
 )
 
 
-AUTH_PROFILE_MODULE = "rfid_lock_management.UserProfile"  # adding extra information for Users
+AUTH_PROFILE_MODULE = "rfid_lock_management.UserProfile"
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -187,13 +173,14 @@ LOGGING = {
 TEMPLATE_CONTEXT_PROCESSORS = TCP + (
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
-    )
+)
 
 # for debug toolbar - requires that the requesting IP address be listed here
-INTERNAL_IPS =  ('127.0.0.1', )
+INTERNAL_IPS = ('127.0.0.1', )
 
 
-# To prevent "The Django Debug Toolbar has intercepted a redirect to the above URL for debug viewing purposes." 
+# To prevent "The Django Debug Toolbar has intercepted a redirect to the
+# above URL for debug viewing purposes."
 DEBUG_TOOLBAR_CONFIG = {
-    'INTERCEPT_REDIRECTS':False,
-    }
+    'INTERCEPT_REDIRECTS': False,
+}
