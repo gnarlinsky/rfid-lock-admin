@@ -1,7 +1,7 @@
 from termcolor import colored
 
 # should we print messages describing the tests as they run?
-PRINT_INFO = True
+PRINT_INFO = False
 
 def t_info(mess_str, level=1):
     """
