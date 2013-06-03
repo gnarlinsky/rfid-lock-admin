@@ -163,10 +163,10 @@ background-color: lightblue;
 
 
 #footer {
-    height: 60px;
-    background-color: #f5f5f5;
+    height: 60px; background-color: #f5f5f5;
     margin:20px; 
     text-align:center; 
+    line-height: 1.8em; 
 }
 
 .messagelist { 
@@ -460,12 +460,17 @@ li.info {
     </div>
     <!-- END Content -->
 
-{% comment %} Don't show footer if not logged in {% endcomment %}
+{% comment %} Don't show footer if not logged in (i.e. at the login screen) {% endcomment %}
 {% if user.is_authenticated %}
 
 {% block footer %}
     <div id="footer">
-        <p class="muted">CU IMC RFID Lock Administration &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; Bugs? Suggestions? <a href="mailto:gnadia@gmail.com">Email me.</a> &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; Copyright © 2013 Me</p>
+        <p class="muted">CU IMC RFID Lock Administration &nbsp; &nbsp; &nbsp; |
+        &nbsp; &nbsp; &nbsp; Bugs? Suggestions? <a href="mailto:gnadia@gmail.com">Email me.</a> &nbsp; &nbsp; &nbsp; |
+        &nbsp; &nbsp; &nbsp; Copyright © 2013 Me<br/>
+        Powered by <a href="https://www.djangoproject.com/">Django</a>.
+        Designed with <a href = "twitter.github.io/bootstrap/">Twitter Bootstrap</a>.
+        </p>
     </div>
 {% endblock footer %}
 {% endif %}
