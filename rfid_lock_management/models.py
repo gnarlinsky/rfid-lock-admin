@@ -11,36 +11,24 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 
 
-# PEP8: whitespace after comma, no trailing whitespaces, no double or more spaces before =,
-# and functuions formatting:
-# call_a(
-#     1,
-#     2
-#     3
-# )
-
-# about functions: it's an optional, but I like it and it's not pep8-volatile
-
-# double lines between classes, single line inside class (also optional, but PEP8 highly recommends it)
-
-
 class Door(models.Model):
     """
     Doors with RFID locks installed.
     """
-    name = models.CharField(max_length=50, unique=True, null=False)  # e.g. "Makerspace," "Bike Project," etc.
+    name = models.CharField(max_length=50, unique=True, null=False)
     description = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
         """
         Represent Door objects with their name fields
         """
-        return u'%s' % (self.name)
+        return self.name
         # also: return self.name
 
     def save(self, *args, **kwargs):
         """
-        When a new Door is added, create a corresponding Permission, if it does not exist already
+        When a new Door is added, create a corresponding Permission, if it does
+        not exist already.
         """
 
         super(Door, self).save(*args, **kwargs)
