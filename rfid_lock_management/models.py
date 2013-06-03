@@ -34,7 +34,8 @@ class Door(models.Model):
         super(Door, self).save(*args, **kwargs)
 
         if not Permission.objects.filter(codename='can_manage_door_%d' % self.pk):
-            content_type = ContentType.objects.get(app_label='rfid_lock_management', model='door')
+            content_type = ContentType.objects.get(
+                app_label='rfid_lock_management', model='door')
 
             Permission.objects.create(
                 codename='can_manage_door_%d' % self.pk,
@@ -46,17 +47,19 @@ class Door(models.Model):
         """
         Return the RFIDs allowed to access this Door
         """
-        return_list = []  # I like variable name "allowed_rfids" more than "return_list", but it's your choice :-)
+        allowed_rfids = []
         for lu in self.lockuser_set.all():
             if lu.get_current_rfid():
-                return_list.append(lu.get_current_rfid())
-        return return_list
+                allowed_rfids.append(lu.get_current_rfid())
+        return allowed_rfids
 
 
 class NewKeycardScan(models.Model):
     """
-    For checking whether the current request is for authenticating a keycard or assigning new keycard.
+    For checking whether the current request is for authenticating a keycard or
+    assigning new keycard.
     """
+
     #time_initiated = models.DateTimeField(auto_now_add=True)
     # auto_now_add and time zones do not play well together sometimes...
     time_initiated = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))  # nonono.
@@ -244,21 +247,24 @@ class LockUser(models.Model):
             try:
                 date_revoked = keycard.date_revoked.strftime("%B %d, %Y, %I:%M %p")
                 revoker = keycard.revoker
-                info_str = "RFID: %s (activated on %s by %s; revoked on %s by %s)" % (rf, date_assigned, assigner, date_revoked, revoker)
+                info_str = "RFID: %s (activated on %s by %s; revoked on %s by %s)" % (
+                    rf, date_assigned, assigner, date_revoked, revoker)
             # Catching exceptions here was really only useful in development, so excluding it from coverage
             except:  # pragma: no cover
             ### good idea use except ExceptionType instead of just except:
             ### except ValueError: lalala
             ### except: print "unknown excepion {}".format(str(sys.exc_info()))
             ### because KeyboardInterrupt and SyntaxErorr also can be an exceptions :-)
-                info_str = "RFID: %s (activated on %s by %s [couldn't get revoker] )" % (rf, date_assigned, assigner)
+                info_str = "RFID: %s (activated on %s by %s [couldn't get revoker] )" % (
+                    rf, date_assigned, assigner)
             rfid_keycards_info_list.append(info_str)
         return ",<br>".join(rfid_keycards_info_list)
     get_all_rfids_html.allow_tags = True
 
     def get_current_rfid(self):
         """
-        Of all RFID's associated with this LockUser, get the one that's active, i.e. has not been revoked.
+        Of all RFID's associated with this LockUser, get the one that's active,
+        i.e. has not been revoked.
         """
         all_rfid_keycards = self.get_all_rfids()
         curr_rfid = all_rfid_keycards.filter(date_revoked=None)
@@ -375,7 +381,8 @@ class LockUser(models.Model):
         # todo: note - a different appraoch than similar methods
         at_query_set = AccessTime.objects.filter(lockuser=self)
         last = at_query_set.latest('access_time')
-        return last.access_time.strftime("%B %d, %Y, %I:%M %p") + " (" + last.door.name + ")"
+        return last.access_time.strftime("%B %d, %Y, %I:%M %p") +
+            " (" + last.door.name + ")"
 
     def last_access_time_and_link_to_more(self):
         """
