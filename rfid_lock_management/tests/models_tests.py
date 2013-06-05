@@ -5,7 +5,7 @@ from django.test.client import Client
 from rfid_lock_management.models import * 
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.utils.timezone import utc
+#from django.utils.timezone import utc
 from test_helpers import t_info
 
 
@@ -55,7 +55,7 @@ class AccessTimeModelTests(TestCase):
         """
         Test that custom __unicode__() returns the correctly formatted time
         """
-        time = datetime.datetime(2013, 5, 16, 15, 30, 20).replace(tzinfo=utc)
+        time = datetime.datetime(2013, 5, 16, 15, 30, 20)
         at = AccessTime.objects.create(access_time=time)
         self.assertEqual(unicode(at), 'May 16, 2013, 03:30 PM')
 
@@ -144,14 +144,14 @@ class RFIDkeycardModelTests(TestCase):
         #   - So, setting delta to the time difference between t1 and t3,
         #     or x + y
         #   - i.e. now() minus t1
-        t1 = datetime.datetime.now().replace(tzinfo=utc)
+        t1 = datetime.datetime.now()
         t_info("Deactivating keycard......", 3)
         rk.deactivate(staff_only_user)
 
         t_info("Is the date revoked correct", 4)
         self.assertAlmostEqual(rk.date_revoked, 
-            datetime.datetime.now().replace(tzinfo=utc),
-            delta=datetime.datetime.now().replace(tzinfo=utc) - t1)
+            datetime.datetime.now(),
+            delta=datetime.datetime.now() - t1)
         t_info("Is the revoker our user", 4)
         self.assertEqual(rk.revoker, staff_only_user)
 
@@ -169,7 +169,7 @@ class RFIDkeycardModelTests(TestCase):
         self.assertTrue(rk.is_active())
 
         # set fake date revoked
-        now = datetime.datetime.now().replace(tzinfo=utc)
+        now = datetime.datetime.now()
         rk.date_revoked = now
         self.assertFalse(rk.is_active())
 
@@ -275,10 +275,10 @@ class LockUserModelTests(TestCase):
             the_rfid='abcde22222', lockuser=lu2, assigner=staff_only_user)
         rk3 = RFIDkeycard.objects.create(
             the_rfid='abcde33333', lockuser=lu2, assigner=staff_only_user,
-            date_revoked=datetime.datetime.now().replace(tzinfo=utc))
+            date_revoked=datetime.datetime.now())
         rk4 = RFIDkeycard.objects.create(
             the_rfid='abcde44444', lockuser=lu2, assigner=staff_only_user,
-            date_revoked=datetime.datetime.now().replace(tzinfo=utc))
+            date_revoked=datetime.datetime.now())
 
         # Note - below does not evaluate these as equivalent, must list()
         # self.assertEqual(lu2.get_all_rfids(),
@@ -305,10 +305,10 @@ class LockUserModelTests(TestCase):
             the_rfid='abcde22222', lockuser=lu2, assigner=staff_only_user)
         rk3 = RFIDkeycard.objects.create(
             the_rfid='abcde33333', lockuser=lu2, assigner=staff_only_user,
-            date_revoked=datetime.datetime.now().replace(tzinfo=utc))
+            date_revoked=datetime.datetime.now())
         rk4 = RFIDkeycard.objects.create(
             the_rfid='abcde44444', lockuser=lu2, assigner=staff_only_user,
-            date_revoked=datetime.datetime.now().replace(tzinfo=utc))
+            date_revoked=datetime.datetime.now())
 
         # Issue #x
         first_rfid = "RFID: %s (activated on %s by %s; revoked on %s by %s)" % (
@@ -341,10 +341,10 @@ class LockUserModelTests(TestCase):
             the_rfid='abcde22222', lockuser=lu2, assigner=staff_only_user)
         rk3 = RFIDkeycard.objects.create(
             the_rfid='abcde33333', lockuser=lu2, assigner=staff_only_user,
-            date_revoked=datetime.datetime.now().replace(tzinfo=utc))
+            date_revoked=datetime.datetime.now())
         rk4 = RFIDkeycard.objects.create(
             the_rfid='abcde44444', lockuser=lu2, assigner=staff_only_user,
-            date_revoked=datetime.datetime.now().replace(tzinfo=utc))
+            date_revoked=datetime.datetime.now())
         self.assertEqual(lu2.get_current_rfid(), rk2)
 
     def test_prettify_get_current_rfid(self):
@@ -407,13 +407,13 @@ class LockUserModelTests(TestCase):
 
         # create several access times, including for different lockusers
         at1 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc), lockuser=lu1)
+            access_time=datetime.datetime.now(), lockuser=lu1)
         at2 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc), lockuser=lu1)
+            access_time=datetime.datetime.now(), lockuser=lu1)
         at3 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc), lockuser=lu1)
+            access_time=datetime.datetime.now(), lockuser=lu1)
         at4 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc), lockuser=lu2)
+            access_time=datetime.datetime.now(), lockuser=lu2)
 
         # test the result for one lockuser
         self.assertEqual(lu1.get_all_access_times(), [
@@ -440,13 +440,13 @@ class LockUserModelTests(TestCase):
 
         # create several access times, including for different lockusers
         at1 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc), lockuser=lu1)
+            access_time=datetime.datetime.now(), lockuser=lu1)
         at2 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc), lockuser=lu1)
+            access_time=datetime.datetime.now(), lockuser=lu1)
         at3 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc), lockuser=lu1)
+            access_time=datetime.datetime.now(), lockuser=lu1)
         at4 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc), lockuser=lu2)
+            access_time=datetime.datetime.now(), lockuser=lu2)
 
         # test the result for one lockuser
         self.assertEqual(lu1.get_last_access_time(), at3.access_time)
@@ -470,13 +470,13 @@ class LockUserModelTests(TestCase):
 
         # create several access times, including for different lockusers
         at1 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc), lockuser=lu1)
+            access_time=datetime.datetime.now(), lockuser=lu1)
         at2 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc), lockuser=lu1)
+            access_time=datetime.datetime.now(), lockuser=lu1)
         at3 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc), lockuser=lu1)
+            access_time=datetime.datetime.now(), lockuser=lu1)
         at4 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc), lockuser=lu2)
+            access_time=datetime.datetime.now(), lockuser=lu2)
 
         # test the result for one lockuser
         self.assertEqual(lu1.prettify_get_last_access_time(),
@@ -564,13 +564,13 @@ class LockUserModelTests(TestCase):
 
         # create several access times
         at1 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc) + timedelta(days=1),
+            access_time=datetime.datetime.now() + timedelta(days=1),
             lockuser=lu)
         at2 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc) + timedelta(days=2),
+            access_time=datetime.datetime.now() + timedelta(days=2),
             lockuser=lu)
         at3 = AccessTime.objects.create(
-            access_time=datetime.datetime.now().replace(tzinfo=utc) + timedelta(days=3),
+            access_time=datetime.datetime.now() + timedelta(days=3),
             lockuser=lu)
 
         link = ("<a href='../../accesstime/?lockuser__id__exact=%d'>"

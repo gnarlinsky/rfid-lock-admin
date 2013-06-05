@@ -4,7 +4,6 @@ from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.management import create_superuser
 from django.db.models import signals
-from django.utils.timezone import utc
 import datetime
 from termcolor import colored   # temp
 from django.contrib.contenttypes.models import ContentType
@@ -60,15 +59,7 @@ class NewKeycardScan(models.Model):
     assigning new keycard.
     """
 
-    #time_initiated = models.DateTimeField(auto_now_add=True)
-    # auto_now_add and time zones do not play well together sometimes...
-    time_initiated = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))  # nonono.
-    # this expression can be calculated on model defining procedure (e.q. application startup), and always be same value for all
-    # objects in single session (from application start to end).
-    # same with functions:
-    # def myfunction(param_a, param_b=datetime.datetime.now()):
-    # will always have same param_b value.
-    # if you need complex logic here you can move it to __init__, or just use auto_now_add=True in field definition.
+    time_initiated = models.DateTimeField(auto_now_add=True)
     waiting_for_scan = models.BooleanField(default=True)
     doorid = models.CharField(max_length=50)   # doorid as in the request url
     rfid = models.CharField(max_length=10)   # rfid as in the request url
@@ -81,7 +72,7 @@ class NewKeycardScan(models.Model):
         indicated they were going to go scan in a card in order to assign it,
         and return True if so.
         """
-        now = datetime.datetime.now().replace(tzinfo=utc)
+        now = datetime.datetime.now()
 
         # How much time has passed since clicked 'Scan new card'
         delta = now - self.time_initiated
@@ -98,7 +89,7 @@ class RFIDkeycard(models.Model):
     """
     the_rfid = models.CharField(max_length=10, null=False, blank=False, editable=False)  # the radio-frequency id
     date_revoked = models.DateTimeField(null=True, blank=True)
-    date_created = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))  # same problem as discussed before
+    date_created = models.DateTimeField(auto_now_add=True)
     lockuser = models.ForeignKey("LockUser", null=False)
     # If we don't specify a related_name, User would have two reverse relations
     # to rfidkeycard_set, which is impossible.
@@ -125,7 +116,7 @@ class RFIDkeycard(models.Model):
         # or return not self.date_revoked?
 
     def deactivate(self, user):
-        now = datetime.datetime.now().replace(tzinfo=utc)
+        now = datetime.datetime.now()
         self.date_revoked = now
         self.revoker = user
 
@@ -381,8 +372,7 @@ class LockUser(models.Model):
         # todo: note - a different appraoch than similar methods
         at_query_set = AccessTime.objects.filter(lockuser=self)
         last = at_query_set.latest('access_time')
-        return last.access_time.strftime("%B %d, %Y, %I:%M %p") +
-            " (" + last.door.name + ")"
+        return last.access_time.strftime("%B %d, %Y, %I:%M %p") + " (" + last.door.name + ")"
 
     def last_access_time_and_link_to_more(self):
         """

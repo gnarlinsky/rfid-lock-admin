@@ -4,8 +4,6 @@ from django.shortcuts import render_to_response
 import rfid_lock_management.models
 from datetime import datetime
 from django.utils import simplejson
-from termcolor import colored   # temp
-from django.utils.timezone import utc
 from django.contrib.auth.decorators import login_required
 from rfid_lock_management.misc_helpers import get_arg_default
 from rfid_lock_management.models import *
@@ -114,11 +112,12 @@ def check(request, doorid, rfid):
                         ######################################################
                         lockuser = rfidkeycard.lockuser
                         # todo: access time is going to be a bit later...
-                        at = AccessTime(the_rfid=rfid, door=door,
-                                        lockuser=lockuser,
-                                        access_time=datetime.datetime.now().replace(
-                                            tzinfo=utc)
-                                        )
+                        at = AccessTime(
+                            the_rfid=rfid,
+                            door=door,
+                            lockuser=lockuser,
+                            access_time=datetime.datetime.now()
+                        )
 
                         # Create and assign data point dict to JSONify for the
                         # access times highchart

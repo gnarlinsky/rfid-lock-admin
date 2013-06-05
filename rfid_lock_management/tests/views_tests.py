@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import simplejson
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.utils.timezone import utc
+#from django.utils.timezone import utc
 from django.test import TestCase
 from django.test.client import Client
 from rfid_lock_management.models import *
@@ -283,7 +283,7 @@ class NewKeycardScanTests(TestCase):
             rfid="1111111111", assigner_user_id=self.staff_only_user.pk)
         min_till_timeout = 2.0
         time_delta = timedelta(minutes=min_till_timeout, seconds=1)
-        fake_time_initiated = (datetime.datetime.now() - time_delta).replace(tzinfo=utc)
+        fake_time_initiated = (datetime.datetime.now() - time_delta)
         new_nks_obj.time_initiated = fake_time_initiated
         new_nks_obj.save()
 
