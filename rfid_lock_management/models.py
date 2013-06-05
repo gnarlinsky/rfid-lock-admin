@@ -4,49 +4,37 @@ from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.management import create_superuser
 from django.db.models import signals
-from django.utils.timezone import utc
 import datetime
 from termcolor import colored   # temp
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 
 
-# PEP8: whitespace after comma, no trailing whitespaces, no double or more spaces before =,
-# and functuions formatting:
-# call_a(
-#     1,
-#     2
-#     3
-# )
-
-# about functions: it's an optional, but I like it and it's not pep8-volatile
-
-# double lines between classes, single line inside class (also optional, but PEP8 highly recommends it)
-
-
 class Door(models.Model):
     """
     Doors with RFID locks installed.
     """
-    name = models.CharField(max_length=50, unique=True, null=False)  # e.g. "Makerspace," "Bike Project," etc.
+    name = models.CharField(max_length=50, unique=True, null=False)
     description = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
         """
         Represent Door objects with their name fields
         """
-        return u'%s' % (self.name)
+        return self.name
         # also: return self.name
 
     def save(self, *args, **kwargs):
         """
-        When a new Door is added, create a corresponding Permission, if it does not exist already
+        When a new Door is added, create a corresponding Permission, if it does
+        not exist already.
         """
 
         super(Door, self).save(*args, **kwargs)
 
         if not Permission.objects.filter(codename='can_manage_door_%d' % self.pk):
-            content_type = ContentType.objects.get(app_label='rfid_lock_management', model='door')
+            content_type = ContentType.objects.get(
+                app_label='rfid_lock_management', model='door')
 
             Permission.objects.create(
                 codename='can_manage_door_%d' % self.pk,
@@ -58,26 +46,20 @@ class Door(models.Model):
         """
         Return the RFIDs allowed to access this Door
         """
-        return_list = []  # I like variable name "allowed_rfids" more than "return_list", but it's your choice :-)
+        allowed_rfids = []
         for lu in self.lockuser_set.all():
             if lu.get_current_rfid():
-                return_list.append(lu.get_current_rfid())
-        return return_list
+                allowed_rfids.append(lu.get_current_rfid())
+        return allowed_rfids
 
 
 class NewKeycardScan(models.Model):
     """
-    For checking whether the current request is for authenticating a keycard or assigning new keycard.
+    For checking whether the current request is for authenticating a keycard or
+    assigning new keycard.
     """
-    #time_initiated = models.DateTimeField(auto_now_add=True)
-    # auto_now_add and time zones do not play well together sometimes...
-    time_initiated = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))  # nonono.
-    # this expression can be calculated on model defining procedure (e.q. application startup), and always be same value for all
-    # objects in single session (from application start to end).
-    # same with functions:
-    # def myfunction(param_a, param_b=datetime.datetime.now()):
-    # will always have same param_b value.
-    # if you need complex logic here you can move it to __init__, or just use auto_now_add=True in field definition.
+
+    time_initiated = models.DateTimeField(auto_now_add=True)
     waiting_for_scan = models.BooleanField(default=True)
     doorid = models.CharField(max_length=50)   # doorid as in the request url
     rfid = models.CharField(max_length=10)   # rfid as in the request url
@@ -90,7 +72,7 @@ class NewKeycardScan(models.Model):
         indicated they were going to go scan in a card in order to assign it,
         and return True if so.
         """
-        now = datetime.datetime.now().replace(tzinfo=utc)
+        now = datetime.datetime.now()
 
         # How much time has passed since clicked 'Scan new card'
         delta = now - self.time_initiated
@@ -107,7 +89,7 @@ class RFIDkeycard(models.Model):
     """
     the_rfid = models.CharField(max_length=10, null=False, blank=False, editable=False)  # the radio-frequency id
     date_revoked = models.DateTimeField(null=True, blank=True)
-    date_created = models.DateTimeField(default=datetime.datetime.now().replace(tzinfo=utc))  # same problem as discussed before
+    date_created = models.DateTimeField(auto_now_add=True)
     lockuser = models.ForeignKey("LockUser", null=False)
     # If we don't specify a related_name, User would have two reverse relations
     # to rfidkeycard_set, which is impossible.
@@ -134,7 +116,7 @@ class RFIDkeycard(models.Model):
         # or return not self.date_revoked?
 
     def deactivate(self, user):
-        now = datetime.datetime.now().replace(tzinfo=utc)
+        now = datetime.datetime.now()
         self.date_revoked = now
         self.revoker = user
 
@@ -256,21 +238,24 @@ class LockUser(models.Model):
             try:
                 date_revoked = keycard.date_revoked.strftime("%B %d, %Y, %I:%M %p")
                 revoker = keycard.revoker
-                info_str = "RFID: %s (activated on %s by %s; revoked on %s by %s)" % (rf, date_assigned, assigner, date_revoked, revoker)
+                info_str = "RFID: %s (activated on %s by %s; revoked on %s by %s)" % (
+                    rf, date_assigned, assigner, date_revoked, revoker)
             # Catching exceptions here was really only useful in development, so excluding it from coverage
             except:  # pragma: no cover
             ### good idea use except ExceptionType instead of just except:
             ### except ValueError: lalala
             ### except: print "unknown excepion {}".format(str(sys.exc_info()))
             ### because KeyboardInterrupt and SyntaxErorr also can be an exceptions :-)
-                info_str = "RFID: %s (activated on %s by %s [couldn't get revoker] )" % (rf, date_assigned, assigner)
+                info_str = "RFID: %s (activated on %s by %s [couldn't get revoker] )" % (
+                    rf, date_assigned, assigner)
             rfid_keycards_info_list.append(info_str)
         return ",<br>".join(rfid_keycards_info_list)
     get_all_rfids_html.allow_tags = True
 
     def get_current_rfid(self):
         """
-        Of all RFID's associated with this LockUser, get the one that's active, i.e. has not been revoked.
+        Of all RFID's associated with this LockUser, get the one that's active,
+        i.e. has not been revoked.
         """
         all_rfid_keycards = self.get_all_rfids()
         curr_rfid = all_rfid_keycards.filter(date_revoked=None)

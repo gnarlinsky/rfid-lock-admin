@@ -4,8 +4,6 @@ from django.shortcuts import render_to_response
 import rfid_lock_management.models
 from datetime import datetime
 from django.utils import simplejson
-from termcolor import colored   # temp
-from django.utils.timezone import utc
 from django.contrib.auth.decorators import login_required
 from rfid_lock_management.misc_helpers import get_arg_default
 from rfid_lock_management.models import *
@@ -23,8 +21,8 @@ def do_json_resp(success, message):
 @login_required
 def chartify(request):
     """
-    Return data in appropriate format for the HighCharts (JavaScript) AccessTime plot.
-    Creates a series for each door.
+    Return data in appropriate format for the HighCharts (JavaScript)
+    AccessTime plot.  Creates a series for each door.
     """
     tooltip_dict = {}
     tooltip_dict['followPointer'] = 'false'
@@ -45,7 +43,9 @@ def chartify(request):
 
 
 def get_allowed_rfids(request, doorid):
-    """ Returns list of allowed rfid's for the specified door in JSON format """
+    """
+    Returns list of allowed rfid's for the specified door in JSON format
+    """
     try:
         door = Door.objects.get(pk=doorid)
         allowed_rfids = door.get_allowed_rfids()  # list of Keycard objects
@@ -79,7 +79,7 @@ def check(request, doorid, rfid):
 
         # Issue #e
         if new_scan.waiting_for_scan:
-            # record the door the new scan request came from (not necessary so far)
+            # record the door the new scan request came from
             new_scan.doorid = doorid
             new_scan.rfid = rfid
             new_scan.save()
@@ -103,20 +103,21 @@ def check(request, doorid, rfid):
                     if door.id == int(doorid):
                         # So response will be 1 -- authenticated.
                         response = 1
-                        # Before returning, though, create the data_point
-                        # attribute for the current access, to build the JS
-                        # chart of visitors later.
+                        # Before returning, create the data_point attribute for
+                        # the current access, to build the JS chart of visitors
+                        # later.
 
                         ######################################################
                         # create the highchart data point for this access time
                         ######################################################
                         lockuser = rfidkeycard.lockuser
                         # todo: access time is going to be a bit later...
-                        at = AccessTime(the_rfid=rfid, door=door,
-                                        lockuser=lockuser,
-                                        access_time=datetime.datetime.now().replace(
-                                            tzinfo=utc)
-                                        )
+                        at = AccessTime(
+                            the_rfid=rfid,
+                            door=door,
+                            lockuser=lockuser,
+                            access_time=datetime.datetime.now()
+                        )
 
                         # Create and assign data point dict to JSONify for the
                         # access times highchart
