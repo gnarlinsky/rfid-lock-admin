@@ -6,8 +6,6 @@ from termcolor import colored
 from django import forms
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-
-### from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
 
 
@@ -121,7 +119,6 @@ class LockUserAdmin(admin.ModelAdmin):
         }),
     )
 
-    ### more readable, as I think
     readonly_fields = (
         "prettify_get_current_rfid",
         "last_access_time_and_door_and_link_to_more",
@@ -133,11 +130,6 @@ class LockUserAdmin(admin.ModelAdmin):
     ###########################################################################
     list_display_links = ['first_name', 'last_name']
 
-    # aaaaa = (
-    #     b,
-    #     c,
-    #     d
-    # )
     list_display = (
         'first_name',
         'last_name',

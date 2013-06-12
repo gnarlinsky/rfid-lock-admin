@@ -22,7 +22,6 @@ class Door(models.Model):
         Represent Door objects with their name fields
         """
         return self.name
-        # also: return self.name
 
     def save(self, *args, **kwargs):
         """
@@ -109,11 +108,14 @@ class RFIDkeycard(models.Model):
         return self.lockuser.get_allowed_doors()
 
     def is_active(self):
-        if self.date_revoked:
-            return False
-        else:
-            return True
-        # or return not self.date_revoked?
+        """
+        If there is a date_revoked, the keycard is not active.
+        """
+        return not self.date_revoked
+#         if self.date_revoked:
+#             return False
+#         else:
+#             return True
 
     def deactivate(self, user):
         now = datetime.datetime.now()
@@ -241,11 +243,7 @@ class LockUser(models.Model):
                 info_str = "RFID: %s (activated on %s by %s; revoked on %s by %s)" % (
                     rf, date_assigned, assigner, date_revoked, revoker)
             # Catching exceptions here was really only useful in development, so excluding it from coverage
-            except:  # pragma: no cover
-            ### good idea use except ExceptionType instead of just except:
-            ### except ValueError: lalala
-            ### except: print "unknown excepion {}".format(str(sys.exc_info()))
-            ### because KeyboardInterrupt and SyntaxErorr also can be an exceptions :-)
+            except: # pragma: no cover
                 info_str = "RFID: %s (activated on %s by %s [couldn't get revoker] )" % (
                     rf, date_assigned, assigner)
             rfid_keycards_info_list.append(info_str)
@@ -263,24 +261,13 @@ class LockUser(models.Model):
         try:
             return curr_rfid[0]
         except:
-        ### except IndexError:
             return None
-        ### or:
-        ### if curr_rfid:
-        ###     curr_rfid[0]
-        ### else:
-        ###     return None
-        ### as you wish
 
     def is_active(self):
         """
         Useful in LockUser's list display
         """
-        if self.get_current_rfid():
-            return True
-        else:
-            return False
-        ### return self.get_current_rfid() is not None (if curr_rfid[0] cannot be None ofc)
+        return self.get_current_rfid() is not None
 
     def prettify_get_current_rfid(self):
         """
@@ -306,11 +293,8 @@ class LockUser(models.Model):
         return self.doors.all()
 
     def prettify_get_allowed_doors(self):
-        ### may be Values helps here:
-        ### >>> Entry.objects.values_list('id', flat=True).order_by('id')
-        ### [1, 2, 3, ...]
         allowed_doors = self.get_allowed_doors()
-        door_names_list = [door.name for door in allowed_doors]
+        door_names_list = allowed_doors.values_list('name', flat=True)
         return ", ".join(door_names_list)
 
     def get_allowed_doors_html_links(self):
@@ -333,13 +317,11 @@ class LockUser(models.Model):
         other RFID's this LockUser ever had. In other words, the search is by
         *person*, not by RFID.
         """
-        ### again, .values(.., flat=True)?
         # Get QuerySet of all AccessTime objects for this lockuser
         at_query_set = AccessTime.objects.filter(lockuser=self).order_by('access_time')
         # Now get the access_time field of each AccessTime object
-        all_access_times_list = [access_time_object.access_time for
-                                 access_time_object in at_query_set]
-        return all_access_times_list
+        all_access_times_list = at_query_set.values_list('access_time', flat=True)
+        return list(all_access_times_list)
 
     def all_access_times_link(self):
         return "<a href='../../accesstime/?lockuser__id__exact=%d'>View all access times</a>" % self.id

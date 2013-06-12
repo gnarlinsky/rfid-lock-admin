@@ -9,7 +9,6 @@ from rfid_lock_management.misc_helpers import get_arg_default
 from rfid_lock_management.models import *
 
 
-# TODO: move somewhere else
 def do_json_resp(success, message):
     response_data = {
         'success': success,
@@ -147,23 +146,19 @@ def initiate_new_keycard_scan(request, lockuser_object_id):
     try:
         lu = LockUser.objects.get(id=lockuser_object_id)
     except:
-        #response_data = {'success':False, "error_mess":"This lock user was probably not found in the system."}
         # Probably the error is DoesNotExist: LockUser matching query does not
-        # exist.  but send this response on ANY type of exception
-        #return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-
+        # exist, but send this response on ANY type of exception.
         return do_json_resp(False, "This lock user was probably not found in the system.")
+
     if lu.get_current_rfid():
-        #response_data = {'success':False, 'error_mess':"This lock user is already assigned a keycard."}
-        #return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
-        return do_json_resp(False,
-                            "This lock user is already assigned a keycard.")
+        return do_json_resp(False, "This lock user is already assigned a keycard.")
     else:
         n = NewKeycardScan()
         n.waiting_for_scan = True
         n.assigner_user = request.user
         n.save()
         response_data = {'success': True, 'new_scan_pk': n.pk}
+        # not do_json_resp, since response_data is different:
         return HttpResponse(simplejson.dumps(response_data),
                             content_type="application/json")
 
@@ -184,25 +179,21 @@ def finished_new_keycard_scan(request, new_scan_pk):
     #   user initiated *after* us, for ex.
     new_scan_qs = NewKeycardScan.objects.filter(pk=new_scan_pk)
     if not new_scan_qs:
-        #response_data = {'success':False, 'error_mess':"No NewKeycardScan obj with pk " + new_scan_pk + "."}
-        #return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
         return do_json_resp(False,
                             "No NewKeycardScan obj with pk {}.".format(new_scan_pk))
     new_scan = new_scan_qs[0]
     min_till_timeout = 2.0
     timed_out = new_scan.timed_out(min_till_timeout)
     if timed_out:
-        return do_json_resp(False, "Sorry, the system timed out. You have {} minutes to scan the card, then hit 'Done.' ".format(min_till_timeout))
+        return do_json_resp(False,
+            "Sorry, the system timed out. You have {} minutes to scan the card, then hit 'Done.' ".format(min_till_timeout))
     if not new_scan.rfid:
-        #response_data = {'success':False, 'error_mess':"NewKeycardScan does not have RFID."}
-        #return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
         return do_json_resp(False, "NewKeycardScan does not have RFID.")
     # Verify that the rfid is not the same as that of another ACTIVE keycard
     keycards_with_same_rfid_qs = RFIDkeycard.objects.filter(the_rfid=new_scan.rfid)
     for k in keycards_with_same_rfid_qs.select_related():
         if k.is_active():
-            #response_data = {'success':False, 'error_mess':"A keycard with the same RFID is already assigned to %s." % k.lockuser} # to do:  include actual link to this lockuser
-            #return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
+            # todo: include link to this lockuser
             return do_json_resp(False,
                                 "A keycard with the same RFID is already assigned to {}.".format(k.lockuser))
     # OK, so far so good. Set waiting and ready-to-assign status,
@@ -212,5 +203,5 @@ def finished_new_keycard_scan(request, new_scan_pk):
     new_scan.assigner_user = request.user  # todo: assigner_user already set in initiate
     new_scan.save()
     response_data = {'success': True, 'rfid': new_scan.rfid}
-    return HttpResponse(simplejson.dumps(response_data),
-                        content_type="application/json")
+    # not do_json_resp, since response_data is different:
+    return HttpResponse(simplejson.dumps(response_data), content_type="application/json")
