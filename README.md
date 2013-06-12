@@ -27,4 +27,5 @@ Run the Django development server.
 Go to [http://localhost:8000/lockadmin](http://localhost:8000/lockadmin) to see the application in action. 
 
 ## Details
-See https://raw.github.com/gnarlinsky/rfid-lock-admin/master/description.pdf for more details about the project and walkthroughs of some basic tasks. 
+See
+[description.pdf](https://raw.github.com/gnarlinsky/rfid-lock-admin/master/description.pdf) for more details about the project and walkthroughs of some basic tasks. 
