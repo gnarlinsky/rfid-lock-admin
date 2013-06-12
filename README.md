@@ -18,7 +18,7 @@ To avoid dependency issues, create a virtualenv and install the required package
 Create the database and load the initial data.
 
     $ python manage.py syncdb
-    $ python manage.py loaddata rfid_lock_management/fixtures/lockuser_keycard_perm_user_accesstime_door_user.json
+    $ python manage.py loaddata rfid_lock_management/fixtures/initial.json
 
 Run the Django development server. 
 
