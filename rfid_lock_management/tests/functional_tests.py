@@ -12,7 +12,7 @@ from test_helpers import t_info
 
 
 class AccessTimeList(LiveServerTestCase):
-    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
+    fixtures = ['initial.json']
 
     def setUp(self):
         """ Start up Selenium WebDriver browser instance """
@@ -70,7 +70,7 @@ class AccessTimeList(LiveServerTestCase):
 
 
 class GeneralFunctionalTests(LiveServerTestCase):
-    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
+    fixtures = ['initial.json']
 
     def setUp(self):
         """
@@ -449,7 +449,7 @@ class GeneralFunctionalTests(LiveServerTestCase):
 
 
 class LogIn(LiveServerTestCase):
-    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
+    fixtures = ['initial.json']
 
     def setUp(self):
         """ Start up Selenium WebDriver browser instance """

@@ -15,7 +15,7 @@ from test_helpers import t_info
 
 
 class LockUserAdminActionsTests(TestCase):
-    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
+    fixtures = ['initial.json']
 
     def setUp(self):
         t_info("TestCase LockUserAdminActionsTests", 1)
@@ -48,7 +48,7 @@ class LockUserAdminActionsTests(TestCase):
 
 
 class AccessTimeAdminTests(TestCase):
-    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
+    fixtures = ['initial.json']
 
     def setUp(self):
         t_info("TestCase AccessTimeAdminTests", 1)

@@ -7,7 +7,7 @@ from test_helpers import t_info
 
 
 class LockCommunicationTests(TestCase):
-    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
+    fixtures = ['initial.json']
 
     def setUp(self):
         self.client = Client()

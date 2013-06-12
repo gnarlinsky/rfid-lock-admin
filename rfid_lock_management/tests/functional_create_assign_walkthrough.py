@@ -29,7 +29,7 @@ SLOWER = .5
 
 
 class CreateLockUserAssignKeycardWalkthrough(LiveServerTestCase):
-    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
+    fixtures = ['initial.json']
 
     def setUp(self):
         t_info("LiveServerTestCase CreateLockUserAssignKeycardWalkthrough", 1)

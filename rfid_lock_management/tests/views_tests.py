@@ -9,7 +9,7 @@ from rfid_lock_management.models import *
 from test_helpers import t_info
 
 class ChartDataTests(TestCase):
-    fixtures = ['lockuser_keycard_perm_user_accesstime_door_user.json']
+    fixtures = ['initial.json']
 
     def setUp(self):
         t_info("TestCase ChartDataTests", 1)
