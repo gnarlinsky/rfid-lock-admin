@@ -9,7 +9,6 @@ generated_docum_and_coverage
 # PyCharm:
 .idea
 expanded_comments.txt
-todo.rtfd
 pydocs
 mydjgrep.sh
 test_create_new_lockuser_and_assign_keycard_walkthrough___screenshots
