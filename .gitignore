@@ -6,10 +6,9 @@
 ignore_me_for_readme
 NO
 generated_docum_and_coverage
-notes.txt
+# PyCharm:
 .idea
 expanded_comments.txt
-expanded_comments_pdfs
 todo.rtfd
 pydocs
 mydjgrep.sh
