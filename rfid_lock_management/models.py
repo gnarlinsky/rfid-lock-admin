@@ -391,7 +391,7 @@ class LockUser(models.Model):
     last_access_time_and_door_and_link_to_more.short_description = "Last access"
 
     def __unicode__(self):
-        """ In the list of AcessTimes, for example, LockUsers will be
+        """ In the list of AccessTimes, for example, LockUsers will be
         represented with their first and last names
         """
         return u'%s %s' % (

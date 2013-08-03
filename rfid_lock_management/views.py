@@ -102,24 +102,19 @@ def check(request, doorid, rfid):
                     if door.id == int(doorid):
                         # So response will be 1 -- authenticated.
                         response = 1
-                        # Before returning, create the data_point attribute for
-                        # the current access, to build the JS chart of visitors
-                        # later.
-
+                        
                         ######################################################
-                        # create the highchart data point for this access time
+                        # create the AccessTime for this visit
                         ######################################################
                         lockuser = rfidkeycard.lockuser
-                        # todo: access time is going to be a bit later...
                         at = AccessTime(
                             the_rfid=rfid,
                             door=door,
                             lockuser=lockuser,
                             access_time=datetime.datetime.now()
                         )
-
-                        # Create and assign data point dict to JSONify for the
-                        # access times highchart
+                        # Now create and assign data point dict to JSONify for
+                        # the access times highchart
                         x_coord = 'Date.UTC(%d,%d,%d)' % (
                             at.access_time.year, at.access_time.month-1,
                             at.access_time.day)
@@ -132,6 +127,7 @@ def check(request, doorid, rfid):
                             'x': x_coord, 'y': y_coord, 'user': user_name}
                         at.data_point = simplejson.dumps(data_point_dict)
                         at.save()
+
     return HttpResponse(response)
 
 
