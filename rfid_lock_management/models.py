@@ -124,6 +124,8 @@ class RFIDkeycard(models.Model):
 
 
 class AccessTime(models.Model):
+    """ Represents a visit to a space
+    """
     the_rfid = models.CharField(max_length=10, null=True)
     access_time = models.DateTimeField(null=True)    # the time the rfid was used
     lockuser = models.ForeignKey("LockUser", null=True)
@@ -242,7 +244,8 @@ class LockUser(models.Model):
                 revoker = keycard.revoker
                 info_str = "RFID: %s (activated on %s by %s; revoked on %s by %s)" % (
                     rf, date_assigned, assigner, date_revoked, revoker)
-            # Catching exceptions here was really only useful in development, so excluding it from coverage
+            # Catching exceptions here was really only useful in development,
+            # so excluding it from coverage.
             except: # pragma: no cover
                 info_str = "RFID: %s (activated on %s by %s [couldn't get revoker] )" % (
                     rf, date_assigned, assigner)
@@ -404,7 +407,7 @@ class LockUser(models.Model):
 # From http://stackoverflow.com/questions/1466827/ --
 #
 # Prevent interactive question about wanting a superuser created.  (This code
-# has to go in this otherwise empty "models" module so that it gets processed by
+# has to go in the "models" module so that it gets processed by
 # the "syncdb" command during database creation.)
 # pragma: no cover  (exclude this code from coverage)
 signals.post_syncdb.disconnect(
