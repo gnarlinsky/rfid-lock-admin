@@ -1,0 +1,601 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rfid_lock_management.tests.functional_tests &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for rfid_lock_management.tests.functional_tests</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.common.keys</span> <span class="kn">import</span> <span class="n">Keys</span>
+<span class="kn">from</span> <span class="nn">selenium.common.exceptions</span> <span class="kn">import</span> <span class="n">NoSuchElementException</span>
+<span class="kn">from</span> <span class="nn">django.test</span> <span class="kn">import</span> <span class="n">TestCase</span><span class="p">,</span> <span class="n">LiveServerTestCase</span>
+<span class="kn">from</span> <span class="nn">django.test.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">Permission</span><span class="p">,</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.contrib.contenttypes.models</span> <span class="kn">import</span> <span class="n">ContentType</span>
+<span class="kn">from</span> <span class="nn">django.contrib.admin.sites</span> <span class="kn">import</span> <span class="n">AdminSite</span>
+<span class="kn">from</span> <span class="nn">rfid_lock_management.admin</span> <span class="kn">import</span> <span class="n">LockUserAdmin</span>
+<span class="kn">from</span> <span class="nn">rfid_lock_management.models</span> <span class="kn">import</span> <span class="n">LockUser</span>
+<span class="kn">from</span> <span class="nn">test_helpers</span> <span class="kn">import</span> <span class="n">t_info</span>
+
+
+<div class="viewcode-block" id="AccessTimeList"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.AccessTimeList">[docs]</a><span class="k">class</span> <span class="nc">AccessTimeList</span><span class="p">(</span><span class="n">LiveServerTestCase</span><span class="p">):</span>
+    <span class="n">fixtures</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;initial.json&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="AccessTimeList.setUp"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.AccessTimeList.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Start up Selenium WebDriver browser instance &quot;&quot;&quot;</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;LiveServerTestCase GeneralFunctionalTests&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodDoc</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c"># set up browser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Firefox</span><span class="p">()</span>
+        <span class="c"># tells webdriver to use a max timeout of 3 seconds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">implicitly_wait</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="c"># open browser and log in</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Opening browser to get to lockuser&#39;s change_form (login first)...&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">live_server_url</span> <span class="o">+</span> <span class="s">&#39;/lockadmin&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">maximize_window</span><span class="p">()</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;But login first..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">username_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;username&#39;</span><span class="p">)</span>
+        <span class="n">username_field</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s">&#39;moe&#39;</span><span class="p">)</span>
+        <span class="n">password_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;password&#39;</span><span class="p">)</span>
+        <span class="n">password_field</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s">&#39;moe&#39;</span><span class="p">)</span>
+        <span class="n">password_field</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">RETURN</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AccessTimeList.tearDown"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.AccessTimeList.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Shut down Selenium WebDriver browser instance &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="AccessTimeList.test_access_time_change_list"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.AccessTimeList.test_access_time_change_list">[docs]</a>    <span class="k">def</span> <span class="nf">test_access_time_change_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="c"># Issue #y (client vs browser.get)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Opening browser to get to room access log page......&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">live_server_url</span> <span class="o">+</span>
+            <span class="s">&#39;/lockadmin/rfid_lock_management/accesstime/&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">maximize_window</span><span class="p">()</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;logging in as staff user....&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">&#39;moe&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">&#39;moe&#39;</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;/lockadmin/rfid_lock_management/accesstime/&quot;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Are we on the change list for access times? Check &quot;</span>
+               <span class="s">&quot;template and title.&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTemplateUsed</span><span class="p">(</span><span class="n">response</span><span class="p">,</span>
+            <span class="s">&#39;admin/rfid_lock_management/change_list.html&#39;</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">title</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+            <span class="s">&#39;Room access log | RFID Lock Administration&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Does user see listed the doors they are allowed to manage in &quot;</span>
+               <span class="s">&quot;top navigation bar?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="c"># in pk order</span>
+        <span class="n">navbar_doors</span> <span class="o">=</span> <span class="s">&quot;Doors you manage: Community Theater, Seminar Room&quot;</span>
+        <span class="n">base_page_body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;body&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="n">navbar_doors</span><span class="p">,</span> <span class="n">base_page_body</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="GeneralFunctionalTests"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests">[docs]</a><span class="k">class</span> <span class="nc">GeneralFunctionalTests</span><span class="p">(</span><span class="n">LiveServerTestCase</span><span class="p">):</span>
+    <span class="n">fixtures</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;initial.json&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="GeneralFunctionalTests.setUp"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start up Selenium WebDriver browser instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;LiveServerTestCase GeneralFunctionalTests&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodDoc</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c"># set up browser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Firefox</span><span class="p">()</span>
+        <span class="c"># tells webdriver to use a max timeout of 3 seconds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">implicitly_wait</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Opening browser to login first.......&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="c"># user opens web browser; goes to main admin page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">live_server_url</span> <span class="o">+</span> <span class="s">&#39;/lockadmin&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">maximize_window</span><span class="p">()</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;But login first..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">username_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;username&#39;</span><span class="p">)</span>
+        <span class="n">username_field</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s">&#39;moe&#39;</span><span class="p">)</span>
+        <span class="n">password_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;password&#39;</span><span class="p">)</span>
+        <span class="n">password_field</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s">&#39;moe&#39;</span><span class="p">)</span>
+        <span class="n">password_field</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">RETURN</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="GeneralFunctionalTests.tearDown"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shut down Selenium WebDriver browser instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="GeneralFunctionalTests.test_no_delete_button_lockuser_change_form"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.test_no_delete_button_lockuser_change_form">[docs]</a>    <span class="k">def</span> <span class="nf">test_no_delete_button_lockuser_change_form</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that staff users do not see a &#39;delete&#39; button/link on the form</span>
+<span class="sd">        page for an individual Lock User. (This is for an existing LockUser --</span>
+<span class="sd">        when *adding* a LockUser there would not be a &#39;delete&#39; link/button in</span>
+<span class="sd">        any case.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">object_id</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">live_server_url</span> <span class="o">+</span>
+            <span class="s">&#39;/lockadmin/rfid_lock_management/lockuser/</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">object_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">maximize_window</span><span class="p">()</span>
+
+        <span class="c"># Now check whether the Delete link is there</span>
+        <span class="c"># Issue #z</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">NoSuchElementException</span><span class="p">,</span> 
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_class_name</span><span class="p">(</span><span class="s">&#39;deletelink-box&#39;</span><span class="p">))</span>
+        <span class="c"># Note - lambda because something like</span>
+        <span class="c">#    self.assertRaises(NoSuchElementException,</span>
+        <span class="c">#       self.browser.find_element_by_class_name(&#39;deletelink-box&#39;))</span>
+        <span class="c"># will not work, because gathers the statements at collection time and</span>
+        <span class="c"># will error then, not at testing time.</span>
+</div>
+<div class="viewcode-block" id="GeneralFunctionalTests.test_lockuser_change_form"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.test_lockuser_change_form">[docs]</a>    <span class="k">def</span> <span class="nf">test_lockuser_change_form</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Is this the change_form for the right lock user?</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># will be looking at change form for this lockuser</span>
+        <span class="n">object_id</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">lockuser</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Opening browser to get to lockuser&#39;s change_form.......&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="c"># Issue #y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">live_server_url</span> <span class="o">+</span>
+            <span class="s">&#39;/lockadmin/rfid_lock_management/lockuser/</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">object_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">maximize_window</span><span class="p">()</span>
+
+        <span class="c"># Non-form-field things</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;check that in div with id=&#39;main_form&#39;, the first/only &quot;</span>
+               <span class="s">&quot;h2 tag text is: &#39;&lt;h2&gt; Lock user/keycard assignment&lt;/h2&gt;&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">main_form_div</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_id</span><span class="p">(</span><span class="s">&#39;main_form&#39;</span><span class="p">)</span>
+        <span class="n">first_h2</span> <span class="o">=</span> <span class="n">main_form_div</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;h2&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">first_h2</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s">&quot;Lock user / keycard assignment&quot;</span><span class="p">)</span>
+
+        <span class="c"># Check the form fields</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check that various form fields that are filled in reflect &quot;</span>
+               <span class="s">&quot;the attributes for the LockUser whose pk is in the url.&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Is the staff user able to see - but not interact with - the &quot;</span>
+               <span class="s">&quot;doors that this lock user has access to, but the staff user &quot;</span>
+               <span class="s">&quot;does not?&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+        <span class="c"># create LockUserAdmin object so we can get other doors</span>
+        <span class="n">lua</span> <span class="o">=</span> <span class="n">LockUserAdmin</span><span class="p">(</span><span class="n">LockUser</span><span class="p">,</span> <span class="n">AdminSite</span><span class="p">())</span>
+
+        <span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">&#39;moe&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">&#39;moe&#39;</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s">&quot;/lockadmin/rfid_lock_management/lockuser/</span><span class="si">%d</span><span class="s">/&quot;</span> <span class="o">%</span> <span class="n">object_id</span><span class="p">)</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s">&#39;request&#39;</span><span class="p">]</span>
+        <span class="n">actual_other_doors</span> <span class="o">=</span> <span class="n">lua</span><span class="o">.</span><span class="n">get_other_doors</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">)</span>
+        <span class="n">door_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">door</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">door</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">actual_other_doors</span><span class="p">)]</span>
+        <span class="c"># get the other doors as page displays them</span>
+        <span class="n">actual_other_doors_str</span> <span class="o">=</span> <span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">door_names</span><span class="p">)</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_id</span><span class="p">(</span><span class="s">&#39;other_doors&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">actual_other_doors_str</span><span class="p">)</span>
+        <span class="c"># test that we see the same thing the admin function would return</span>
+        <span class="c"># Issue #x</span>
+        <span class="c">#    (Here specifically: alternative -  hardcode actual_doors_str, i.e.</span>
+        <span class="c">#    actual_other_doors_str = &quot;Space 1 Space 4&quot;  )</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Comparing the value of the relevant text input field &quot;</span>
+               <span class="s">&quot;with the lockuser&#39;s actual email.&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="n">field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;email&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s">&#39;value&#39;</span><span class="p">),</span> <span class="n">lockuser</span><span class="o">.</span><span class="n">email</span><span class="p">)</span>
+
+        <span class="n">field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;first_name&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s">&#39;value&#39;</span><span class="p">),</span> <span class="n">lockuser</span><span class="o">.</span><span class="n">first_name</span><span class="p">)</span>
+
+        <span class="n">field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;last_name&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s">&#39;value&#39;</span><span class="p">),</span> <span class="n">lockuser</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span>
+
+        <span class="n">field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;address&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s">&#39;value&#39;</span><span class="p">),</span> <span class="n">lockuser</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
+
+        <span class="n">field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;phone_number&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s">&#39;value&#39;</span><span class="p">),</span> <span class="n">lockuser</span><span class="o">.</span><span class="n">phone_number</span><span class="p">)</span>
+
+        <span class="n">field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;phone_number&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s">&#39;value&#39;</span><span class="p">),</span> <span class="n">lockuser</span><span class="o">.</span><span class="n">phone_number</span><span class="p">)</span>
+
+        <span class="n">doors_pk_tuples</span> <span class="o">=</span> <span class="n">lockuser</span><span class="o">.</span><span class="n">doors</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s">&#39;pk&#39;</span><span class="p">)</span>
+        <span class="c"># make list of str, not list of tuples</span>
+        <span class="n">doors_pk_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">doors_pk_tuples</span><span class="p">]</span>
+
+        <span class="n">door_checkboxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_elements_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[name=&#39;doors&#39;]&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">door_checkbox</span> <span class="ow">in</span> <span class="n">door_checkboxes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">door_checkbox</span><span class="o">.</span><span class="n">is_selected</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">door_checkbox</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s">&#39;value&#39;</span><span class="p">)),</span> <span class="n">doors_pk_list</span><span class="p">)</span>
+
+        <span class="n">deact_checkbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[id=&#39;id_deactivate_current_keycard&#39;]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deact_checkbox</span><span class="o">.</span><span class="n">is_selected</span><span class="p">(),</span>
+            <span class="n">lockuser</span><span class="o">.</span><span class="n">deactivate_current_keycard</span><span class="p">)</span>
+
+        <span class="n">current_rfid_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&#39;.form-row.field-prettify_get_current_rfid&#39;</span><span class="p">)</span>
+        <span class="n">current_rfid_field</span> <span class="o">=</span> <span class="n">current_rfid_field</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">current_rfid_field</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+            <span class="n">lockuser</span><span class="o">.</span><span class="n">prettify_get_current_rfid</span><span class="p">())</span>
+
+        <span class="n">last_access_time_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&#39;.form-row.field-last_access_time_and_door_and_link_to_more&#39;</span><span class="p">)</span>
+        <span class="n">last_access_field</span> <span class="o">=</span> <span class="n">last_access_time_field</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span>
+            <span class="s">&#39;p&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="n">lockuser</span><span class="o">.</span><span class="n">prettify_get_last_access_time</span><span class="p">(),</span>
+            <span class="n">last_access_time_field</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="GeneralFunctionalTests.test_keycard_deactivation_but_some_doors_permitted"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.test_keycard_deactivation_but_some_doors_permitted">[docs]</a>    <span class="k">def</span> <span class="nf">test_keycard_deactivation_but_some_doors_permitted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Tests is the situation where the lock user is permitted access to</span>
+<span class="sd">        some door(s), but not the one(s) the staff user is allowed access to.</span>
+<span class="sd">        That is, on the change form, there will be no checked Door(s), so</span>
+<span class="sd">        checking &#39;Deactive keycard&#39; should not deactivate the keycard.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Opening browser to get to lockuser&#39;s change_form.......&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">lockuser_id</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c"># in fixture, lock user 1  assigned a keycard and is permitted Space 1</span>
+        <span class="c"># and Space 4 access; the logged in staff user is not permitted access</span>
+        <span class="c"># to either of those.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">live_server_url</span> <span class="o">+</span>
+             <span class="s">&#39;/lockadmin/rfid_lock_management/lockuser/</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">lockuser_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">maximize_window</span><span class="p">()</span>
+
+        <span class="c"># Issue #a</span>
+        <span class="c"># possibly redundant double checking.....</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Before any changes / saving, &#39;Current RFID&#39; should be&quot;</span>
+               <span class="s">&quot;something (but not None and not nothing)&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="c"># current_rfid_field = self.browser.find_element_by_class_name(</span>
+        <span class="c">#   &#39;form-row field-prettify_get_current_rfid&#39;)</span>
+        <span class="c"># Note: above throws WebDriverException: Message: u&#39;Compound class</span>
+        <span class="c"># names not permitted&#39;</span>
+        <span class="n">current_rfid_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&#39;.form-row.field-prettify_get_current_rfid&#39;</span><span class="p">)</span>
+        <span class="n">current_rfid_field</span> <span class="o">=</span> <span class="n">current_rfid_field</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">current_rfid_field</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s">&#39;None&#39;</span><span class="p">)</span>
+
+        <span class="c"># strip out whitespace in case template formatting introduces extra</span>
+        <span class="c"># white space</span>
+        <span class="n">current_rfid_no_ws</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_rfid_field</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">current_rfid_no_ws</span><span class="p">)</span>
+
+        <span class="c"># a key difference between this test and test_keycard_deactivation</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check that no doors are selected&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">door_checkboxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_elements_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[name=&#39;doors&#39;]&quot;</span><span class="p">)</span>
+        <span class="n">door_checkbox_statuses</span> <span class="o">=</span> <span class="p">[</span><span class="n">door_checkbox</span><span class="o">.</span><span class="n">is_selected</span><span class="p">()</span>
+                                  <span class="k">for</span> <span class="n">door_checkbox</span> <span class="ow">in</span> <span class="n">door_checkboxes</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="nb">any</span><span class="p">(</span><span class="n">door_checkbox_statuses</span><span class="p">))</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Find the &#39;Deactivate keycard&#39; checkbox and verify it&#39;s &quot;</span>
+               <span class="s">&quot;not checked&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">deact_checkbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[id=&#39;id_deactivate_current_keycard&#39;]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">deact_checkbox</span><span class="o">.</span><span class="n">is_selected</span><span class="p">())</span>
+
+        <span class="c"># a key difference between this test and test_keycard_deactivation</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Find the other doors text and verify there is at least &quot;</span>
+               <span class="s">&quot;one door listed&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="n">other_doors_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_id</span><span class="p">(</span><span class="s">&#39;other_doors&#39;</span><span class="p">)</span>
+
+        <span class="c"># Stripping out whitespace in case template formatting introduces extra</span>
+        <span class="c"># white space</span>
+        <span class="n">other_doors_text</span> <span class="o">=</span> <span class="n">other_doors_field</span><span class="o">.</span><span class="n">text</span>
+        <span class="n">other_doors_no_ws</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">other_doors_text</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">other_doors_no_ws</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check the &#39;Deactivate keycard&#39; checkbox&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">deact_checkbox</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Find and click &#39;Save&#39;&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">save_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[value=&#39;Save&#39;]&quot;</span><span class="p">)</span>
+        <span class="n">save_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Are we back on the change list?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="c"># check change list title</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">title</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+            <span class="s">&#39;Manage lock users | RFID Lock Administration&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Back on change list, change message(s) correct&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">test_lockuser</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">lockuser_id</span><span class="p">)</span>
+        <span class="n">message1</span> <span class="o">=</span> <span class="s">&#39;The lock user &quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot; was changed successfully.&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">test_lockuser</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="n">test_lockuser</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span>
+
+        <span class="c"># message 2: a key difference between this test and</span>
+        <span class="c"># test_keycard_deactivation</span>
+        <span class="c"># message2 = &quot;%s % s&#39;s keycard was not deactivated because you do not</span>
+        <span class="c">#    have permission to manage % s.&quot;.format(test_lockuser.first_name,</span>
+        <span class="c">#    test_lockuser.last_name, other_doors_text)</span>
+        <span class="n">message2</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;{} {}&#39;s keycard was not deactivated because you do not &quot;</span>
+                    <span class="s">&quot;have permission to manage {}.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">test_lockuser</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span>
+                        <span class="n">test_lockuser</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span>
+                        <span class="n">other_doors_text</span>
+                    <span class="p">)</span>
+
+        <span class="c"># todo:  note that using earlier result from body of change</span>
+        <span class="c"># form to compare with messages on change list...</span>
+        <span class="n">info_messages_elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_elements_by_class_name</span><span class="p">(</span>
+            <span class="s">&#39;info&#39;</span><span class="p">)</span>
+        <span class="n">info_messages</span> <span class="o">=</span> <span class="p">[</span><span class="n">mess</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">mess</span> <span class="ow">in</span> <span class="n">info_messages_elements</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="n">message1</span><span class="p">,</span> <span class="n">info_messages</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="n">message2</span><span class="p">,</span> <span class="n">info_messages</span><span class="p">)</span>
+
+        <span class="c"># a key difference between this test and test_keycard_deactivation</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Back on change list, lockuser should still have &quot;</span>
+               <span class="s">&quot;keycard(active: True).&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_elements_by_tag_name</span><span class="p">(</span><span class="s">&#39;tr&#39;</span><span class="p">)</span>
+        <span class="n">rows_text</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
+
+        <span class="c"># implicitly joining long string</span>
+        <span class="n">burns_row</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;C. M. Burns mr.burns@springfieldnuclearpowerplant.com &#39;</span>
+                    <span class="s">&#39;True RFID: 1122135122 (activated on April 10, 2013, 12:52&#39;</span>
+                    <span class="s">&#39; AM by superuser) Springfield Mafia Secret Meeting Room, &#39;</span>
+                    <span class="s">&#39;Junior Achievers Club April 10, 2013, 12:57 AM &#39;</span>
+                    <span class="s">&#39;(Springfield &#39;</span> <span class="s">&#39;Mafia Secret Meeting Room)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="n">burns_row</span><span class="p">,</span> <span class="n">rows_text</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Hit back to go back to the change form&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">back</span><span class="p">()</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Are we back on the change form?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">title</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+            <span class="s">&#39;Change lock user | RFID Lock Administration&#39;</span><span class="p">)</span>
+
+        <span class="c"># a key difference between this test and test_keycard_deactivation</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Back on change form, &#39;Current RFID&#39; should not be &quot;</span>
+               <span class="s">&quot;None, still have the RFID keycard info&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">current_rfid_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&#39;.form-row.field-prettify_get_current_rfid&#39;</span><span class="p">)</span>
+        <span class="n">current_rfid</span> <span class="o">=</span> <span class="n">current_rfid_field</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">)</span>
+        <span class="n">current_rfid_no_ws</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_rfid_field</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">current_rfid_no_ws</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">current_rfid_field</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s">&#39;None&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Back on change form, &#39;Deactivate current keycard&#39; &quot;</span>
+               <span class="s">&quot;SHOULD be checked&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">deact_checkbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[id=&#39;id_deactivate_current_keycard&#39;]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">deact_checkbox</span><span class="o">.</span><span class="n">is_selected</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="GeneralFunctionalTests.test_keycard_deactivation"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.test_keycard_deactivation">[docs]</a>    <span class="k">def</span> <span class="nf">test_keycard_deactivation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Change form for an active (i.e. has assigned keycard) lock user: after</span>
+<span class="sd">        checking &#39;Deactivate current keycard&#39; and saving, does the change list</span>
+<span class="sd">        show the deactivation/saved message? Does the change list show this</span>
+<span class="sd">        lockuser as inactive? Back on the change form, there should not be an</span>
+<span class="sd">        assigned keycard (Current RFID: None) and &#39;Deactivate current keycard&#39;</span>
+<span class="sd">        should be unchecked.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Opening browser to get to lockuser&#39;s change_form.......&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">lockuser_id</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">live_server_url</span> <span class="o">+</span>
+             <span class="s">&#39;/lockadmin/rfid_lock_management/lockuser/</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">lockuser_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">maximize_window</span><span class="p">()</span>
+
+        <span class="c"># Issue #a</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Before any changes / saving, &#39;Current RFID&#39; should be &quot;</span>
+               <span class="s">&quot;something&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">current_rfid_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&#39;.form-row.field-prettify_get_current_rfid&#39;</span><span class="p">)</span>
+        <span class="n">current_rfid_field</span> <span class="o">=</span> <span class="n">current_rfid_field</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">current_rfid_field</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s">&#39;None&#39;</span><span class="p">)</span>
+
+        <span class="c"># strip out whitespace in case template formatting introduces extra</span>
+        <span class="c"># white space</span>
+        <span class="n">current_rfid_no_ws</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_rfid_field</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">current_rfid_no_ws</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">current_rfid_field</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s">&#39;None&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Find the &#39;Deactivate keycard&#39; checkbox and verify it&#39;s &quot;</span>
+               <span class="s">&quot;not checked&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">deact_checkbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[id=&#39;id_deactivate_current_keycard&#39;]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">deact_checkbox</span><span class="o">.</span><span class="n">is_selected</span><span class="p">())</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check the &#39;Deactivate keycard&#39; checkbox&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">deact_checkbox</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Find and click &#39;Save&#39;&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">save_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[value=&#39;Save&#39;]&quot;</span><span class="p">)</span>
+        <span class="n">save_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Are we back on the change form? Check title.&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">title</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+            <span class="s">&#39;Manage lock users | RFID Lock Administration&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Back on change list, change message(s) correct&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">test_lockuser</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">lockuser_id</span><span class="p">)</span>
+        <span class="n">message1</span> <span class="o">=</span> <span class="s">&#39;The lock user &quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot; was changed successfully.&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">test_lockuser</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="n">test_lockuser</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span>
+        <span class="n">message2</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&#39;s keycard was deactivated successfully.&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">test_lockuser</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="n">test_lockuser</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span>
+        <span class="n">info_messages_elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_elements_by_class_name</span><span class="p">(</span>
+            <span class="s">&#39;info&#39;</span><span class="p">)</span>
+        <span class="n">info_messages</span> <span class="o">=</span> <span class="p">[</span><span class="n">mess</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">mess</span> <span class="ow">in</span> <span class="n">info_messages_elements</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="n">message1</span><span class="p">,</span> <span class="n">info_messages</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="n">message2</span><span class="p">,</span> <span class="n">info_messages</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Back on change list, lockuser should no longer have &quot;</span>
+               <span class="s">&quot;keycard and active status is now False&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_elements_by_tag_name</span><span class="p">(</span><span class="s">&#39;tr&#39;</span><span class="p">)</span>
+        <span class="n">rows_text</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span>
+            <span class="s">&#39;Lisa Simpson smartgirl63@yahoo.com False None Community Theater (None)&#39;</span><span class="p">,</span>
+            <span class="n">rows_text</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Hit back to go back to the change form........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">back</span><span class="p">()</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Are we back on the change form? Check title.&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">title</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+            <span class="s">&#39;Change lock user | RFID Lock Administration&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Back on change form, &#39;Current RFID&#39; should now be None&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">current_rfid_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&#39;.form-row.field-prettify_get_current_rfid&#39;</span><span class="p">)</span>
+        <span class="n">current_rfid</span> <span class="o">=</span> <span class="n">current_rfid_field</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">current_rfid</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s">&#39;None&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Back on change form, &#39;Deactivate current keycard&#39; &quot;</span>
+               <span class="s">&quot;SHOULD be checked&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">deact_checkbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[id=&#39;id_deactivate_current_keycard&#39;]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">deact_checkbox</span><span class="o">.</span><span class="n">is_selected</span><span class="p">())</span>
+
+</div></div>
+<div class="viewcode-block" id="LogIn"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.LogIn">[docs]</a><span class="k">class</span> <span class="nc">LogIn</span><span class="p">(</span><span class="n">LiveServerTestCase</span><span class="p">):</span>
+    <span class="n">fixtures</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;initial.json&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="LogIn.setUp"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.LogIn.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Start up Selenium WebDriver browser instance &quot;&quot;&quot;</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;LiveServerTestCase LogIn&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodDoc</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c"># set up browser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Firefox</span><span class="p">()</span>
+        <span class="c"># tells webdriver to use a max timeout of 3 seconds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">implicitly_wait</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LogIn.tearDown"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.LogIn.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Shut down Selenium WebDriver browser instance &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="LogIn.test_can_do_stuff_in_browser"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_tests.LogIn.test_can_do_stuff_in_browser">[docs]</a>    <span class="k">def</span> <span class="nf">test_can_do_stuff_in_browser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Logging in; making sure correct user and other info displayed &quot;&quot;&quot;</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Does user see the login screen when going to /lockadmin; &quot;</span>
+               <span class="s">&quot;able to log in; see the right stuff on the following screen?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span>
+            <span class="s">&quot;Opening browser to get to the log in screen at /lockadmin....&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="c"># user opens web browser; goes to main admin page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">live_server_url</span> <span class="o">+</span> <span class="s">&#39;/lockadmin&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">maximize_window</span><span class="p">()</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Does it say RFID Lock Administration?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="c"># returns WebElement object</span>
+        <span class="n">login_page_body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;body&#39;</span><span class="p">)</span>
+        <span class="c"># .text strips out the HTML markup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s">&quot;RFID Lock Administration&quot;</span><span class="p">,</span> <span class="n">login_page_body</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Can user actually log in via website?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="c"># User types in username and password and hits return</span>
+        <span class="n">username_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;username&#39;</span><span class="p">)</span>
+        <span class="n">username_field</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s">&#39;moe&#39;</span><span class="p">)</span>
+        <span class="n">password_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;password&#39;</span><span class="p">)</span>
+        <span class="n">password_field</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s">&#39;moe&#39;</span><span class="p">)</span>
+        <span class="n">password_field</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">RETURN</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;After username and password accepted, is the user &quot;</span>
+               <span class="s">&quot;taken to the main page&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">base_page_body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;body&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s">&quot;Logged in as moe&quot;</span><span class="p">,</span> <span class="n">base_page_body</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="c"># todo: Issue #q</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Does user see main links in the body?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">base_page_body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;body&#39;</span><span class="p">)</span>
+        <span class="n">navbar_links</span> <span class="o">=</span> <span class="s">&quot;Lock users</span><span class="se">\n</span><span class="s">Room access log</span><span class="se">\n</span><span class="s">Create user and assign new keycard&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="n">navbar_links</span><span class="p">,</span> <span class="n">base_page_body</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Does user see listed the doors they are allowed to &quot;</span>
+               <span class="s">&quot;manage in top navigation bar?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="c"># in pk order</span>
+        <span class="n">navbar_doors</span> <span class="o">=</span> <span class="s">&quot;Doors you manage: Community Theater, Seminar Room&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="n">navbar_doors</span><span class="p">,</span> <span class="n">base_page_body</span><span class="o">.</span><span class="n">text</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

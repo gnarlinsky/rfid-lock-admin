@@ -1,0 +1,528 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rfid_lock_management.models &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for rfid_lock_management.models</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth</span> <span class="kn">import</span> <span class="n">models</span> <span class="k">as</span> <span class="n">auth_models</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.management</span> <span class="kn">import</span> <span class="n">create_superuser</span>
+<span class="kn">from</span> <span class="nn">django.db.models</span> <span class="kn">import</span> <span class="n">signals</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">termcolor</span> <span class="kn">import</span> <span class="n">colored</span>   <span class="c"># temp</span>
+<span class="kn">from</span> <span class="nn">django.contrib.contenttypes.models</span> <span class="kn">import</span> <span class="n">ContentType</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">Permission</span>
+
+
+<div class="viewcode-block" id="Door"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.Door">[docs]</a><span class="k">class</span> <span class="nc">Door</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Doors with RFID locks installed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Represent Door objects with their name fields</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+<div class="viewcode-block" id="Door.save"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.Door.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        When a new Door is added, create a corresponding Permission, if it does</span>
+<span class="sd">        not exist already.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">Door</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">Permission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">codename</span><span class="o">=</span><span class="s">&#39;can_manage_door_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">):</span>
+            <span class="n">content_type</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">app_label</span><span class="o">=</span><span class="s">&#39;rfid_lock_management&#39;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s">&#39;door&#39;</span><span class="p">)</span>
+
+            <span class="n">Permission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">codename</span><span class="o">=</span><span class="s">&#39;can_manage_door_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s">&#39;Can manage door to </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">content_type</span><span class="o">=</span><span class="n">content_type</span>
+            <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Door.get_allowed_rfids"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.Door.get_allowed_rfids">[docs]</a>    <span class="k">def</span> <span class="nf">get_allowed_rfids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the RFIDs allowed to access this Door</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">allowed_rfids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">lu</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lockuser_set</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">lu</span><span class="o">.</span><span class="n">get_current_rfid</span><span class="p">():</span>
+                <span class="n">allowed_rfids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">get_current_rfid</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">allowed_rfids</span>
+
+</div></div>
+<div class="viewcode-block" id="NewKeycardScan"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.NewKeycardScan">[docs]</a><span class="k">class</span> <span class="nc">NewKeycardScan</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For checking whether the current request is for authenticating a keycard or</span>
+<span class="sd">    assigning new keycard.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">time_initiated</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">waiting_for_scan</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">doorid</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>   <span class="c"># doorid as in the request url</span>
+    <span class="n">rfid</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>   <span class="c"># rfid as in the request url</span>
+    <span class="n">ready_to_assign</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">assigner_user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NewKeycardScan.timed_out"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.NewKeycardScan.timed_out">[docs]</a>    <span class="k">def</span> <span class="nf">timed_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minutes</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check whether specified number of minutes have passed since staff user</span>
+<span class="sd">        indicated they were going to go scan in a card in order to assign it,</span>
+<span class="sd">        and return True if so.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="c"># How much time has passed since clicked &#39;Scan new card&#39;</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_initiated</span>
+
+        <span class="c"># Has it been more than specificed number of minutes?</span>
+        <span class="n">max_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="n">minutes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="n">max_time</span>
+
+</div></div>
+<div class="viewcode-block" id="RFIDkeycard"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.RFIDkeycard">[docs]</a><span class="k">class</span> <span class="nc">RFIDkeycard</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Door access represented by a (potentially reusable) RFID keycard</span>
+<span class="sd">    (or keyfob or whatever) assigned to a LockUser.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">the_rfid</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>  <span class="c"># the radio-frequency id</span>
+    <span class="n">date_revoked</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">date_created</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">lockuser</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s">&quot;LockUser&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="c"># If we don&#39;t specify a related_name, User would have two reverse relations</span>
+    <span class="c"># to rfidkeycard_set, which is impossible.</span>
+    <span class="n">assigner</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">&#39;RFIDkeycard_assigned&#39;</span><span class="p">)</span>
+    <span class="n">revoker</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">&#39;RFIDkeycard_revoked&#39;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Represent keycard object with the rfid number</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">u&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">the_rfid</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RFIDkeycard.get_allowed_doors"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.RFIDkeycard.get_allowed_doors">[docs]</a>    <span class="k">def</span> <span class="nf">get_allowed_doors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the Doors this user is allowed access to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lockuser</span><span class="o">.</span><span class="n">get_allowed_doors</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="RFIDkeycard.is_active"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.RFIDkeycard.is_active">[docs]</a>    <span class="k">def</span> <span class="nf">is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If there is a date_revoked, the keycard is not active.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_revoked</span>
+<span class="c">#         if self.date_revoked:</span>
+<span class="c">#             return False</span>
+<span class="c">#         else:</span>
+<span class="c">#             return True</span>
+</div>
+<div class="viewcode-block" id="RFIDkeycard.deactivate"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.RFIDkeycard.deactivate">[docs]</a>    <span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date_revoked</span> <span class="o">=</span> <span class="n">now</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">revoker</span> <span class="o">=</span> <span class="n">user</span>
+
+</div></div>
+<div class="viewcode-block" id="AccessTime"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.AccessTime">[docs]</a><span class="k">class</span> <span class="nc">AccessTime</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Represents a visit to a space</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">the_rfid</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">access_time</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>    <span class="c"># the time the rfid was used</span>
+    <span class="n">lockuser</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s">&quot;LockUser&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">door</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s">&quot;Door&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">data_point</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>  <span class="c"># Issue #j</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#return u&#39;%s&#39; % self.access_time</span>
+        <span class="c"># e.g. &#39;April 09, 2013, 12:25 PM&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AccessTime.get_this_lockuser_html"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.AccessTime.get_this_lockuser_html">[docs]</a>    <span class="k">def</span> <span class="nf">get_this_lockuser_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the HTML with link to /lockuser/the_id/ to display on the</span>
+<span class="sd">        AccessTime change list page</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lockuser_link_html</span> <span class="o">=</span> <span class="s">&quot;&lt;a href=&#39;../lockuser/</span><span class="si">%d</span><span class="s">/&#39;&gt;</span><span class="si">%s</span><span class="s">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lockuser</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lockuser</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lockuser_link_html</span></div>
+    <span class="n">get_this_lockuser_html</span><span class="o">.</span><span class="n">allow_tags</span> <span class="o">=</span> <span class="bp">True</span>
+
+</div>
+<div class="viewcode-block" id="LockUser"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser">[docs]</a><span class="k">class</span> <span class="nc">LockUser</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    (Despite the misleading name, LockUsers are not subclassed Users, but</span>
+<span class="sd">    subclassed Models.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">first_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">last_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">EmailField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">phone_number</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">birthdate</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">doors</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Door</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">doors</span><span class="o">.</span><span class="n">help_text</span> <span class="o">=</span> <span class="s">&quot;Select at least one space to activate keycard.&quot;</span>
+    <span class="n">deactivate_current_keycard</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">deactivate_current_keycard</span><span class="o">.</span><span class="n">help_text</span> <span class="o">=</span> <span class="s">&quot;Revoke keycard access and deactivate user.&quot;</span>
+    <span class="n">current_keycard_revoker</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LockUser.save"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overriding save():</span>
+<span class="sd">            - We&#39;ll deactivate a LockUser&#39;s current keycard here, if</span>
+<span class="sd">              deactivate_current_keycard is checked on the LockUser&#39;s</span>
+<span class="sd">              change_form.</span>
+<span class="sd">            - If we&#39;re assigning a new keycard, the keycard is created and</span>
+<span class="sd">              saved here.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Since rfid_lock_management_rfidkeycard.lockuser_id may not be NULL</span>
+        <span class="c"># when saving RFIDkeycard object, we need to save the LockUser object</span>
+        <span class="c"># first, so we can get self.id (which is also necessary before any work</span>
+        <span class="c"># with FK&#39;s and M2M).</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LockUser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c"># Not doing a check for door existence here. At this point,</span>
+        <span class="c"># deactivate_current_keycard is set to true if there were no doors (see</span>
+        <span class="c"># admin.py), but doors may not have been saved yet, so checking</span>
+        <span class="c"># self.doors.exists() would be misleading.</span>
+        <span class="c">#if self.doors.exists():</span>
+        <span class="n">new_scan_queryset</span> <span class="o">=</span> <span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">new_scan_queryset</span><span class="p">:</span>
+            <span class="c"># get last created NewKeycardScan object</span>
+            <span class="n">new_scan</span> <span class="o">=</span> <span class="n">new_scan_queryset</span><span class="o">.</span><span class="n">latest</span><span class="p">(</span><span class="s">&quot;pk&quot;</span><span class="p">)</span>
+            <span class="c"># Note:  this --</span>
+            <span class="c">#   new_scan = new_scan_queryset.latest(&quot;time_initiated&quot;)</span>
+            <span class="c"># -- may not actually return the latest created object if &#39;start</span>
+            <span class="c"># scan&#39; was hit a bunch of times in a row -- microseconds don&#39;t seem</span>
+            <span class="c"># to be at sufficient resolution to actually get the latest object.</span>
+            <span class="k">if</span> <span class="n">new_scan</span><span class="o">.</span><span class="n">ready_to_assign</span><span class="p">:</span>
+                <span class="n">new_scan</span><span class="o">.</span><span class="n">ready_to_assign</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">new_scan</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>  <span class="c"># save new_scan before saving new_keycard</span>
+                <span class="c"># assign the rfid from the keycard that was just scanned</span>
+                <span class="n">new_keycard</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="p">(</span>
+                    <span class="n">lockuser</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_rfid</span><span class="o">=</span><span class="n">new_scan</span><span class="o">.</span><span class="n">rfid</span><span class="p">,</span>
+                    <span class="n">assigner</span><span class="o">=</span><span class="n">new_scan</span><span class="o">.</span><span class="n">assigner_user</span><span class="p">)</span>
+                <span class="n">new_keycard</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">current_keycard</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_current_rfid</span><span class="p">()</span>
+
+        <span class="c"># Deactivate a LockUser&#39;s current keycard here, if</span>
+        <span class="c"># deactivate_current_keycard is checked on the LockUser&#39;s change_form,</span>
+        <span class="c"># or if no doors were selected.  not doing a check for door existence</span>
+        <span class="c"># here. At this point, deactivate_current_keycard is set to true if</span>
+        <span class="c"># there were no doors (see admin.py), but doors may not have been saved</span>
+        <span class="c"># yet, so checking self.doors.exists() would be misleading.</span>
+        <span class="k">if</span> <span class="n">current_keycard</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">deactivate_current_keycard</span><span class="p">:</span>
+            <span class="n">current_keycard</span><span class="o">.</span><span class="n">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_keycard_revoker</span><span class="p">)</span>
+            <span class="c"># save keycard since have changed it</span>
+            <span class="n">current_keycard</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="c"># todo: consider putting the following two statements into</span>
+            <span class="c"># deactivate()</span>
+            <span class="c"># no current keycard to deactivate anymore</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">deactivate_current_keycard</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_keycard_revoker</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="LockUser.get_all_rfids"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.get_all_rfids">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_rfids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all RFID&#39;s associated with this LockUser</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rfidkeycard_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="LockUser.get_all_rfids_html"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.get_all_rfids_html">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_rfids_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns HTML for displaying list of all keycards (excluding curent, if any).</span>
+<span class="sd">        Includes date assigned and date revoked, as well as rfid number.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_rfid_keycards</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_rfids</span><span class="p">()</span>
+        <span class="n">all_keycards_except_current</span> <span class="o">=</span> <span class="n">all_rfid_keycards</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">date_revoked</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+        <span class="n">rfid_keycards_info_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">keycard</span> <span class="ow">in</span> <span class="n">all_keycards_except_current</span><span class="p">:</span>
+            <span class="n">rf</span> <span class="o">=</span> <span class="n">keycard</span><span class="o">.</span><span class="n">the_rfid</span>
+            <span class="n">date_assigned</span> <span class="o">=</span> <span class="n">keycard</span><span class="o">.</span><span class="n">date_created</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">)</span>
+            <span class="n">assigner</span> <span class="o">=</span> <span class="n">keycard</span><span class="o">.</span><span class="n">assigner</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">date_revoked</span> <span class="o">=</span> <span class="n">keycard</span><span class="o">.</span><span class="n">date_revoked</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">)</span>
+                <span class="n">revoker</span> <span class="o">=</span> <span class="n">keycard</span><span class="o">.</span><span class="n">revoker</span>
+                <span class="n">info_str</span> <span class="o">=</span> <span class="s">&quot;RFID: </span><span class="si">%s</span><span class="s"> (activated on </span><span class="si">%s</span><span class="s"> by </span><span class="si">%s</span><span class="s">; revoked on </span><span class="si">%s</span><span class="s"> by </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">rf</span><span class="p">,</span> <span class="n">date_assigned</span><span class="p">,</span> <span class="n">assigner</span><span class="p">,</span> <span class="n">date_revoked</span><span class="p">,</span> <span class="n">revoker</span><span class="p">)</span>
+            <span class="c"># Catching exceptions here was really only useful in development,</span>
+            <span class="c"># so excluding it from coverage.</span>
+            <span class="k">except</span><span class="p">:</span> <span class="c"># pragma: no cover</span>
+                <span class="n">info_str</span> <span class="o">=</span> <span class="s">&quot;RFID: </span><span class="si">%s</span><span class="s"> (activated on </span><span class="si">%s</span><span class="s"> by </span><span class="si">%s</span><span class="s"> [couldn&#39;t get revoker] )&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">rf</span><span class="p">,</span> <span class="n">date_assigned</span><span class="p">,</span> <span class="n">assigner</span><span class="p">)</span>
+            <span class="n">rfid_keycards_info_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info_str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&quot;,&lt;br&gt;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rfid_keycards_info_list</span><span class="p">)</span></div>
+    <span class="n">get_all_rfids_html</span><span class="o">.</span><span class="n">allow_tags</span> <span class="o">=</span> <span class="bp">True</span>
+
+<div class="viewcode-block" id="LockUser.get_current_rfid"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.get_current_rfid">[docs]</a>    <span class="k">def</span> <span class="nf">get_current_rfid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Of all RFID&#39;s associated with this LockUser, get the one that&#39;s active,</span>
+<span class="sd">        i.e. has not been revoked.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_rfid_keycards</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_rfids</span><span class="p">()</span>
+        <span class="n">curr_rfid</span> <span class="o">=</span> <span class="n">all_rfid_keycards</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">date_revoked</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+        <span class="c"># There should only be one</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">curr_rfid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="LockUser.is_active"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.is_active">[docs]</a>    <span class="k">def</span> <span class="nf">is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Useful in LockUser&#39;s list display</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_current_rfid</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="LockUser.prettify_get_current_rfid"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.prettify_get_current_rfid">[docs]</a>    <span class="k">def</span> <span class="nf">prettify_get_current_rfid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns results of get_current_rfid(), but as a nice pretty string.</span>
+<span class="sd">        Also display date assigned as well as rfid number on LockUser change</span>
+<span class="sd">        form and list display.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">curr_rfid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_current_rfid</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">curr_keycard_info</span> <span class="o">=</span> <span class="s">&quot;RFID: </span><span class="si">%s</span><span class="s"> (activated on </span><span class="si">%s</span><span class="s"> by </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">curr_rfid</span><span class="o">.</span><span class="n">the_rfid</span><span class="p">,</span>
+                <span class="n">curr_rfid</span><span class="o">.</span><span class="n">date_created</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">),</span>
+                <span class="n">curr_rfid</span><span class="o">.</span><span class="n">assigner</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">curr_keycard_info</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span></div>
+    <span class="n">prettify_get_current_rfid</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="s">&quot;Current RFID&quot;</span>
+
+<div class="viewcode-block" id="LockUser.get_allowed_doors"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.get_allowed_doors">[docs]</a>    <span class="k">def</span> <span class="nf">get_allowed_doors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the Doors this user is allowed access to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">doors</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="LockUser.prettify_get_allowed_doors"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.prettify_get_allowed_doors">[docs]</a>    <span class="k">def</span> <span class="nf">prettify_get_allowed_doors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">allowed_doors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_allowed_doors</span><span class="p">()</span>
+        <span class="n">door_names_list</span> <span class="o">=</span> <span class="n">allowed_doors</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">door_names_list</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUser.get_allowed_doors_html_links"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.get_allowed_doors_html_links">[docs]</a>    <span class="k">def</span> <span class="nf">get_allowed_doors_html_links</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the HTML with links to /door/the_id/ to display on the LockUser</span>
+<span class="sd">        change list page.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">allowed_doors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_allowed_doors</span><span class="p">()</span>
+        <span class="n">doors_links_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">door</span> <span class="ow">in</span> <span class="n">allowed_doors</span><span class="p">:</span>
+            <span class="n">door_link_html</span> <span class="o">=</span> <span class="s">&quot;&lt;a href=&#39;../door/</span><span class="si">%d</span><span class="s">/&#39;&gt;</span><span class="si">%s</span><span class="s">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">door</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="n">door</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">doors_links_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">door_link_html</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">doors_links_list</span><span class="p">)</span></div>
+    <span class="n">get_allowed_doors_html_links</span><span class="o">.</span><span class="n">allow_tags</span> <span class="o">=</span> <span class="bp">True</span>
+
+<div class="viewcode-block" id="LockUser.get_all_access_times"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.get_all_access_times">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_access_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns list of all access times (the actual access_time field, not the</span>
+<span class="sd">        objects) for this user, which means that the search should include any</span>
+<span class="sd">        other RFID&#39;s this LockUser ever had. In other words, the search is by</span>
+<span class="sd">        *person*, not by RFID.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Get QuerySet of all AccessTime objects for this lockuser</span>
+        <span class="n">at_query_set</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">lockuser</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;access_time&#39;</span><span class="p">)</span>
+        <span class="c"># Now get the access_time field of each AccessTime object</span>
+        <span class="n">all_access_times_list</span> <span class="o">=</span> <span class="n">at_query_set</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s">&#39;access_time&#39;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">all_access_times_list</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUser.all_access_times_link"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.all_access_times_link">[docs]</a>    <span class="k">def</span> <span class="nf">all_access_times_link</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;&lt;a href=&#39;../../accesstime/?lockuser__id__exact=</span><span class="si">%d</span><span class="s">&#39;&gt;View all access times&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div>
+    <span class="n">all_access_times_link</span><span class="o">.</span><span class="n">allow_tags</span> <span class="o">=</span> <span class="bp">True</span>
+
+<div class="viewcode-block" id="LockUser.get_last_access_time"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.get_last_access_time">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_access_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the last time this person used the lock.</span>
+<span class="sd">        Same story with current RFID vs previous one as in the</span>
+<span class="sd">        comment for get_all_access_time().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">access_times</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_access_times</span><span class="p">()</span>
+
+        <span class="c"># grab the last one</span>
+        <span class="k">if</span> <span class="n">access_times</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">access_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="LockUser.prettify_get_last_access_time"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.prettify_get_last_access_time">[docs]</a>    <span class="k">def</span> <span class="nf">prettify_get_last_access_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_access_time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">last</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">last</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="LockUser.prettify_get_last_access_time_and_door"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.prettify_get_last_access_time_and_door">[docs]</a>    <span class="k">def</span> <span class="nf">prettify_get_last_access_time_and_door</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Includes the door this access time is associated with (for change list)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># todo: note - a different appraoch than similar methods</span>
+        <span class="n">at_query_set</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">lockuser</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="n">at_query_set</span><span class="o">.</span><span class="n">latest</span><span class="p">(</span><span class="s">&#39;access_time&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">last</span><span class="o">.</span><span class="n">access_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; (&quot;</span> <span class="o">+</span> <span class="n">last</span><span class="o">.</span><span class="n">door</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">&quot;)&quot;</span>
+</div>
+<div class="viewcode-block" id="LockUser.last_access_time_and_link_to_more"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.last_access_time_and_link_to_more">[docs]</a>    <span class="k">def</span> <span class="nf">last_access_time_and_link_to_more</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Including link to all access times (for change form)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">last_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_access_time</span><span class="p">()</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_access_times_link</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">last_time</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">last_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">),</span> <span class="n">link</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span></div>
+    <span class="n">last_access_time_and_link_to_more</span><span class="o">.</span><span class="n">allow_tags</span> <span class="o">=</span> <span class="bp">True</span>
+
+<div class="viewcode-block" id="LockUser.last_access_time_and_door_and_link_to_more"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.LockUser.last_access_time_and_door_and_link_to_more">[docs]</a>    <span class="k">def</span> <span class="nf">last_access_time_and_door_and_link_to_more</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Including link to all access times (for change form)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># todo: note - a different appraoch than similar methods</span>
+        <span class="n">at_query_set</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">lockuser</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="n">at_query_set</span><span class="o">.</span><span class="n">latest</span><span class="p">(</span><span class="s">&#39;access_time&#39;</span><span class="p">)</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_access_times_link</span><span class="p">()</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        if last:</span>
+<span class="sd">            return &quot;%s (%s) (%s)&quot; % (last.access_time.strftime(&quot;%B %d, %Y, %I:%M %p&quot;), last.door.name, link)</span>
+<span class="sd">        else:</span>
+<span class="sd">            return None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># todo (see __B__)</span>
+        <span class="n">return_val</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">last</span><span class="p">:</span>
+            <span class="n">return_val</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">) (</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">last</span><span class="o">.</span><span class="n">access_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">),</span> <span class="n">last</span><span class="o">.</span><span class="n">door</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">link</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">return_val</span></div>
+    <span class="n">last_access_time_and_door_and_link_to_more</span><span class="o">.</span><span class="n">allow_tags</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">last_access_time_and_door_and_link_to_more</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="s">&quot;Last access&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; In the list of AccessTimes, for example, LockUsers will be</span>
+<span class="sd">        represented with their first and last names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">u&#39;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span>
+
+
+<span class="c">####################################################################</span>
+<span class="c"># Prevent interactive question about wanting a superuser created.</span>
+<span class="c">####################################################################</span>
+<span class="c"># From http://stackoverflow.com/questions/1466827/ --</span>
+<span class="c">#</span>
+<span class="c"># Prevent interactive question about wanting a superuser created.  (This code</span>
+<span class="c"># has to go in the &quot;models&quot; module so that it gets processed by</span>
+<span class="c"># the &quot;syncdb&quot; command during database creation.)</span>
+<span class="c"># pragma: no cover  (exclude this code from coverage)</span></div>
+<span class="n">signals</span><span class="o">.</span><span class="n">post_syncdb</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span>
+    <span class="n">create_superuser</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">auth_models</span><span class="p">,</span>
+    <span class="n">dispatch_uid</span><span class="o">=</span><span class="s">&#39;django.contrib.auth.management.create_superuser&#39;</span><span class="p">)</span>
+
+
+<span class="c"># Create our own test user automatically.</span>
+<div class="viewcode-block" id="create_testuser"><a class="viewcode-back" href="../../main.html#rfid_lock_management.models.create_testuser">[docs]</a><span class="k">def</span> <span class="nf">create_testuser</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">created_models</span><span class="p">,</span> <span class="n">verbosity</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c"># pragma: no cover</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">auth_models</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">&#39;superuser&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">auth_models</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;*&#39;</span> <span class="o">*</span> <span class="mi">80</span>
+        <span class="k">print</span> <span class="s">&#39;Creating test user -- login: superuser, password: superuser&#39;</span>
+        <span class="k">print</span> <span class="s">&#39;*&#39;</span> <span class="o">*</span> <span class="mi">80</span>
+        <span class="k">assert</span> <span class="n">auth_models</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_superuser</span><span class="p">(</span>
+            <span class="s">&#39;superuser&#39;</span><span class="p">,</span> <span class="s">&#39;x@x.com&#39;</span><span class="p">,</span> <span class="s">&#39;superuser&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;Test user already exists.&#39;</span>
+</div>
+<span class="n">signals</span><span class="o">.</span><span class="n">post_syncdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+    <span class="n">create_testuser</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">auth_models</span><span class="p">,</span>
+    <span class="n">dispatch_uid</span><span class="o">=</span><span class="s">&#39;common.models.create_testuser&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

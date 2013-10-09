@@ -1,0 +1,151 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rfid_lock_management.templatetags.custom_filters &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for rfid_lock_management.templatetags.custom_filters</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">template</span>
+<span class="kn">from</span> <span class="nn">django.contrib.admin.sites</span> <span class="kn">import</span> <span class="n">AdminSite</span>
+<span class="kn">from</span> <span class="nn">django.contrib.contenttypes.models</span> <span class="kn">import</span> <span class="n">ContentType</span>
+<span class="kn">from</span> <span class="nn">django.template.defaultfilters</span> <span class="kn">import</span> <span class="n">stringfilter</span><span class="p">,</span> <span class="n">safe</span><span class="p">,</span> <span class="n">cut</span>
+<span class="kn">from</span> <span class="nn">rfid_lock_management.models</span> <span class="kn">import</span> <span class="n">LockUser</span>
+<span class="kn">from</span> <span class="nn">rfid_lock_management.admin</span> <span class="kn">import</span> <span class="n">LockUserAdmin</span>
+
+<span class="n">register</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">Library</span><span class="p">()</span>
+
+<span class="nd">@register.filter</span>
+<div class="viewcode-block" id="get_doors_you_manage"><a class="viewcode-back" href="../../../other.html#rfid_lock_management.templatetags.custom_filters.get_doors_you_manage">[docs]</a><span class="k">def</span> <span class="nf">get_doors_you_manage</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Give template the list of door names that the staff user can manage,</span>
+<span class="sd">    or &#39;None&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lua</span> <span class="o">=</span> <span class="n">LockUserAdmin</span><span class="p">(</span><span class="n">LockUser</span><span class="p">,</span> <span class="n">AdminSite</span><span class="p">())</span>
+    <span class="n">doors_to_show_qs</span> <span class="o">=</span> <span class="n">lua</span><span class="o">.</span><span class="n">get_doors_to_show</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">return_val</span> <span class="o">=</span> <span class="s">&#39;None&#39;</span>  <span class="c"># avoiding a test for &#39;None&#39;...</span>
+    <span class="k">if</span> <span class="n">doors_to_show_qs</span><span class="p">:</span>
+        <span class="n">return_val</span> <span class="o">=</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">door</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">door</span> <span class="ow">in</span> <span class="n">doors_to_show_qs</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">return_val</span>
+</div>
+<span class="nd">@register.filter</span>
+<div class="viewcode-block" id="fix_json_string"><a class="viewcode-back" href="../../../other.html#rfid_lock_management.templatetags.custom_filters.fix_json_string">[docs]</a><span class="k">def</span> <span class="nf">fix_json_string</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Marks a string as not requiring further HTML escaping prior to output.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">string</span> <span class="o">=</span> <span class="n">safe</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+    <span class="n">string</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&quot;</span><span class="se">\\</span><span class="s">&quot;&#39;</span><span class="p">,</span><span class="s">&quot;&#39;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&quot;&#39;&quot;</span><span class="p">)</span> <span class="c"># fix quotes</span>
+    <span class="n">string</span> <span class="o">=</span> <span class="n">cut</span><span class="p">(</span><span class="n">string</span><span class="p">,</span><span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">)</span> <span class="c"># keep fixing</span>
+    <span class="n">string</span> <span class="o">=</span> <span class="n">safe</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>  <span class="c"># keep fixing</span>
+    <span class="k">return</span> <span class="n">string</span>
+</div>
+<span class="nd">@register.filter</span>
+<div class="viewcode-block" id="does_lockuser_have_active_keycard"><a class="viewcode-back" href="../../../other.html#rfid_lock_management.templatetags.custom_filters.does_lockuser_have_active_keycard">[docs]</a><span class="k">def</span> <span class="nf">does_lockuser_have_active_keycard</span><span class="p">(</span><span class="n">object_id</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">this_lockuser</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">object_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="c"># No lockuser, so no keycard (i.e. can still get behavior we want</span>
+        <span class="c"># on add, when there is no lockuser yet).</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="n">this_lockuser</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">this_lockuser</span><span class="o">.</span><span class="n">get_current_rfid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+</div>
+<span class="nd">@register.filter</span>
+<span class="c">#def get_object_type(the_object):</span>
+<div class="viewcode-block" id="get_object_type"><a class="viewcode-back" href="../../../other.html#rfid_lock_management.templatetags.custom_filters.get_object_type">[docs]</a><span class="k">def</span> <span class="nf">get_object_type</span><span class="p">(</span><span class="n">content_type_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get class of object, based on the content type id</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">content_type_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ct</span><span class="o">.</span><span class="n">model</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

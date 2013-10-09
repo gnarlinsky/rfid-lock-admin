@@ -1,0 +1,468 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rfid_lock_management.tests.views_tests &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for rfid_lock_management.tests.views_tests</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">import</span> <span class="nn">simplejson</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">Permission</span><span class="p">,</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.contrib.contenttypes.models</span> <span class="kn">import</span> <span class="n">ContentType</span>
+<span class="c">#from django.utils.timezone import utc</span>
+<span class="kn">from</span> <span class="nn">django.test</span> <span class="kn">import</span> <span class="n">TestCase</span>
+<span class="kn">from</span> <span class="nn">django.test.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="kn">from</span> <span class="nn">rfid_lock_management.models</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">test_helpers</span> <span class="kn">import</span> <span class="n">t_info</span>
+
+<div class="viewcode-block" id="ChartDataTests"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.views_tests.ChartDataTests">[docs]</a><span class="k">class</span> <span class="nc">ChartDataTests</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="n">fixtures</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;initial.json&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ChartDataTests.setUp"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.views_tests.ChartDataTests.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;TestCase ChartDataTests&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodDoc</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="ChartDataTests.test_chartify"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.views_tests.ChartDataTests.test_chartify">[docs]</a>    <span class="k">def</span> <span class="nf">test_chartify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Does chartify() return response with the correct(ly formatted) data</span>
+<span class="sd">        for HighChart plot of access times?</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># login as staff user in fixture</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">&#39;moe&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">&#39;moe&#39;</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;/chart/&quot;</span><span class="p">)</span>
+        <span class="c">#response.context[&#39;chart_data&#39;]</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response status code&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content type&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s">&#39;content-type&#39;</span><span class="p">],</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+
+        <span class="c"># tooltip hardcoded in view as well</span>
+        <span class="n">tooltip</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;followPointer&#39;</span><span class="p">:</span> <span class="s">&#39;false&#39;</span><span class="p">,</span> <span class="s">&#39;pointFormat&#39;</span><span class="p">:</span> <span class="s">&#39;&quot;{point.user}&quot;&#39;</span><span class="p">}</span>
+        <span class="n">all_doors_series</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">door</span> <span class="ow">in</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="c"># get the data points for this door</span>
+            <span class="n">at_this_door</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">door</span><span class="o">=</span><span class="n">door</span><span class="p">)</span>
+            <span class="n">data_points_values_list</span> <span class="o">=</span> <span class="n">at_this_door</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s">&#39;data_point&#39;</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">dp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">dp</span> <span class="ow">in</span> <span class="n">data_points_values_list</span><span class="p">]</span>
+            <span class="c"># create door series</span>
+            <span class="n">door_series</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;&quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="n">door</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                           <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+                           <span class="s">&#39;tooltip&#39;</span><span class="p">:</span> <span class="n">tooltip</span><span class="p">}</span>
+            <span class="c"># append to list of all door series</span>
+            <span class="n">all_doors_series</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">door_series</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response context for chart_type string&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="c"># the one we&#39;re really interested in</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s">&#39;chart_data&#39;</span><span class="p">],</span>
+            <span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">all_doors_series</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">))</span>
+
+</div></div>
+<div class="viewcode-block" id="NewKeycardScanTests"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.views_tests.NewKeycardScanTests">[docs]</a><span class="k">class</span> <span class="nc">NewKeycardScanTests</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="NewKeycardScanTests.setUp"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.views_tests.NewKeycardScanTests.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;TestCase NewKeycardScanTests&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodDoc</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Creating staff user doing this......&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">staff_only_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="s">&#39;js@jmail.com&#39;</span><span class="p">,</span> <span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;logging in as staff user....&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="NewKeycardScanTests.test_initiate_new_keycard_scan_but_no_lockuser"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_initiate_new_keycard_scan_but_no_lockuser">[docs]</a>    <span class="k">def</span> <span class="nf">test_initiate_new_keycard_scan_but_no_lockuser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lockuser with specified id does not exist:</span>
+<span class="sd">        - check for appropriate response</span>
+<span class="sd">        - and that a new NewKeycardScan object is not created</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;There&#39;s no LockUser with pk 1, right?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">num_new_keycard_scan_obj_before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Getting response..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;/start_scan/1/&quot;</span><span class="p">)</span>  <span class="c"># lockuser object id is 1</span>
+
+        <span class="c"># check that NewKeycardScan object has NOT been created (by comparing</span>
+        <span class="c"># before and after NewKeycardScan objects count)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check that a NewKeycardScan object has not been created&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">num_new_keycard_scan_obj_after</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">num_new_keycard_scan_obj_before</span><span class="p">,</span>
+            <span class="n">num_new_keycard_scan_obj_after</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response status code&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content type&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s">&#39;content-type&#39;</span><span class="p">],</span> <span class="s">&#39;application/json&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;success&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;error_mess&#39;</span><span class="p">],</span>
+            <span class="s">&quot;This lock user was probably not found in the system.&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="NewKeycardScanTests.test_initiate_new_keycard_scan_but_lockuser_has_keycard"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_initiate_new_keycard_scan_but_lockuser_has_keycard">[docs]</a>    <span class="k">def</span> <span class="nf">test_initiate_new_keycard_scan_but_lockuser_has_keycard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lockuser with specified id already has an assigned keycard: check for</span>
+<span class="sd">        appropriate response and that a new NewKeycardScan object is not</span>
+<span class="sd">        created</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;No LockUsers at all, right?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()),</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Creating new lockuser..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;...with pk 1&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Now there should be one LockUser, the one we just&quot;</span>
+                <span class="s">&quot; made....&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lu</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;...with pk 1&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Creating new RFIDkeycard and assigning to our &quot;</span>
+                <span class="s">&quot;LockUser..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">rk</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&quot;1111111111&quot;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">staff_only_user</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Make sure this LockUser already has a keycard&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">is_active</span><span class="p">())</span>   <span class="c"># or lu.get_current_rfid()...</span>
+
+        <span class="n">num_new_keycard_scan_obj_before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Getting response..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;/start_scan/1/&quot;</span><span class="p">)</span>  <span class="c"># lockuser object id is 1</span>
+
+        <span class="c"># Parallels test_initiate_new_keycard_scan</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check that a NewKeycardScan object has not been &quot;</span>
+                <span class="s">&quot;created&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">num_new_keycard_scan_obj_after</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">num_new_keycard_scan_obj_before</span><span class="p">,</span>
+            <span class="n">num_new_keycard_scan_obj_after</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response status code&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content type&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s">&#39;content-type&#39;</span><span class="p">],</span> <span class="s">&#39;application/json&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;success&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;error_mess&#39;</span><span class="p">],</span>
+            <span class="s">&quot;This lock user is already assigned a keycard.&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="NewKeycardScanTests.test_initiate_new_keycard_scan"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_initiate_new_keycard_scan">[docs]</a>    <span class="k">def</span> <span class="nf">test_initiate_new_keycard_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lockuser with specified id exists, does not have assigned keycard:</span>
+<span class="sd">        - check for appropriate response</span>
+<span class="sd">        - and that a new NewKeycardScan object is created,</span>
+<span class="sd">        - and it has correct attributes (waiting_for_scan = True;</span>
+<span class="sd">          assigner_user = request.user)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;No LockUsers at all, right?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Creating new lockuser..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;...with pk 1&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;There should be no NewKeycardScan objects to begin with&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Getting response..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;/start_scan/1/&quot;</span><span class="p">)</span>  <span class="c"># lockuser object id is 1</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response status code&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;There should be a new NewKeycardScan object now...&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()),</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;...with pk 1&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">new_nks_obj</span> <span class="o">=</span> <span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new_nks_obj</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content type&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s">&#39;content-type&#39;</span><span class="p">],</span> <span class="s">&#39;application/json&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;success&#39;</span><span class="p">],</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;new_scan_pk&#39;</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check that NewKeycardScan object has correct attributes&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">new_nks_obj</span><span class="o">.</span><span class="n">waiting_for_scan</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new_nks_obj</span><span class="o">.</span><span class="n">assigner_user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">staff_only_user</span><span class="p">)</span>
+
+
+    <span class="c">################################################</span>
+    <span class="c"># test_finished_new_keycard_scan* tests summary</span>
+    <span class="c">################################################</span>
+    <span class="c"># views.finished__new_keycard_scan can return one of six HttpResponses:</span>
+    <span class="c">#   response_data = {&#39;success&#39;:True, &#39;rfid&#39;:new_scan.rfid}</span>
+    <span class="c">#   response_data = {&#39;success&#39;:False, </span>
+    <span class="c">#                    &#39;error_mess&#39;:&quot;No NewKeycardScan objects at all&quot;};</span>
+    <span class="c">#   response_data = {&#39;success&#39;:False,</span>
+    <span class="c">#                    &#39;error_mess&#39;:&quot;No NewKeycardScan obj with pk %d&quot; %</span>
+    <span class="c">#                    new_scan_pk}</span>
+    <span class="c">#   response_data = {&#39;success&#39;:False,</span>
+    <span class="c">#                    &#39;error_mess&#39;:&quot;NewKeycardScan does not have rfid&quot;}</span>
+    <span class="c">#   response_data = {&#39;success&#39;:False,</span>
+    <span class="c">#                    &#39;error_mess&#39;:&quot;A keycard with the same RFID is already&quot;</span>
+    <span class="c">#                       &quot; assigned to %s.&quot; % k.lockuser}</span>
+    <span class="c">#   response_data = {&#39;success&#39;:False,</span>
+    <span class="c">#                    &#39;error_mess&#39;:&quot;Sorry, the system timed out. You have &quot;</span>
+    <span class="c">#                       &quot; %d minutes to scan the card, then hit &#39;Done&#39;</span>
+    <span class="c">#</span>
+    <span class="c"># Issue #b (verifying model fields)</span></div>
+<div class="viewcode-block" id="NewKeycardScanTests.test_finished_new_keycard_scan"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan">[docs]</a>    <span class="k">def</span> <span class="nf">test_finished_new_keycard_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Everything went ok (no active keycard with this RFID num already;</span>
+<span class="sd">        a NewKeycardScan object with this pk does exist and has an RFID num;</span>
+<span class="sd">        not timed out), so can assign keycard.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_scan_pk</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">new_rfid</span> <span class="o">=</span> <span class="s">&quot;9999999999&quot;</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Creating new NewKeycardScan object we should have&quot;</span>
+                          <span class="s">&quot;at this point..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">new_nks_obj</span> <span class="o">=</span> <span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">rfid</span><span class="o">=</span><span class="n">new_rfid</span><span class="p">,</span> <span class="n">assigner_user_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">staff_only_user</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Make sure it has the pk from URL&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new_nks_obj</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="n">new_scan_pk</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Getting response..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;/done_scan/</span><span class="si">%d</span><span class="s">/&quot;</span> <span class="o">%</span> <span class="n">new_scan_pk</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response status code&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content type&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s">&#39;content-type&#39;</span><span class="p">],</span> <span class="s">&#39;application/json&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;success&#39;</span><span class="p">],</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;rfid&#39;</span><span class="p">],</span> <span class="n">new_rfid</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Getting the changed NewKeycardScan obj........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">new_nks_obj</span> <span class="o">=</span> <span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check that NewKeycardScan object has correct attributes&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">new_nks_obj</span><span class="o">.</span><span class="n">waiting_for_scan</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">new_nks_obj</span><span class="o">.</span><span class="n">ready_to_assign</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="NewKeycardScanTests.test_finished_new_keycard_scan_no_keycardscan_obj_with_pk"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan_no_keycardscan_obj_with_pk">[docs]</a>    <span class="k">def</span> <span class="nf">test_finished_new_keycard_scan_no_keycardscan_obj_with_pk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; No NewKeycardScan object with the pk specified in the URL &quot;&quot;&quot;</span>
+        <span class="n">new_scan_pk</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check that there is no NewKeycardScan object with &quot;</span>
+            <span class="s">&quot;pk specified in the URL&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">new_scan_pk</span><span class="p">))</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Getting response..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;/done_scan/</span><span class="si">%d</span><span class="s">/&quot;</span> <span class="o">%</span> <span class="n">new_scan_pk</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response status code&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content type&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s">&#39;content-type&#39;</span><span class="p">],</span> <span class="s">&#39;application/json&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;success&#39;</span><span class="p">],</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;error_mess&#39;</span><span class="p">],</span>
+            <span class="s">&quot;No NewKeycardScan obj with pk </span><span class="si">%d</span><span class="s">.&quot;</span> <span class="o">%</span> <span class="n">new_scan_pk</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="NewKeycardScanTests.test_finished_new_keycard_scan_timed_out"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan_timed_out">[docs]</a>    <span class="k">def</span> <span class="nf">test_finished_new_keycard_scan_timed_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Longer than x minutes to scan new card -- timed out &quot;&quot;&quot;</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Creating NewKeycardScan object; setting creation &quot;</span>
+        <span class="s">&quot;time to 1 sec more than the time-out time......&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">new_nks_obj</span> <span class="o">=</span> <span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">rfid</span><span class="o">=</span><span class="s">&quot;1111111111&quot;</span><span class="p">,</span> <span class="n">assigner_user_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">staff_only_user</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+        <span class="n">min_till_timeout</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="n">time_delta</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="n">min_till_timeout</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">fake_time_initiated</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">time_delta</span><span class="p">)</span>
+        <span class="n">new_nks_obj</span><span class="o">.</span><span class="n">time_initiated</span> <span class="o">=</span> <span class="n">fake_time_initiated</span>
+        <span class="n">new_nks_obj</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Getting response..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;/done_scan/</span><span class="si">%d</span><span class="s">/&quot;</span> <span class="o">%</span> <span class="n">new_nks_obj</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response status code&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content type&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s">&#39;content-type&#39;</span><span class="p">],</span> <span class="s">&#39;application/json&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;success&#39;</span><span class="p">],</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="c"># self.assertEqual(simplejson.loads(response.content)[&#39;error_mess&#39;],</span>
+        <span class="c"># &quot;Sorry, the system timed out. You have %d minutes to scan the card,</span>
+        <span class="c"># then hit &#39;Done.&#39; &quot;  % default_timeout_minutes)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;error_mess&#39;</span><span class="p">],</span>
+            <span class="s">&quot;Sorry, the system timed out. You have {} minutes to scan the card, &quot;</span>
+            <span class="s">&quot;then hit &#39;Done.&#39; &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">min_till_timeout</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="NewKeycardScanTests.test_finished_new_keycard_scan_obj_does_not_have_rfid"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan_obj_does_not_have_rfid">[docs]</a>    <span class="k">def</span> <span class="nf">test_finished_new_keycard_scan_obj_does_not_have_rfid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; NewKeycardScan object did not get an RFID num &quot;&quot;&quot;</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Creating new NewKeycardScan object we should have at this point&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">new_nks_obj</span> <span class="o">=</span> <span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">assigner_user_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">staff_only_user</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;...and it does not have an rfid&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">new_nks_obj</span><span class="o">.</span><span class="n">rfid</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;/done_scan/</span><span class="si">%d</span><span class="s">/&quot;</span> <span class="o">%</span> <span class="n">new_nks_obj</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response status code&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content type&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s">&#39;content-type&#39;</span><span class="p">],</span> <span class="s">&#39;application/json&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;success&#39;</span><span class="p">],</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;error_mess&#39;</span><span class="p">],</span>
+            <span class="s">&quot;NewKeycardScan does not have RFID.&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="NewKeycardScanTests.test_finished_new_keycard_scan_keycard_with_same_rfid_exists"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan_keycard_with_same_rfid_exists">[docs]</a>    <span class="k">def</span> <span class="nf">test_finished_new_keycard_scan_keycard_with_same_rfid_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A keycard with the same RFID is already assigned to another</span>
+<span class="sd">        lockuser</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># create the RFIDkeycard whose rfid is the same as the one trying to</span>
+        <span class="c"># assign; create the lockuser with that rfid</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Creating new lockuser..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+
+        <span class="c"># attempting to assign this one, but it already belongs to an active lock user</span>
+        <span class="n">duplicate_rfid</span> <span class="o">=</span> <span class="s">&quot;1111111111&quot;</span>
+        <span class="n">new_scan_pk</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Creating new RFIDkeycard and assigning to our &quot;</span>
+                <span class="s">&quot;LockUser..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">rk</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="n">duplicate_rfid</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">staff_only_user</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Make sure this LockUser has this keycard&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">is_active</span><span class="p">())</span>   <span class="c"># or lu.get_current_rfid()...</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Creating new NewKeycardScan object we should have &quot;</span>
+                <span class="s">&quot;at this point..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">new_nks_obj</span> <span class="o">=</span> <span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">rfid</span><span class="o">=</span><span class="n">duplicate_rfid</span><span class="p">,</span> <span class="n">assigner_user_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">staff_only_user</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check that the NewKeycardScan object with pk &quot;</span>
+                <span class="s">&quot;specified in the URL has the duplicate rfid&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="c"># todo:  or is this actually covered in NewKeycardScan model tests?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">new_scan_pk</span><span class="p">,</span>
+            <span class="n">rfid</span><span class="o">=</span><span class="n">duplicate_rfid</span><span class="p">))</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Getting response..........&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;/done_scan/</span><span class="si">%d</span><span class="s">/&quot;</span> <span class="o">%</span> <span class="n">new_nks_obj</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response status code&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content type&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s">&#39;content-type&#39;</span><span class="p">],</span> <span class="s">&#39;application/json&#39;</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Check response content&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;success&#39;</span><span class="p">],</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s">&#39;error_mess&#39;</span><span class="p">],</span>
+            <span class="s">&quot;A keycard with the same RFID is already assigned to </span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span> <span class="n">lu</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

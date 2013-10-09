@@ -1,0 +1,451 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rfid_lock_management.admin &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for rfid_lock_management.admin</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">admin</span>
+<span class="kn">from</span> <span class="nn">django.forms</span> <span class="kn">import</span> <span class="n">CheckboxSelectMultiple</span><span class="p">,</span> <span class="n">ModelForm</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">rfid_lock_management.models</span> <span class="kn">import</span> <span class="n">LockUser</span><span class="p">,</span> <span class="n">AccessTime</span><span class="p">,</span> <span class="n">RFIDkeycard</span><span class="p">,</span> <span class="n">Door</span>
+<span class="kn">from</span> <span class="nn">termcolor</span> <span class="kn">import</span> <span class="n">colored</span>
+<span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponseRedirect</span>
+
+
+<div class="viewcode-block" id="LockUserForm"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.LockUserForm">[docs]</a><span class="k">class</span> <span class="nc">LockUserForm</span><span class="p">(</span><span class="n">ModelForm</span><span class="p">):</span>
+<div class="viewcode-block" id="LockUserForm.Meta"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.LockUserForm.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">LockUser</span>
+</div>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;request&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;obj&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="c"># doors permitted to lockuser, but not to staff user</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doors_not_ok_for_staff</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;doors_not_ok_for_staff&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">LockUserForm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c"># todo:  clean_fieldname?</span>
+    <span class="c"># (https://docs.djangoproject.com/en/1.1/ref/forms/validation/#ref-forms-validation)</span>
+    <span class="c"># todo: refactor the logic/DRYer</span>
+<div class="viewcode-block" id="LockUserForm.clean"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.LockUserForm.clean">[docs]</a>    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If no Doors were selected -- if user is not permitted to access any door</span>
+<span class="sd">        -- deactivate associated keycard.</span>
+
+<span class="sd">        If the user is permitted access to doors that the staff user is not</span>
+<span class="sd">        permitted access, make sure lockuser still has access to door staff</span>
+<span class="sd">        user is not permitted to manage, since those wouldn&#39;t be on the</span>
+<span class="sd">        form. Also, if &#39;deactivate current keycard&#39; was checked in this</span>
+<span class="sd">        situation, the keycard should NOT actually be revoked, because of</span>
+<span class="sd">        those other doors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
+        <span class="c"># grab the cleaned fields we need</span>
+        <span class="n">cleaned_doors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;doors&quot;</span><span class="p">)</span>
+        <span class="c"># .get():  if data not there, returns nothing - vs exception for []</span>
+        <span class="n">cleaned_deactivate_current_keycard</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s">&quot;deactivate_current_keycard&quot;</span><span class="p">)</span>
+
+        <span class="c"># If the user is not permitted to access any door, set</span>
+        <span class="c"># deactivate_current_keycard to True. Note that we&#39;re changing</span>
+        <span class="c"># cleaned_data here, not calling deactivate() on the associated</span>
+        <span class="c"># RFIDkeycard.</span>
+        <span class="c">#if not cleaned_doors and not cleaned_deactivate_current_keycard:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cleaned_doors</span><span class="p">:</span>
+            <span class="c">#if not self.doors_not_ok_for_staff:</span>
+            <span class="c">#    self.cleaned_data[&#39;deactivate_current_keycard&#39;] = True</span>
+            <span class="c">#else:  # don&#39;t deactivate keycard if no doors checked, because</span>
+            <span class="c"># there are still doors lock user can access</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">doors_not_ok_for_staff</span><span class="p">:</span>
+                <span class="c"># If the user is permitted access to doors that the staff user</span>
+                <span class="c"># is not permitted access, make sure lockuser still has access</span>
+                <span class="c"># to door staff user is not permitted to manage, since those</span>
+                <span class="c"># wouldn&#39;t be on the form.</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">doors_not_ok_for_staff</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;doors&#39;</span><span class="p">]:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;doors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;doors&#39;</span><span class="p">]</span> <span class="o">|</span> \
+                            <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;doors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cleaned_deactivate_current_keycard</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;deactivate_current_keycard&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;will not deactivate&#39;</span>
+                    <span class="c">#messages.add_message(self.request, messages.INFO, msg)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;special_message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">doors_not_ok_for_staff</span><span class="p">:</span>
+            <span class="c"># If there ARE cleaned (i.e. selected) doors, but</span>
+            <span class="c"># deactivate_current_keycard is True (i.e. staff user checked</span>
+            <span class="c"># &#39;deactivate current keycard&#39;), we should not allow the</span>
+            <span class="c"># deactivation -- since there are still doors lock user can access.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;deactivate_current_keycard&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;deactivate_current_keycard&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;will not deactivate&#39;</span>
+                <span class="c">#messages.add_message(self.request, messages.INFO, msg)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;special_message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
+                <span class="c"># If the user is permitted access to doors that the staff user</span>
+                <span class="c"># is not permitted access, make sure lockuser still has access</span>
+                <span class="c"># to door staff user is not permitted to manage, since those</span>
+                <span class="c"># wouldn&#39;t be on the form.</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">doors_not_ok_for_staff</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;doors&#39;</span><span class="p">]:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;doors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;doors&#39;</span><span class="p">]</span> <span class="o">|</span> \
+                            <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;doors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span>
+
+</div></div>
+<div class="viewcode-block" id="LockUserAdmin"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.LockUserAdmin">[docs]</a><span class="k">class</span> <span class="nc">LockUserAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="s">&quot;Encapsulates all admin options and functionality for a given model.&quot;</span>
+
+    <span class="c">###########################################################################</span>
+    <span class="c"># change form</span>
+    <span class="c">###########################################################################</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">LockUserForm</span>
+    <span class="c"># display options as checkboxes, not default as selection list</span>
+    <span class="n">formfield_overrides</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;widget&#39;</span><span class="p">:</span> <span class="n">CheckboxSelectMultiple</span><span class="p">},</span>
+    <span class="p">}</span>
+    <span class="n">fieldsets</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s">&#39;fields&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="p">(</span><span class="s">&#39;first_name&#39;</span><span class="p">,</span> <span class="s">&#39;last_name&#39;</span><span class="p">),</span>
+                <span class="s">&#39;email&#39;</span><span class="p">,</span>
+                <span class="s">&#39;phone_number&#39;</span><span class="p">,</span>
+                <span class="s">&#39;address&#39;</span><span class="p">,</span>
+                <span class="s">&#39;prettify_get_current_rfid&#39;</span><span class="p">,</span>
+                <span class="s">&#39;last_access_time_and_door_and_link_to_more&#39;</span><span class="p">,</span>
+                <span class="s">&#39;doors&#39;</span><span class="p">,</span>
+                <span class="s">&#39;deactivate_current_keycard&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">}),</span>
+    <span class="p">)</span>
+
+    <span class="n">readonly_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s">&quot;prettify_get_current_rfid&quot;</span><span class="p">,</span>
+        <span class="s">&quot;last_access_time_and_door_and_link_to_more&quot;</span><span class="p">,</span>
+        <span class="s">&quot;prettify_get_last_access_time&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c">###########################################################################</span>
+    <span class="c"># change list</span>
+    <span class="c">###########################################################################</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;first_name&#39;</span><span class="p">,</span> <span class="s">&#39;last_name&#39;</span><span class="p">]</span>
+
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s">&#39;first_name&#39;</span><span class="p">,</span>
+        <span class="s">&#39;last_name&#39;</span><span class="p">,</span>
+        <span class="s">&#39;email&#39;</span><span class="p">,</span>
+        <span class="s">&#39;is_active&#39;</span><span class="p">,</span>
+        <span class="s">&#39;_current_rfid_heading&#39;</span><span class="p">,</span>
+        <span class="s">&#39;_doors_heading&#39;</span><span class="p">,</span>
+        <span class="s">&#39;_last_access_heading&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;doors&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="LockUserAdmin.get_form"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.LockUserAdmin.get_form">[docs]</a>    <span class="k">def</span> <span class="nf">get_form</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ModelForm</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">LockUserAdmin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_form</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">class</span> <span class="nc">ModelFormMetaClass</span><span class="p">(</span><span class="n">ModelForm</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="c"># get doors this lockuser can access but staff user cannot,</span>
+                <span class="c"># unless creating a new user</span>
+                <span class="k">if</span> <span class="n">obj</span><span class="p">:</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;doors_not_ok_for_staff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_other_doors</span><span class="p">(</span>
+                        <span class="n">request</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">ModelForm</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ModelFormMetaClass</span>
+</div>
+<div class="viewcode-block" id="LockUserAdmin.deactivate"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.LockUserAdmin.deactivate">[docs]</a>    <span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">queryset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Staff should not have the ability to delete LockUsers, only to</span>
+<span class="sd">        DEACTIVATE them.</span>
+
+<span class="sd">        Before deactivating, this checks if the LockUser is permitted doors</span>
+<span class="sd">        that the staff user is not.  This would mean that the staff user is</span>
+<span class="sd">        not allowed to revoke the keycard, and the lock user would remain active.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">queryset</span><span class="p">:</span>
+            <span class="n">doors_not_ok_for_staff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_other_doors</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">doors_not_ok_for_staff</span><span class="p">:</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">deactivate_current_keycard</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">current_keycard_revoker</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+                <span class="c"># otherwise associated keycard won&#39;t become deactivated</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</div>
+    <span class="n">deactivate</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="s">&quot;Deactivate selected lock users/keycards&quot;</span>
+
+    <span class="n">actions</span> <span class="o">=</span> <span class="p">(</span><span class="n">deactivate</span><span class="p">,)</span>
+
+    <span class="c"># Specifying these in list_display allows changing the column heading</span>
+    <span class="k">def</span> <span class="nf">_doors_heading</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">prettify_get_allowed_doors</span><span class="p">()</span>
+    <span class="n">_doors_heading</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="s">&#39;Allowed doors&#39;</span>
+
+    <span class="k">def</span> <span class="nf">_last_access_heading</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">prettify_get_last_access_time_and_door</span><span class="p">()</span>
+    <span class="n">_last_access_heading</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="s">&#39;Last access&#39;</span>
+
+    <span class="k">def</span> <span class="nf">_current_rfid_heading</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">prettify_get_current_rfid</span><span class="p">()</span>
+    <span class="n">_current_rfid_heading</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="s">&#39;Current RFID&#39;</span>
+
+<div class="viewcode-block" id="LockUserAdmin.get_doors_to_show"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.LockUserAdmin.get_doors_to_show">[docs]</a>    <span class="k">def</span> <span class="nf">get_doors_to_show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="c"># superuser will always see all doors (doors_to_show)</span>
+        <span class="c">#(exclude from coverage report - superuser distinction is a</span>
+        <span class="c"># development-only feature)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>  <span class="c"># pragma: no cover</span>
+            <span class="k">return</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="c"># otherwise filter on permissions</span>
+        <span class="n">doors_to_show</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">none</span><span class="p">()</span>  <span class="c"># creates an EmptyQuerySet</span>
+        <span class="k">for</span> <span class="n">door</span> <span class="ow">in</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="c"># put in proper format for has_perm</span>
+            <span class="n">perm</span> <span class="o">=</span> <span class="s">&quot;rfid_lock_management.can_manage_door_</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">door</span><span class="o">.</span><span class="n">pk</span>
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">has_perm</span><span class="p">(</span><span class="n">perm</span><span class="p">):</span>
+                <span class="c"># concatenating QuerySets</span>
+                <span class="n">doors_to_show</span> <span class="o">=</span> <span class="n">doors_to_show</span> <span class="o">|</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">door</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">doors_to_show</span>
+
+    <span class="c"># Issue h</span></div>
+<div class="viewcode-block" id="LockUserAdmin.get_other_doors"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.LockUserAdmin.get_other_doors">[docs]</a>    <span class="k">def</span> <span class="nf">get_other_doors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Doors that the staff User is not allowed to administer. In change_form</span>
+<span class="sd">        template, will get a set of these Door objects from context, then check</span>
+<span class="sd">        the lockuser_set of each to see if the current lockuser has access to</span>
+<span class="sd">        it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#(exclude from coverage report - superuser distinction is a</span>
+        <span class="c"># development-only feature)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>  <span class="c"># pragma: no cover</span>
+            <span class="c"># superuser will always see all doors (doors_to_show)</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="c"># otherwise filter on permissions</span>
+        <span class="c"># creates an EmptyQuerySet</span>
+        <span class="n">doors_not_permitted_to_this_staff_user</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">none</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">door</span> <span class="ow">in</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="c"># put in proper format for has_perm</span>
+            <span class="n">perm</span> <span class="o">=</span> <span class="s">&quot;rfid_lock_management.can_manage_door_</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">door</span><span class="o">.</span><span class="n">pk</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">has_perm</span><span class="p">(</span><span class="n">perm</span><span class="p">):</span>
+                <span class="n">doors_not_permitted_to_this_staff_user</span> <span class="o">=</span> <span class="n">doors_not_permitted_to_this_staff_user</span> <span class="o">|</span> \
+                    <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">door</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>  <span class="c"># concatenating QuerySets</span>
+        <span class="c"># all elem that are in this set but not the other. i.e. all doors</span>
+        <span class="n">this_lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">)</span>
+        <span class="n">ok_for_user_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">this_lu</span><span class="o">.</span><span class="n">get_allowed_doors</span><span class="p">())</span>
+        <span class="n">not_for_staff_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">doors_not_permitted_to_this_staff_user</span><span class="p">)</span>
+        <span class="n">doors_not_ok_for_staff</span> <span class="o">=</span> <span class="n">not_for_staff_set</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">ok_for_user_set</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">doors_not_ok_for_staff</span>
+</div>
+<div class="viewcode-block" id="LockUserAdmin.formfield_for_manytomany"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.LockUserAdmin.formfield_for_manytomany">[docs]</a>    <span class="k">def</span> <span class="nf">formfield_for_manytomany</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_field</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The queryset() method in DoorAdmin restricts a staff user&#39;s ability</span>
+<span class="sd">        to view/change Doors that they do not have permission for (individual</span>
+<span class="sd">        objects and change list).  But on the listdisplay and changeform for</span>
+<span class="sd">        LockUsers, staff users can still see Doors  -- and assign them -- that</span>
+<span class="sd">        they don&#39;t have permission for.  So here, we need to to limit the</span>
+<span class="sd">        ManyToMany Door field output for the LockUser.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">db_field</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&quot;doors&quot;</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s">&quot;queryset&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_doors_to_show</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">LockUserAdmin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">formfield_for_manytomany</span><span class="p">(</span>
+            <span class="n">db_field</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserAdmin.change_view"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.LockUserAdmin.change_view">[docs]</a>    <span class="k">def</span> <span class="nf">change_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">,</span> <span class="n">form_url</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">extra_context</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        LockUser may have access to Doors that the staff user cannot admin;</span>
+<span class="sd">        this must be accounted for when determining (Javascript) whether to</span>
+<span class="sd">        disable &quot;Assign keycard&quot; button or select &quot;Deactivate keycard&quot; because</span>
+<span class="sd">        all Doors have been unchecked.  In change_form template, will get a set</span>
+<span class="sd">        of these Door objects from context, then check the lockuser_set of each</span>
+<span class="sd">        to see if the current lockuser has access to it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">extra_context</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&quot;doors_not_permitted_to_this_staff_user&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_other_doors</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">LockUserAdmin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">change_view</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">,</span> <span class="n">form_url</span><span class="p">,</span> <span class="n">extra_context</span><span class="o">=</span><span class="n">extra_context</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserAdmin.has_delete_permission"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.LockUserAdmin.has_delete_permission">[docs]</a>    <span class="k">def</span> <span class="nf">has_delete_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Don&#39;t display &quot;delete&quot; button</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="LockUserAdmin.save_model"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.LockUserAdmin.save_model">[docs]</a>    <span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">change</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If deactivate current keycard was checked (which may have actually</span>
+<span class="sd">        happened in clean, if  no Doors were selected) need to deactivate</span>
+<span class="sd">        current keycard.  Doing this here rather than models.py because need to</span>
+<span class="sd">        attach request.user to the RFIDkeycard object being deactivated, to</span>
+<span class="sd">        record revoker.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># (Note that deactivate_current_keycard should have been set to true in</span>
+        <span class="c"># clean, if no doors.)</span>
+        <span class="c"># if obj.deactivate_current_keycard or not obj.doors.exists():</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">deactivate_current_keycard</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">current_keycard_revoker</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">&#39;s keycard was deactivated successfully.&quot;</span> <span class="o">%</span> <span class="n">obj</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">messages</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">current_keycard_revoker</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;special_message&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;will not deactivate&#39;</span><span class="p">:</span>
+                    <span class="c"># nicer way to print the doors, not &quot;set([&lt;Door: Space 1&gt;])&quot;</span>
+                    <span class="n">doors_not_permit</span> <span class="o">=</span> <span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="n">door</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">door</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">doors_not_ok_for_staff</span><span class="p">))</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">&#39;s keycard was not deactivated because you do &quot;</span>
+                           <span class="s">&quot;not have permission to manage </span><span class="si">%s</span><span class="s">.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span>
+                               <span class="n">obj</span><span class="p">,</span> <span class="n">doors_not_permit</span><span class="p">)</span>
+                    <span class="n">messages</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">messages</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LockUserAdmin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">change</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="AccessTimeAdmin"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.AccessTimeAdmin">[docs]</a><span class="k">class</span> <span class="nc">AccessTimeAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;access_time&#39;</span><span class="p">,</span> <span class="s">&#39;lockuser_html_heading&#39;</span><span class="p">,</span> <span class="s">&#39;door&#39;</span><span class="p">)</span>
+    <span class="n">actions</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c"># don&#39;t provide the actions dropdown</span>
+    <span class="c"># include date-based drilldown navigation</span>
+    <span class="n">date_hierarchy</span> <span class="o">=</span> <span class="s">&#39;access_time&#39;</span>
+    <span class="c"># show filters by RFID and active/inactive on the right</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;lockuser&#39;</span><span class="p">,</span> <span class="s">&#39;door&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AccessTimeAdmin.changelist_view"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.AccessTimeAdmin.changelist_view">[docs]</a>    <span class="k">def</span> <span class="nf">changelist_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">extra_context</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Don&#39;t show links to individual AccessTime change forms from any field.</span>
+<span class="sd">        (list_display_links = [] will not works - will default to linking from</span>
+<span class="sd">        items in AccessTime column.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AccessTimeAdmin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">changelist_view</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span> <span class="n">extra_context</span><span class="o">=</span><span class="n">extra_context</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AccessTimeAdmin.change_view"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.AccessTimeAdmin.change_view">[docs]</a>    <span class="k">def</span> <span class="nf">change_view</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">extra_context</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Don&#39;t allow access to individual AccessTime objects.</span>
+
+<span class="sd">        No need to show the link to  page for an individual AccessTime, so no</span>
+<span class="sd">        field should link to it, as was set in changelist_view. However, the</span>
+<span class="sd">        page can still be accessed, so redirect to change list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s">&#39;admin:rfid_lock_management_accesstime_changelist&#39;</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="AccessTimeAdmin.has_delete_permission"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.AccessTimeAdmin.has_delete_permission">[docs]</a>    <span class="k">def</span> <span class="nf">has_delete_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Don&#39;t display &quot;delete&quot; button</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="AccessTimeAdmin.has_add_permission"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.AccessTimeAdmin.has_add_permission">[docs]</a>    <span class="k">def</span> <span class="nf">has_add_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Don&#39;t display Save And Add button</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="AccessTimeAdmin.lockuser_html_heading"><a class="viewcode-back" href="../../main.html#rfid_lock_management.admin.AccessTimeAdmin.lockuser_html_heading">[docs]</a>    <span class="k">def</span> <span class="nf">lockuser_html_heading</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the HTML with link to lock user&#39;s change_form to display on the</span>
+<span class="sd">        Access Times change list page.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">&quot;&lt;a href=&#39;../lockuser/</span><span class="si">%d</span><span class="s">/&#39;&gt;</span><span class="si">%s</span><span class="s">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">lockuser</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">lockuser</span><span class="p">)</span></div>
+    <span class="n">lockuser_html_heading</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="s">&#39;User&#39;</span>
+    <span class="n">lockuser_html_heading</span><span class="o">.</span><span class="n">allow_tags</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="c"># Register models</span></div>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">LockUser</span><span class="p">,</span> <span class="n">LockUserAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">AccessTime</span><span class="p">,</span> <span class="n">AccessTimeAdmin</span><span class="p">)</span>
+
+<span class="c"># Globally disable deletion of selected objects (i.e this will not be an</span>
+<span class="c"># available action in the Actions dropdown of all ModelAdmins/change_list</span>
+<span class="c"># pages.</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">disable_action</span><span class="p">(</span><span class="s">&#39;delete_selected&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

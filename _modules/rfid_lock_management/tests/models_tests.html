@@ -1,0 +1,674 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rfid_lock_management.tests.models_tests &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for rfid_lock_management.tests.models_tests</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.test</span> <span class="kn">import</span> <span class="n">TestCase</span><span class="p">,</span> <span class="n">LiveServerTestCase</span>
+<span class="kn">from</span> <span class="nn">django.test.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="kn">from</span> <span class="nn">rfid_lock_management.models</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">Permission</span>
+<span class="kn">from</span> <span class="nn">django.contrib.contenttypes.models</span> <span class="kn">import</span> <span class="n">ContentType</span>
+<span class="c">#from django.utils.timezone import utc</span>
+<span class="kn">from</span> <span class="nn">test_helpers</span> <span class="kn">import</span> <span class="n">t_info</span>
+
+
+<div class="viewcode-block" id="DoorModelTests"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.DoorModelTests">[docs]</a><span class="k">class</span> <span class="nc">DoorModelTests</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DoorModelTests.setUp"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.DoorModelTests.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;TestCase DoorModelTests&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodDoc</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DoorModelTests.test_unicode"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.DoorModelTests.test_unicode">[docs]</a>    <span class="k">def</span> <span class="nf">test_unicode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test that custom __unicode__() method returns name of Door</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">door</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Test door&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">door</span><span class="p">),</span> <span class="s">&#39;Test door&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DoorModelTests.test_door_perm_creation"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.DoorModelTests.test_door_perm_creation">[docs]</a>    <span class="k">def</span> <span class="nf">test_door_perm_creation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        When a new Door is added, create a corresponding Permission (i.e.</span>
+<span class="sd">        checking Door&#39;s save() method)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">door_name</span> <span class="o">=</span> <span class="s">&quot;Test door&quot;</span>
+        <span class="n">door</span> <span class="o">=</span> <span class="n">Door</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">door_name</span><span class="p">)</span>
+        <span class="c"># explicitly save()&#39;ing rather than Door.objects.create()</span>
+        <span class="n">door</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c"># now check that both door and associated permission exist</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">door_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="c"># note: door_name, not door.name</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Permission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">codename</span><span class="o">=</span><span class="s">&#39;can_manage_door_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">door</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s">&#39;Can manage door to </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">door_name</span><span class="p">,</span>
+            <span class="n">content_type</span><span class="o">=</span><span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">app_label</span><span class="o">=</span><span class="s">&#39;rfid_lock_management&#39;</span><span class="p">,</span>
+                <span class="n">model</span><span class="o">=</span><span class="s">&#39;door&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="AccessTimeModelTests"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.AccessTimeModelTests">[docs]</a><span class="k">class</span> <span class="nc">AccessTimeModelTests</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="AccessTimeModelTests.setUp"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.AccessTimeModelTests.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;TestCase AccessTimeModelTests&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodDoc</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AccessTimeModelTests.test_unicode"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.AccessTimeModelTests.test_unicode">[docs]</a>    <span class="k">def</span> <span class="nf">test_unicode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test that custom __unicode__() returns the correctly formatted time</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2013</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="n">at</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">access_time</span><span class="o">=</span><span class="n">time</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">at</span><span class="p">),</span> <span class="s">&#39;May 16, 2013, 03:30 PM&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AccessTimeModelTests.test_get_this_lockuser_html"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.AccessTimeModelTests.test_get_this_lockuser_html">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_this_lockuser_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create AccessTime with specific lockuser; make sure</span>
+<span class="sd">        get_this_lockuser_html returns the correct html</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">at</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">at</span><span class="o">.</span><span class="n">get_this_lockuser_html</span><span class="p">(),</span>
+            <span class="s">&quot;&lt;a href=&#39;../lockuser/</span><span class="si">%d</span><span class="s">/&#39;&gt;</span><span class="si">%s</span><span class="s">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="n">lu</span><span class="p">))</span>
+
+</div></div>
+<div class="viewcode-block" id="RFIDkeycardModelTests"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.RFIDkeycardModelTests">[docs]</a><span class="k">class</span> <span class="nc">RFIDkeycardModelTests</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RFIDkeycardModelTests.setUp"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;TestCase RFIDkeycardModelTests&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodDoc</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RFIDkeycardModelTests.test_unicode"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.test_unicode">[docs]</a>    <span class="k">def</span> <span class="nf">test_unicode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test that custom __unicode__() method returns the rfid string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">staff_only_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="s">&#39;js@jmail.com&#39;</span><span class="p">,</span> <span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+        <span class="n">rk</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde12345&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">rk</span><span class="p">),</span> <span class="s">&#39;abcde12345&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RFIDkeycardModelTests.test_get_allowed_doors"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.test_get_allowed_doors">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_allowed_doors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Does get_allowed_doors() return the door(s), if any, that the</span>
+<span class="sd">        associated lockuser is allowed to access</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># create the LockUser and Doors</span>
+        <span class="n">door1</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Allowed door&#39;</span><span class="p">)</span>
+        <span class="n">door2</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Prohibited door&#39;</span><span class="p">)</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">staff_only_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="s">&#39;js@jmail.com&#39;</span><span class="p">,</span> <span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+        <span class="n">rk</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde12345&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+
+        <span class="c"># only one door allowed</span>
+        <span class="n">lu</span><span class="o">.</span><span class="n">doors</span> <span class="o">=</span> <span class="p">[</span><span class="n">door1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rk</span><span class="o">.</span><span class="n">get_allowed_doors</span><span class="p">()),</span> <span class="p">[</span><span class="n">door1</span><span class="p">])</span>
+        <span class="c"># todo:  here and elsewhere, consider using assertQuerysetEqual() --</span>
+        <span class="c"># see http://stackoverflow.com/a/14189017</span>
+
+        <span class="c"># no doors allowed</span>
+        <span class="n">lu</span><span class="o">.</span><span class="n">doors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rk</span><span class="o">.</span><span class="n">get_allowed_doors</span><span class="p">()),</span> <span class="p">[])</span>
+</div>
+<div class="viewcode-block" id="RFIDkeycardModelTests.test_deactivate"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.test_deactivate">[docs]</a>    <span class="k">def</span> <span class="nf">test_deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        On deactivation, is RFIDkeycard object&#39;s date revoked and revoker set</span>
+<span class="sd">        correctly?</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># create keycard and associated lockuser</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">staff_only_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="s">&#39;js@jmail.com&#39;</span><span class="p">,</span> <span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+        <span class="n">rk</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde12345&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+
+        <span class="c"># need logged in user so we can assign the revoker</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+
+        <span class="c"># Check that the time revoked is correct -- i.e. that it&#39;s now. But we</span>
+        <span class="c"># need to account for lag in time between setting the now variable and</span>
+        <span class="c"># executing deactivate (including the print statement). This can be</span>
+        <span class="c"># done with assertAlmostEqual(first, second, delta=None). This is my</span>
+        <span class="c"># approach to calculate the delta:</span>
+        <span class="c">#   - get the time at t1</span>
+        <span class="c">#   - RFIDkeycard.deactivate() at time t2=t1+x</span>
+        <span class="c">#   - assert for RFIDkeycard.date_revoked at time t3=t1+x+y</span>
+        <span class="c">#   - So deactivation happened AT MOST x+y microseconds ago,</span>
+        <span class="c">#     at time of assertion</span>
+        <span class="c">#   - So, setting delta to the time difference between t1 and t3,</span>
+        <span class="c">#     or x + y</span>
+        <span class="c">#   - i.e. now() minus t1</span>
+        <span class="n">t1</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Deactivating keycard......&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">rk</span><span class="o">.</span><span class="n">deactivate</span><span class="p">(</span><span class="n">staff_only_user</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Is the date revoked correct&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">rk</span><span class="o">.</span><span class="n">date_revoked</span><span class="p">,</span> 
+            <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+            <span class="n">delta</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">t1</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Is the revoker our user&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rk</span><span class="o">.</span><span class="n">revoker</span><span class="p">,</span> <span class="n">staff_only_user</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RFIDkeycardModelTests.test_is_active"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.test_is_active">[docs]</a>    <span class="k">def</span> <span class="nf">test_is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="c"># create keycard and associated lockuser</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">staff_only_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="s">&#39;js@jmail.com&#39;</span><span class="p">,</span> <span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+        <span class="n">rk</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde12345&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+
+        <span class="c"># should be active after just created</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">rk</span><span class="o">.</span><span class="n">is_active</span><span class="p">())</span>
+
+        <span class="c"># set fake date revoked</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">rk</span><span class="o">.</span><span class="n">date_revoked</span> <span class="o">=</span> <span class="n">now</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">rk</span><span class="o">.</span><span class="n">is_active</span><span class="p">())</span>
+
+</div></div>
+<div class="viewcode-block" id="LockUserModelTests"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests">[docs]</a><span class="k">class</span> <span class="nc">LockUserModelTests</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LockUserModelTests.setUp"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;TestCase LockUserModelTests&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodDoc</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_creating_new_obj_and_saving_it_to_db"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_creating_new_obj_and_saving_it_to_db">[docs]</a>    <span class="k">def</span> <span class="nf">test_creating_new_obj_and_saving_it_to_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create new LockUser, set attributes, save to database</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Can we create new LockUser; set attributes; save it?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">lockuser</span> <span class="o">=</span> <span class="n">LockUser</span><span class="p">()</span>
+        <span class="n">lockuser</span><span class="o">.</span><span class="n">first_name</span> <span class="o">=</span> <span class="s">&quot;Homer&quot;</span>
+        <span class="n">lockuser</span><span class="o">.</span><span class="n">last_name</span> <span class="o">=</span> <span class="s">&quot;Simpson&quot;</span>
+        <span class="n">lockuser</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="s">&quot;chunkylover53@aol.com&quot;</span>
+        <span class="n">lockuser</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="s">&quot;742 Evergreen Terrace, Springfield, USA&quot;</span>
+        <span class="n">lockuser</span><span class="o">.</span><span class="n">phone_number</span> <span class="o">=</span> <span class="s">&quot;(939) 555-5555&quot;</span>
+        <span class="n">lockuser</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>  <span class="c"># i.e., INSERT</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Can we find it in the database again?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">all_lockusers_in_db</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_lockusers_in_db</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">the_only_lockuser_in_db</span> <span class="o">=</span> <span class="n">all_lockusers_in_db</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_only_lockuser_in_db</span><span class="p">,</span> <span class="n">lockuser</span><span class="p">)</span>
+
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Were the attributes saved?&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_only_lockuser_in_db</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="s">&quot;Homer&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_only_lockuser_in_db</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span> <span class="s">&quot;Simpson&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_only_lockuser_in_db</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> 
+            <span class="s">&quot;chunkylover53@aol.com&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_only_lockuser_in_db</span><span class="o">.</span><span class="n">address</span><span class="p">,</span>
+             <span class="s">&quot;742 Evergreen Terrace, Springfield, USA&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_only_lockuser_in_db</span><span class="o">.</span><span class="n">phone_number</span><span class="p">,</span> <span class="s">&quot;(939) 555-5555&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_unicode"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_unicode">[docs]</a>    <span class="k">def</span> <span class="nf">test_unicode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test that custom __unicode__() -- i.e. just obj_name -- returns first</span>
+<span class="sd">        and last name of lockuser</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">lu</span><span class="p">),</span> <span class="s">&#39;Jane Doe&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_is_active"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_is_active">[docs]</a>    <span class="k">def</span> <span class="nf">test_is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if is_active() reflects whether the user is assigned a keycard</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">is_active</span><span class="p">())</span>
+
+        <span class="c"># now assigning a keycard</span>
+        <span class="n">staff_only_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="s">&#39;js@jmail.com&#39;</span><span class="p">,</span> <span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+        <span class="n">rk</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde12345&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">is_active</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_get_allowed_doors"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_allowed_doors">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_allowed_doors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Does get_allowed_doors() return the door(s), if any, that the lockuser</span>
+<span class="sd">        is allowed to access</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># create the LockUser and Doors and associated/&#39;supporting&#39; objects</span>
+        <span class="n">door1</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Allowed door&#39;</span><span class="p">)</span>
+        <span class="n">door2</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Prohibited door&#39;</span><span class="p">)</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">staff_only_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="s">&#39;js@jmail.com&#39;</span><span class="p">,</span> <span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+        <span class="n">rk</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde12345&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+
+        <span class="c"># only one door allowed</span>
+        <span class="n">lu</span><span class="o">.</span><span class="n">doors</span> <span class="o">=</span> <span class="p">[</span><span class="n">door1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">get_allowed_doors</span><span class="p">()),</span> <span class="p">[</span><span class="n">door1</span><span class="p">])</span>
+
+        <span class="c"># no doors allowed</span>
+        <span class="n">lu</span><span class="o">.</span><span class="n">doors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">get_allowed_doors</span><span class="p">()),</span> <span class="p">[])</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_get_all_rfids"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_all_rfids">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_all_rfids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Does get_all_rfids() returns all RFIDkeycards objects associated with</span>
+<span class="sd">        Lockuser</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lu1</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">lu2</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe2@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">staff_only_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="s">&#39;js@jmail.com&#39;</span><span class="p">,</span> <span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+        <span class="c"># Of these four RFIDkeycards, three are assigned to the LockUser will</span>
+        <span class="c"># be testing this with, meaning that three should be in the returned</span>
+        <span class="c"># list</span>
+        <span class="n">rk1</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde11111&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu1</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+        <span class="n">rk2</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde22222&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu2</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+        <span class="n">rk3</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde33333&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu2</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">,</span>
+            <span class="n">date_revoked</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+        <span class="n">rk4</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde44444&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu2</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">,</span>
+            <span class="n">date_revoked</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+
+        <span class="c"># Note - below does not evaluate these as equivalent, must list()</span>
+        <span class="c"># self.assertEqual(lu2.get_all_rfids(),</span>
+        <span class="c"># RFIDkeycard.objects.filter(pk__in=[rk2.pk,rk3.pk,rk4.pk]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">lu2</span><span class="o">.</span><span class="n">get_all_rfids</span><span class="p">()),</span> <span class="p">[</span><span class="n">rk2</span><span class="p">,</span> <span class="n">rk3</span><span class="p">,</span> <span class="n">rk4</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_get_all_rfids_html"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_all_rfids_html">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_all_rfids_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that method returns the correctly formatted html string of all</span>
+<span class="sd">        rfids, NOT including the current one</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lu1</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">lu2</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe2@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">staff_only_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="s">&#39;js@jmail.com&#39;</span><span class="p">,</span> <span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+        <span class="c"># Of these four RFIDkeycards, three are assigned to the LockUser will</span>
+        <span class="c"># be testing this with, and one of those is the LockUser&#39;s current</span>
+        <span class="c"># keycard, meaning that there should only be two in the returned list</span>
+        <span class="n">rk1</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde11111&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu1</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+        <span class="n">rk2</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde22222&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu2</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+        <span class="n">rk3</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde33333&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu2</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">,</span>
+            <span class="n">date_revoked</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+        <span class="n">rk4</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde44444&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu2</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">,</span>
+            <span class="n">date_revoked</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+
+        <span class="c"># Issue #x</span>
+        <span class="n">first_rfid</span> <span class="o">=</span> <span class="s">&quot;RFID: </span><span class="si">%s</span><span class="s"> (activated on </span><span class="si">%s</span><span class="s"> by </span><span class="si">%s</span><span class="s">; revoked on </span><span class="si">%s</span><span class="s"> by </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">rk3</span><span class="o">.</span><span class="n">the_rfid</span><span class="p">,</span> <span class="n">rk3</span><span class="o">.</span><span class="n">date_created</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">),</span>
+            <span class="n">rk3</span><span class="o">.</span><span class="n">assigner</span><span class="p">,</span> <span class="n">rk3</span><span class="o">.</span><span class="n">date_revoked</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">),</span>
+            <span class="n">rk3</span><span class="o">.</span><span class="n">revoker</span>
+        <span class="p">)</span>
+        <span class="n">second_rfid</span> <span class="o">=</span> <span class="s">&quot;RFID: </span><span class="si">%s</span><span class="s"> (activated on </span><span class="si">%s</span><span class="s"> by </span><span class="si">%s</span><span class="s">; revoked on </span><span class="si">%s</span><span class="s"> by </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">rk4</span><span class="o">.</span><span class="n">the_rfid</span><span class="p">,</span> <span class="n">rk4</span><span class="o">.</span><span class="n">date_created</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">),</span>
+            <span class="n">rk4</span><span class="o">.</span><span class="n">assigner</span><span class="p">,</span> <span class="n">rk4</span><span class="o">.</span><span class="n">date_revoked</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">),</span>
+            <span class="n">rk4</span><span class="o">.</span><span class="n">revoker</span>
+        <span class="p">)</span>
+        <span class="n">correct_output_string</span> <span class="o">=</span> <span class="n">first_rfid</span> <span class="o">+</span> <span class="s">&quot;,&lt;br&gt;&quot;</span> <span class="o">+</span> <span class="n">second_rfid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu2</span><span class="o">.</span><span class="n">get_all_rfids_html</span><span class="p">(),</span> <span class="n">correct_output_string</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_get_current_rfid"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_current_rfid">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_current_rfid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="c"># Of these four RFIDkeycards, three are assigned to the LockUser will</span>
+        <span class="c"># be testing this with, and one of those is the LockUser&#39;s current</span>
+        <span class="c"># keycard</span>
+        <span class="n">lu1</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">lu2</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe2@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">staff_only_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="s">&#39;js@jmail.com&#39;</span><span class="p">,</span> <span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+        <span class="n">rk1</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde11111&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu1</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+        <span class="n">rk2</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde22222&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu2</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+        <span class="n">rk3</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde33333&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu2</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">,</span>
+            <span class="n">date_revoked</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+        <span class="n">rk4</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde44444&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu2</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">,</span>
+            <span class="n">date_revoked</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu2</span><span class="o">.</span><span class="n">get_current_rfid</span><span class="p">(),</span> <span class="n">rk2</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_prettify_get_current_rfid"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_prettify_get_current_rfid">[docs]</a>    <span class="k">def</span> <span class="nf">test_prettify_get_current_rfid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe2@gmail.com&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">prettify_get_current_rfid</span><span class="p">(),</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="n">staff_only_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="s">&#39;js@jmail.com&#39;</span><span class="p">,</span> <span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+        <span class="n">curr_rfid</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde22222&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+        <span class="n">correct_return_string</span> <span class="o">=</span> <span class="s">&quot;RFID: </span><span class="si">%s</span><span class="s"> (activated on </span><span class="si">%s</span><span class="s"> by </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">curr_rfid</span><span class="o">.</span><span class="n">the_rfid</span><span class="p">,</span>
+            <span class="n">curr_rfid</span><span class="o">.</span><span class="n">date_created</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">),</span>
+            <span class="n">curr_rfid</span><span class="o">.</span><span class="n">assigner</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">prettify_get_current_rfid</span><span class="p">(),</span> <span class="n">correct_return_string</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_prettify_get_allowed_doors_html_links"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_prettify_get_allowed_doors_html_links">[docs]</a>    <span class="k">def</span> <span class="nf">test_prettify_get_allowed_doors_html_links</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">door1</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Space 1&#39;</span><span class="p">)</span>
+        <span class="n">door2</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Space 2&#39;</span><span class="p">)</span>
+        <span class="n">door3</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Space 3&#39;</span><span class="p">)</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">lu</span><span class="o">.</span><span class="n">doors</span> <span class="o">=</span> <span class="p">[</span><span class="n">door1</span><span class="p">,</span> <span class="n">door2</span><span class="p">]</span>
+        <span class="n">lu</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">correct_return_string</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;&lt;a href=&#39;../door/</span><span class="si">%d</span><span class="s">/&#39;&gt;</span><span class="si">%s</span><span class="s">&lt;/a&gt;, &quot;</span>
+             <span class="s">&quot;&lt;a href=&#39;../door/</span><span class="si">%d</span><span class="s">/&#39;&gt;</span><span class="si">%s</span><span class="s">&lt;/a&gt;&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span>
+             <span class="n">door1</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="n">door1</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">door2</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="n">door2</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">get_allowed_doors_html_links</span><span class="p">(),</span>
+            <span class="n">correct_return_string</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_prettify_get_allowed_doors"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_prettify_get_allowed_doors">[docs]</a>    <span class="k">def</span> <span class="nf">test_prettify_get_allowed_doors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="n">door1</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Space 1&#39;</span><span class="p">)</span>
+        <span class="n">door2</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Space 2&#39;</span><span class="p">)</span>
+        <span class="n">door3</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;Space 3&#39;</span><span class="p">)</span>  <span class="c"># not assigned</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">lu</span><span class="o">.</span><span class="n">doors</span> <span class="o">=</span> <span class="p">[</span><span class="n">door1</span><span class="p">,</span> <span class="n">door2</span><span class="p">]</span>
+        <span class="n">lu</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">correct_return_string</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">door1</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">door2</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">prettify_get_allowed_doors</span><span class="p">(),</span>
+            <span class="n">correct_return_string</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_get_all_access_times"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_all_access_times">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_all_access_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Are the access times (access_time field for AccessTime object) for this</span>
+<span class="sd">        LockUser the same as those returned by get_all_access_times (or None)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># create our lockusers</span>
+        <span class="n">lu1</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">lu2</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe2@gmail.com&#39;</span><span class="p">)</span>
+
+        <span class="c"># create several access times, including for different lockusers</span>
+        <span class="n">at1</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu1</span><span class="p">)</span>
+        <span class="n">at2</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu1</span><span class="p">)</span>
+        <span class="n">at3</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu1</span><span class="p">)</span>
+        <span class="n">at4</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu2</span><span class="p">)</span>
+
+        <span class="c"># test the result for one lockuser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu1</span><span class="o">.</span><span class="n">get_all_access_times</span><span class="p">(),</span> <span class="p">[</span>
+                         <span class="n">at1</span><span class="o">.</span><span class="n">access_time</span><span class="p">,</span> <span class="n">at2</span><span class="o">.</span><span class="n">access_time</span><span class="p">,</span> <span class="n">at3</span><span class="o">.</span><span class="n">access_time</span><span class="p">])</span>
+
+        <span class="c"># Testing the case when there are no access times: delete the access</span>
+        <span class="c"># times just created for this lock user</span>
+        <span class="n">at1</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">at2</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">at3</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+        <span class="c"># and test again</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu1</span><span class="o">.</span><span class="n">get_all_access_times</span><span class="p">(),</span> <span class="p">[])</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_get_last_access_time"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_last_access_time">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_last_access_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Is the last access time for this LockUser the same as that returned by</span>
+<span class="sd">        get_last_access_time (or None) &quot;&quot;&quot;</span>
+        <span class="c"># create our lockusers</span>
+        <span class="n">lu1</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">lu2</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe2@gmail.com&#39;</span><span class="p">)</span>
+
+        <span class="c"># create several access times, including for different lockusers</span>
+        <span class="n">at1</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu1</span><span class="p">)</span>
+        <span class="n">at2</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu1</span><span class="p">)</span>
+        <span class="n">at3</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu1</span><span class="p">)</span>
+        <span class="n">at4</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu2</span><span class="p">)</span>
+
+        <span class="c"># test the result for one lockuser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu1</span><span class="o">.</span><span class="n">get_last_access_time</span><span class="p">(),</span> <span class="n">at3</span><span class="o">.</span><span class="n">access_time</span><span class="p">)</span>
+
+        <span class="c"># Testing the case when there are no access times: delete the access</span>
+        <span class="c"># times just created for this lock user</span>
+        <span class="n">at1</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">at2</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">at3</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+        <span class="c"># and test again</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu1</span><span class="o">.</span><span class="n">get_last_access_time</span><span class="p">(),</span> <span class="bp">None</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_prettify_get_last_access_time"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_prettify_get_last_access_time">[docs]</a>    <span class="k">def</span> <span class="nf">test_prettify_get_last_access_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check that this method formats the last access time correctly &quot;&quot;&quot;</span>
+        <span class="c"># create our lockusers</span>
+        <span class="n">lu1</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">lu2</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe2@gmail.com&#39;</span><span class="p">)</span>
+
+        <span class="c"># create several access times, including for different lockusers</span>
+        <span class="n">at1</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu1</span><span class="p">)</span>
+        <span class="n">at2</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu1</span><span class="p">)</span>
+        <span class="n">at3</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu1</span><span class="p">)</span>
+        <span class="n">at4</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu2</span><span class="p">)</span>
+
+        <span class="c"># test the result for one lockuser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu1</span><span class="o">.</span><span class="n">prettify_get_last_access_time</span><span class="p">(),</span>
+             <span class="n">at3</span><span class="o">.</span><span class="n">access_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">))</span>
+
+        <span class="c"># Testing the case when there are no access times: delete the access</span>
+        <span class="c"># times just created for this lock user</span>
+        <span class="n">at1</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">at2</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">at3</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+        <span class="c"># and test again</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu1</span><span class="o">.</span><span class="n">prettify_get_last_access_time</span><span class="p">(),</span> <span class="bp">None</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_custom_save_deactivate_keycard"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_custom_save_deactivate_keycard">[docs]</a>    <span class="k">def</span> <span class="nf">test_custom_save_deactivate_keycard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that custom save deactivates current keycard</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#  create the objects and &#39;supporting&#39; objects we need</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">staff_only_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="s">&#39;js@jmail.com&#39;</span><span class="p">,</span> <span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+        <span class="n">rk</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde12345&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+        <span class="n">lu</span><span class="o">.</span><span class="n">deactivate_current_keycard</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">lu</span><span class="o">.</span><span class="n">current_keycard_revoker</span> <span class="o">=</span> <span class="n">staff_only_user</span>
+        <span class="n">lu</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c"># Explicitly save() and check that deactivate_current_keycard is now</span>
+        <span class="c"># False; that current_keycard_revoker = None; and that the keycard is</span>
+        <span class="c"># no longer active</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">deactivate_current_keycard</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">current_keycard_revoker</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="c"># refetch to get changes</span>
+        <span class="n">rk</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">the_rfid</span><span class="o">=</span><span class="s">&#39;abcde12345&#39;</span><span class="p">,</span> <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">,</span> <span class="n">assigner</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">rk</span><span class="o">.</span><span class="n">is_active</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_custom_save_assign_keycard"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_custom_save_assign_keycard">[docs]</a>    <span class="k">def</span> <span class="nf">test_custom_save_assign_keycard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that custom save assigns (creates and saves) new RFIDkeycard for</span>
+<span class="sd">        this LockUser</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># need LockUser, NewKeycardScan with ready_to_assign=True (and its</span>
+        <span class="c"># assigner User)</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;Creating staff user doing this......&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">staff_only_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="s">&#39;johnny_staff&#39;</span><span class="p">,</span> <span class="s">&#39;js@jmail.com&#39;</span><span class="p">,</span> <span class="s">&#39;my_password&#39;</span><span class="p">)</span>
+        <span class="n">new_nks_obj</span> <span class="o">=</span> <span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">rfid</span><span class="o">=</span><span class="s">&#39;abcdefghij&#39;</span><span class="p">,</span> <span class="n">assigner_user</span><span class="o">=</span><span class="n">staff_only_user</span><span class="p">,</span>
+            <span class="n">ready_to_assign</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">num_rk_before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+        <span class="n">lu</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c"># refetch the NewKeycardScan object</span>
+        <span class="n">new_nks_obj</span> <span class="o">=</span> <span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">new_nks_obj</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+
+        <span class="c"># check that the NewKeycardScan object&#39;s ready_to_assign is now False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">new_nks_obj</span><span class="o">.</span><span class="n">ready_to_assign</span><span class="p">)</span>
+
+        <span class="c"># check that a new RFIDkeycard has been created:  make sure there is</span>
+        <span class="c"># one more RFIDkeycard object now</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">num_rk_before</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()))</span>
+
+        <span class="c"># check that the new keycard has the right attributes</span>
+        <span class="n">new_rk</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">latest</span><span class="p">(</span><span class="s">&quot;date_created&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new_rk</span><span class="o">.</span><span class="n">lockuser</span><span class="p">,</span> <span class="n">lu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new_rk</span><span class="o">.</span><span class="n">the_rfid</span><span class="p">,</span> <span class="n">new_nks_obj</span><span class="o">.</span><span class="n">rfid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new_rk</span><span class="o">.</span><span class="n">assigner</span><span class="p">,</span> <span class="n">new_nks_obj</span><span class="o">.</span><span class="n">assigner_user</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserModelTests.test_last_access_time_and_link_to_more"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.models_tests.LockUserModelTests.test_last_access_time_and_link_to_more">[docs]</a>    <span class="k">def</span> <span class="nf">test_last_access_time_and_link_to_more</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that method returns the correctly formatted html string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># create our lockuser</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Doe&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s">&#39;jdoe@gmail.com&#39;</span><span class="p">)</span>
+
+        <span class="c"># no access times for this lock user</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">last_access_time_and_link_to_more</span><span class="p">(),</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="c"># create several access times</span>
+        <span class="n">at1</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">)</span>
+        <span class="n">at2</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">)</span>
+        <span class="n">at3</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+            <span class="n">lockuser</span><span class="o">=</span><span class="n">lu</span><span class="p">)</span>
+
+        <span class="n">link</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;&lt;a href=&#39;../../accesstime/?lockuser__id__exact=</span><span class="si">%d</span><span class="s">&#39;&gt;&quot;</span>
+            <span class="s">&quot;View all access times&lt;/a&gt;&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">lu</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">correct_output_string</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">at3</span><span class="o">.</span><span class="n">access_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%B </span><span class="si">%d</span><span class="s">, %Y, %I:%M %p&quot;</span><span class="p">),</span> <span class="n">link</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">last_access_time_and_link_to_more</span><span class="p">(),</span>
+            <span class="n">correct_output_string</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

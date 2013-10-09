@@ -1,0 +1,222 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Form handling &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="index.html" />
+    <link rel="prev" title="Unit tests" href="demo-tests.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="demo-tests.html" title="Unit tests"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="form-handling">
+<h1>Form handling<a class="headerlink" href="#form-handling" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="customer-contact-form-handling">
+<h2>Customer contact form handling<a class="headerlink" href="#customer-contact-form-handling" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/end_user_form_screenshot.png" src="_images/end_user_form_screenshot.png" style="width: 300px;" />
+<div class="section" id="validation">
+<h3>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h3>
+<p>All fields are required.</p>
+<ul class="simple">
+<li><strong>phone number field</strong>: Phone number validation is tricky, as there are so many different ways to write phone numbers &#8211;  (123) 456-7890 or 1-123-456-7890 or 456-7890 or 1234567890 or 123-456-BLAH or ..... Perhaps the minimum validation should check that at least seven characters (i.e. a local phone number without any punctuation) have been entered.</li>
+<li><strong>emails field</strong>: At least one email is required. Since the &#8220;Email(s)&#8221; field is a single text field, this requirement is handled by using <tt class="xref py py-func docutils literal"><span class="pre">app.helpers.parse_emails()</span></tt> to verify whether at least one valid email address has been entered; if it has not, the user will see an error stating so (versus the default &#8220;This field is required&#8221; error, which only appears if the text field is left blank).</li>
+</ul>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><tt class="xref py py-func docutils literal"><span class="pre">app.helpers.parse_emails()</span></tt></p>
+</div>
+</div>
+</div>
+<div class="section" id="admin-form-for-viewing-editing-deleting-individual-customer-records-handling">
+<h2>Admin form (for viewing/editing/deleting individual customer records) handling<a class="headerlink" href="#admin-form-for-viewing-editing-deleting-individual-customer-records-handling" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/admin_change_form_screenshot.png" src="_images/admin_change_form_screenshot.png" style="width: 500px;" />
+<div class="section" id="id1">
+<h3>Validation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><strong>emails field</strong>: Unlike the single text field that customers see when filling out the contact form, administrator users see emails as separate fields, and they are able to delete or add extra fields. <tt class="xref py py-func docutils literal"><span class="pre">app.admin.EmailFormSet.clean()</span></tt> maintains the at-least-one-email requirement (requiring fields in inline forms is a little tricky when extra instances of the form are required).</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="multiple-emails">
+<h1>Multiple emails<a class="headerlink" href="#multiple-emails" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="why-create-a-new-model-that-holds-only-an-emailfield-and-a-fk">
+<h2>Why create a new model that holds only an <cite>EmailField</cite> and a FK?<a class="headerlink" href="#why-create-a-new-model-that-holds-only-an-emailfield-and-a-fk" title="Permalink to this headline">¶</a></h2>
+<p>The contact form allows multiple emails. Since an Customer instance holds all
+information associated with one person, it seems natural to create an Customer
+attribute for holding emails.  We can handle this by using a TextField to hold
+an Customer&#8217;s email address(es) — or we can create a model to hold a single
+email address in an EmailField, and associate the Customer with any number of
+these model instances. I went with the latter, for a number of reasons. For
+one, this allows an Customer instance to be associated with an unlimited
+(barring memory limitations and so forth) number of email addresses without
+jumping through a bunch of hoops, and makes changing/deleting/adding emails
+easier as well.</p>
+<p>For administrative users, it&#8217;s easier to view, delete, and add email addresses
+with multiple fields, or at least it seems so from a user interface perspective.
+It also avoids all the headaches with parsing out valid emails and storing them
+separately. Additionally, using an <cite>EmailField</cite> lets us use Django&#8217;s email validation for this type of field.</p>
+<p>See the answer to &#8220;Why do customers see a single text field for emails, but
+administrative users see separate fields?&#8221; for additional justification.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<blockquote>
+<div><img alt="_images/admin_change_list_whole_screenshot_circled_email_col.png" src="_images/admin_change_list_whole_screenshot_circled_email_col.png" style="width: 500px;" />
+</div></blockquote>
+<p class="last">In the admin change list, the emails column is actually the result of <tt class="xref py py-func docutils literal"><span class="pre">app.models.Customer.emails()</span></tt> &#8211; this nicely fits into one column and is cleaner than adding additional columns to hold every email associated with a single person.</p>
+</div>
+</div>
+<div class="section" id="why-do-customers-see-a-single-text-field-for-emails-but-administrative-users-see-separate-fields">
+<h2>Why do customers see a single text field for emails, but administrative users see separate fields?<a class="headerlink" href="#why-do-customers-see-a-single-text-field-for-emails-but-administrative-users-see-separate-fields" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/admin_change_form_screenshot_circled_inline.png" src="_images/admin_change_form_screenshot_circled_inline.png" style="height: 300px;" />
+<img alt="_images/end_user_form_screenshot_circled_email.png" src="_images/end_user_form_screenshot_circled_email.png" style="height: 300px;" />
+<p>From a user interface perspective, it seems cleaner to present email addresses
+as separate fields to the administrative user. Viewing, deleting, and creating
+email addresses seems more natural as well. But presenting the customer with
+separate form fields and an &#8220;add more&#8221; button seems problematic in a number of
+ways, from a user interface perspective:  it&#8217;s clumsier, adding more stuff on
+the screen, and seems sort of confusing and unfamiliar in terms of the
+interaction required.</p>
+<p>See answer to &#8220;Why create a new model that holds only an
+<cite>EmailField</cite> and a FK?&#8221; above for additional reasoning.</p>
+<div class="section" id="schema">
+<h3>Schema<a class="headerlink" href="#schema" title="Permalink to this headline">¶</a></h3>
+<p>The decision to use a separate model for emails informs the schema. This is
+what Django generates based on the <cite>Customer</cite> and <cite>CustomerEmail</cite> models:</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="ss">&quot;app_customer&quot;</span> <span class="p">(</span>
+    <span class="ss">&quot;id&quot;</span> <span class="nb">integer</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="ss">&quot;first_name&quot;</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="ss">&quot;last_name&quot;</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="ss">&quot;street_address&quot;</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="ss">&quot;state&quot;</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="ss">&quot;city&quot;</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="ss">&quot;phone&quot;</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="ss">&quot;all_emails&quot;</span> <span class="nb">text</span> <span class="k">NOT</span> <span class="k">NULL</span>
+<span class="p">)</span>
+
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="ss">&quot;app_customeremail&quot;</span> <span class="p">(</span>
+    <span class="ss">&quot;id&quot;</span> <span class="nb">integer</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="ss">&quot;customer_id&quot;</span> <span class="nb">integer</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">REFERENCES</span> <span class="ss">&quot;app_customer&quot;</span> <span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">),</span>
+    <span class="ss">&quot;email&quot;</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Form handling</a><ul>
+<li><a class="reference internal" href="#customer-contact-form-handling">Customer contact form handling</a><ul>
+<li><a class="reference internal" href="#validation">Validation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#admin-form-for-viewing-editing-deleting-individual-customer-records-handling">Admin form (for viewing/editing/deleting individual customer records) handling</a><ul>
+<li><a class="reference internal" href="#id1">Validation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#multiple-emails">Multiple emails</a><ul>
+<li><a class="reference internal" href="#why-create-a-new-model-that-holds-only-an-emailfield-and-a-fk">Why create a new model that holds only an <cite>EmailField</cite> and a FK?</a></li>
+<li><a class="reference internal" href="#why-do-customers-see-a-single-text-field-for-emails-but-administrative-users-see-separate-fields">Why do customers see a single text field for emails, but administrative users see separate fields?</a><ul>
+<li><a class="reference internal" href="#schema">Schema</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="demo-tests.html"
+                        title="previous chapter">Unit tests</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/internal_and_design.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="demo-tests.html" title="Unit tests"
+             >previous</a> |</li>
+        <li><a href="index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

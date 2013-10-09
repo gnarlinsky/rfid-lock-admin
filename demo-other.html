@@ -1,0 +1,134 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Other &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="index.html" />
+    <link rel="next" title="Unit tests" href="demo-tests.html" />
+    <link rel="prev" title="app Package" href="demo.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="demo-tests.html" title="Unit tests"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="demo.html" title="app Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="other">
+<h1>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="ttools">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">ttools</span></tt><a class="headerlink" href="#ttools" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="helpers">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">helpers</span></tt><a class="headerlink" href="#helpers" title="Permalink to this headline">¶</a></h2>
+<p>In <tt class="xref py py-mod docutils literal"><span class="pre">app.forms</span></tt>, <tt class="xref py py-func docutils literal"><span class="pre">app.helpers.parse_emails()</span></tt> is used to extract valid emails from a string containing multiple emails and/or separator characters and/or gibberish, using a regular expression. The cleaned string is then stored in the form&#8217;s <cite>cleaned_data</cite> dictionary.</p>
+<p>In <tt class="xref py py-mod docutils literal"><span class="pre">app.views</span></tt>, <tt class="xref py py-func docutils literal"><span class="pre">app.helpers.parse_emails()</span></tt> is used to extract the valid emails from a string containing multiple emails and separator characters. A new CustomerEmail instance is then created for each email address; each CustomerEmail instance is associated with the current Customer instance (submitter of the form) with a ForeignKey relationship.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Other</a><ul>
+<li><a class="reference internal" href="#ttools"><tt class="docutils literal"><span class="pre">ttools</span></tt></a></li>
+<li><a class="reference internal" href="#helpers"><tt class="docutils literal"><span class="pre">helpers</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="demo.html"
+                        title="previous chapter">app Package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="demo-tests.html"
+                        title="next chapter">Unit tests</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/demo-other.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="demo-tests.html" title="Unit tests"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="demo.html" title="app Package"
+             >previous</a> |</li>
+        <li><a href="index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

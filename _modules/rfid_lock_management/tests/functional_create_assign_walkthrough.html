@@ -1,0 +1,410 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rfid_lock_management.tests.functional_create_assign_walkthrough &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for rfid_lock_management.tests.functional_create_assign_walkthrough</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.common.keys</span> <span class="kn">import</span> <span class="n">Keys</span>
+
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.test</span> <span class="kn">import</span> <span class="n">TestCase</span><span class="p">,</span> <span class="n">LiveServerTestCase</span>
+<span class="kn">from</span> <span class="nn">django.test.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">Permission</span>
+<span class="kn">from</span> <span class="nn">django.contrib.contenttypes.models</span> <span class="kn">import</span> <span class="n">ContentType</span>
+<span class="kn">from</span> <span class="nn">django.contrib.admin.sites</span> <span class="kn">import</span> <span class="n">AdminSite</span>
+
+<span class="kn">from</span> <span class="nn">test_helpers</span> <span class="kn">import</span> <span class="n">t_info</span>
+
+
+<span class="c"># Take screenshot at certain points -- useful for documentation walking through</span>
+<span class="c"># the process of creating a new lock user and assigning a keycard.  (Note -</span>
+<span class="c"># uses screencapture, which is OS X only [the results are higher quality than</span>
+<span class="c"># using selenium&#39;s save_screenshot])</span>
+<span class="n">SCREENSHOTS</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="c"># note:  -C option captures the cursor on the screen</span>
+
+<span class="c"># Indicate how many seconds to pause at key points to slow down walkthrough.</span>
+<span class="c"># Set to 0 to turn off</span>
+<span class="c"># ~.5 for screenshots</span>
+<span class="n">SLOWER</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span>
+
+
+<div class="viewcode-block" id="CreateLockUserAssignKeycardWalkthrough"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough">[docs]</a><span class="k">class</span> <span class="nc">CreateLockUserAssignKeycardWalkthrough</span><span class="p">(</span><span class="n">LiveServerTestCase</span><span class="p">):</span>
+    <span class="n">fixtures</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;initial.json&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="CreateLockUserAssignKeycardWalkthrough.setUp"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;LiveServerTestCase CreateLockUserAssignKeycardWalkthrough&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c"># Set up browser and mouse</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Firefox</span><span class="p">()</span>
+        <span class="c"># self.mouse = ActionChains(self.browser)</span>
+        <span class="c"># tells webdriver to use a max timeout of 3 seconds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">implicitly_wait</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="c"># Create dir for screenshots (archive existing)</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span> <span class="o">+</span> <span class="s">&#39;___screenshots&#39;</span>
+            <span class="c"># just create new directories in os x (note)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">):</span>
+                <span class="c"># os.rename(self.screenshots_dir,</span>
+                <span class="c"># &quot;archive___&quot;+self.screenshots_dir)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">):</span>
+                        <span class="c"># delete folder</span>
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c"># delete file</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&quot;Exception: &quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;not found: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CreateLockUserAssignKeycardWalkthrough.tearDown"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Shut down Selenium WebDriver browser instance &quot;&quot;&quot;</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;(tearing down)&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="CreateLockUserAssignKeycardWalkthrough.test_create_new_lockuser_and_assign_keycard_walkthrough"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough.test_create_new_lockuser_and_assign_keycard_walkthrough">[docs]</a>    <span class="k">def</span> <span class="nf">test_create_new_lockuser_and_assign_keycard_walkthrough</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; This is a walkthrough for: adding a lockuser to the system, and</span>
+<span class="sd">        assigning a keycard.  The sequence of events:</span>
+
+<span class="sd">        Staff user...</span>
+<span class="sd">        - logs in</span>
+<span class="sd">        - (main page loads (currently /lockadmin/rfid_lock_management/))</span>
+<span class="sd">        - clicks &#39;New user&#39; button</span>
+<span class="sd">        - (add form loads (/lockadmin/rfid_lock_management/lockuser/add/) )</span>
+<span class="sd">        - fills out all fields</span>
+<span class="sd">        - selects a door checkbox</span>
+<span class="sd">        - clicks &lt;input type=&quot;submit&quot; value=&quot;Save and continue editing&quot;</span>
+<span class="sd">          name=&quot;_continue&quot; class=&quot;btn&quot;&gt;</span>
+<span class="sd">        - clicks &lt;input type=&quot;button&quot; class=&quot;btn&quot; id=&quot;add_keycard_button&quot;</span>
+<span class="sd">          value=&quot;Assign keycard&quot;&gt;</span>
+<span class="sd">        - &lt;to do at this point -- will find_element_by_* find the element below</span>
+<span class="sd">          if the enclosing div is not visible, since it itself is not</span>
+<span class="sd">          explicitly set to not be visible? Depending on answer, might have to</span>
+<span class="sd">          insert new events/checks in here............. &gt;</span>
+<span class="sd">        - clicks &lt;input type=&quot;button&quot; class=&quot;btn&quot; id=&quot;start_button&quot; value=&quot;Scan</span>
+<span class="sd">          new card&quot;&gt;</span>
+<span class="sd">        - opens new browser window and goes to address e.g.</span>
+<span class="sd">          http://192.168.x.x:port_num/checkdoor//checkrfid (obv use liveserver</span>
+<span class="sd">          variable)</span>
+<span class="sd">        - back to previous window</span>
+<span class="sd">        - clicks &lt;input type=&quot;button&quot; class=&quot;btn&quot; id=&quot;done_button&quot;</span>
+<span class="sd">          value=&quot;Done&quot;&gt;</span>
+<span class="sd">        - clicks &lt;input type=&quot;submit&quot; value=&quot;Save&quot; class=&quot;btn&quot; name=&quot;_save&quot;&gt;</span>
+<span class="sd">        - (change list loads)</span>
+<span class="sd">        - * change list table should have the correct line with the lock user&#39;s</span>
+<span class="sd">          information, status, RFID, etc. * &quot;&quot;&quot;</span>
+        <span class="c"># start counter for screenshot file names, which will be numbered</span>
+        <span class="c"># sequentially</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">sc_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - logs in</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">live_server_url</span> <span class="o">+</span> <span class="s">&#39;/lockadmin&#39;</span><span class="p">)</span>
+                         <span class="c"># user opens web browser; goes to main admin page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">maximize_window</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">sc_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLOWER</span><span class="p">)</span>
+            <span class="c"># %02d pads to 2 characters</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;screencapture  </span><span class="si">%s</span><span class="s">/</span><span class="si">%02d</span><span class="s">.png&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">,</span> <span class="n">sc_counter</span><span class="p">))</span>
+
+        <span class="n">username_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;username&#39;</span><span class="p">)</span>
+        <span class="n">username_field</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s">&#39;moe&#39;</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLOWER</span><span class="p">)</span>
+        <span class="n">password_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;password&#39;</span><span class="p">)</span>
+        <span class="n">password_field</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s">&#39;moe&#39;</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLOWER</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">sc_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;screencapture  </span><span class="si">%s</span><span class="s">/</span><span class="si">%02d</span><span class="s">.png&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">,</span> <span class="n">sc_counter</span><span class="p">))</span>
+
+        <span class="n">password_field</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">Keys</span><span class="o">.</span><span class="n">RETURN</span><span class="p">)</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - (main page loads (currently /lockadmin/rfid_lock_management/))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">sc_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;screencapture  </span><span class="si">%s</span><span class="s">/</span><span class="si">%02d</span><span class="s">.png&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">,</span> <span class="n">sc_counter</span><span class="p">))</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - clicks &#39;New user&#39; button</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">add_lockuser_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_id</span><span class="p">(</span>
+            <span class="s">&#39;new_user_button&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">sc_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;screencapture  </span><span class="si">%s</span><span class="s">/</span><span class="si">%02d</span><span class="s">.png&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">,</span> <span class="n">sc_counter</span><span class="p">))</span>
+        <span class="n">add_lockuser_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - lock user add form loads (lockuser/add/) </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">sc_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;screencapture  </span><span class="si">%s</span><span class="s">/</span><span class="si">%02d</span><span class="s">.png&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">,</span> <span class="n">sc_counter</span><span class="p">))</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - fills out fields</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">first_name</span> <span class="o">=</span> <span class="s">&#39;Marge&#39;</span>
+        <span class="n">last_name</span> <span class="o">=</span> <span class="s">&#39;Simpson&#39;</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="s">&#39;marge@yahoo.com&#39;</span>
+        <span class="n">phone_number</span> <span class="o">=</span> <span class="s">&#39;2175553223&#39;</span>
+        <span class="n">address</span> <span class="o">=</span> <span class="s">&#39;742 Evergreen Terrace, Springfield, IL&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;first_name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">first_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;last_name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">last_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;email&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span>
+            <span class="s">&#39;phone_number&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">phone_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">&#39;address&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLOWER</span><span class="p">)</span>
+            <span class="n">sc_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;screencapture  </span><span class="si">%s</span><span class="s">/</span><span class="si">%02d</span><span class="s">.png&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">,</span> <span class="n">sc_counter</span><span class="p">))</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - selects a door checkbox</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">door_checkboxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_elements_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[name=&#39;doors&#39;]&quot;</span><span class="p">)</span>
+        <span class="n">door_checkboxes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+        <span class="c"># scroll to bottom of page (useful for screenshot)</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span>
+                <span class="s">&quot;window.scrollTo(0, document.body.scrollHeight);&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLOWER</span><span class="p">)</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - clicks &#39;Save and continue&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">save_and_continue_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[value=&#39;Save and continue editing&#39;]&quot;</span><span class="p">)</span>
+        <span class="n">save_and_continue_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+        <span class="c"># scroll to bottom of page (useful for screenshot)</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span>
+                <span class="s">&quot;window.scrollTo(0, document.body.scrollHeight);&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">sc_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;screencapture  </span><span class="si">%s</span><span class="s">/</span><span class="si">%02d</span><span class="s">.png&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">,</span> <span class="n">sc_counter</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLOWER</span><span class="p">)</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - clicks &#39;Assign keycard&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assign_keycard_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[value=&#39;Assign keycard&#39;]&quot;</span><span class="p">)</span>
+        <span class="n">assign_keycard_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+        <span class="c"># scroll to bottom of page (useful for screenshot)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span>
+            <span class="s">&quot;window.scrollTo(0, document.body.scrollHeight);&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLOWER</span><span class="p">)</span>
+            <span class="n">sc_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;screencapture  </span><span class="si">%s</span><span class="s">/</span><span class="si">%02d</span><span class="s">.png&#39;</span> <span class="o">%</span>
+                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">,</span> <span class="n">sc_counter</span><span class="p">))</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - clicks &#39;Scan new card&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">scan_new_card_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[value=&#39;Scan new card&#39;]&quot;</span><span class="p">)</span>
+        <span class="n">scan_new_card_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLOWER</span><span class="p">)</span>
+            <span class="n">sc_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;screencapture  </span><span class="si">%s</span><span class="s">/</span><span class="si">%02d</span><span class="s">.png&#39;</span> <span class="o">%</span>
+                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">,</span> <span class="n">sc_counter</span><span class="p">))</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - opens new browser window and goes to address e.g.</span>
+<span class="sd">          http://192.168.x.x:port_num/checkdoor/&lt;door id&gt;/checkrfid/&lt;rfid&gt;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rfid</span> <span class="o">=</span> <span class="s">&#39;abcde12345&#39;</span>
+        <span class="n">scan_keycard_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">live_server_url</span> <span class="o">+</span> \
+            <span class="s">&#39;/checkdoor/1/checkrfid/&#39;</span> <span class="o">+</span> <span class="n">rfid</span>
+        <span class="c"># Opening another browser instance, because dealing with selenium</span>
+        <span class="c"># opening additional windows in Firefox is getting ridiculous</span>
+        <span class="n">browser2</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Firefox</span><span class="p">()</span>
+        <span class="n">browser2</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">scan_keycard_url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLOWER</span><span class="p">)</span>
+            <span class="n">sc_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;screencapture  </span><span class="si">%s</span><span class="s">/</span><span class="si">%02d</span><span class="s">.png&#39;</span> <span class="o">%</span>
+                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">,</span> <span class="n">sc_counter</span><span class="p">))</span>
+        <span class="n">browser2</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - back to previous window</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLOWER</span><span class="p">)</span>
+            <span class="n">sc_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;screencapture  </span><span class="si">%s</span><span class="s">/</span><span class="si">%02d</span><span class="s">.png&#39;</span> <span class="o">%</span>
+                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">,</span> <span class="n">sc_counter</span><span class="p">))</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - clicks &#39;Done&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">done_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[value=&#39;Done&#39;]&quot;</span><span class="p">)</span>
+        <span class="n">done_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLOWER</span><span class="p">)</span>
+            <span class="n">sc_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;screencapture  </span><span class="si">%s</span><span class="s">/</span><span class="si">%02d</span><span class="s">.png&#39;</span> <span class="o">%</span>
+                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">,</span> <span class="n">sc_counter</span><span class="p">))</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - clicks &#39;Save&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">save_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span>
+            <span class="s">&quot;input[value=&#39;Save&#39;]&quot;</span><span class="p">)</span>
+        <span class="n">save_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - (change list loads)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">SCREENSHOTS</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">SLOWER</span><span class="p">)</span>
+            <span class="n">sc_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;screencapture  </span><span class="si">%s</span><span class="s">/</span><span class="si">%02d</span><span class="s">.png&#39;</span> <span class="o">%</span>
+                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screenshots_dir</span><span class="p">,</span> <span class="n">sc_counter</span><span class="p">))</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - * change list table should have the correct line with the lock user&#39;s</span>
+<span class="sd">          information, status, RFID, etc. *</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># After saving, one of the rows on the changelist table should now be:</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">browser</span><span class="o">.</span><span class="n">find_elements_by_tag_name</span><span class="p">(</span><span class="s">&#39;tr&#39;</span><span class="p">)</span>
+
+        <span class="c"># checking cell by cell, using variables defined at the beginning</span>
+        <span class="c"># the second row -- the top row, following the header row -- holds the</span>
+        <span class="c"># newly added lock user&#39;s information</span>
+        <span class="n">th_cell</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">&#39;th&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">th_cell</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">first_name</span><span class="p">)</span>
+
+        <span class="n">td_cells</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">find_elements_by_tag_name</span><span class="p">(</span><span class="s">&#39;td&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">td_cells</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">last_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">td_cells</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">td_cells</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s">&#39;True&#39;</span><span class="p">)</span>  <span class="c"># is active</span>
+        <span class="c"># don&#39;t check the &quot;activated on&quot; date in the current RFID cell, but</span>
+        <span class="c"># check other info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s">&#39;moe&#39;</span><span class="p">,</span> <span class="n">td_cells</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="n">rfid</span><span class="p">,</span> <span class="n">td_cells</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">td_cells</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s">&#39;Community Theater&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">td_cells</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s">&#39;(None)&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,188 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rfid_lock_management.tests.admin_tests &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for rfid_lock_management.tests.admin_tests</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+
+
+<span class="kn">from</span> <span class="nn">django.test</span> <span class="kn">import</span> <span class="n">TestCase</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.test.client</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">admin</span>
+<span class="kn">from</span> <span class="nn">django.forms</span> <span class="kn">import</span> <span class="n">CheckboxSelectMultiple</span><span class="p">,</span> <span class="n">ModelForm</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">rfid_lock_management.models</span> <span class="kn">import</span> <span class="n">LockUser</span><span class="p">,</span> <span class="n">AccessTime</span>
+<span class="kn">from</span> <span class="nn">rfid_lock_management.admin</span> <span class="kn">import</span> <span class="n">LockUserAdmin</span><span class="p">,</span> <span class="n">AccessTimeAdmin</span>
+<span class="kn">from</span> <span class="nn">django.contrib.admin.sites</span> <span class="kn">import</span> <span class="n">AdminSite</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponsePermanentRedirect</span>
+<span class="kn">from</span> <span class="nn">test_helpers</span> <span class="kn">import</span> <span class="n">t_info</span>
+
+
+<div class="viewcode-block" id="LockUserAdminActionsTests"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests">[docs]</a><span class="k">class</span> <span class="nc">LockUserAdminActionsTests</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="n">fixtures</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;initial.json&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="LockUserAdminActionsTests.setUp"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;TestCase LockUserAdminActionsTests&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodDoc</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">&#39;moe&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">&#39;moe&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="LockUserAdminActionsTests.tearDown"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="LockUserAdminActionsTests.test_deactivate"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests.test_deactivate">[docs]</a>    <span class="k">def</span> <span class="nf">test_deactivate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deactivating selected lock users (admin action)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;/lockadmin/rfid_lock_management/lockuser/&quot;</span><span class="p">)</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s">&#39;request&#39;</span><span class="p">]</span>
+
+        <span class="c"># deactivate all LockUsers</span>
+        <span class="n">lua</span> <span class="o">=</span> <span class="n">LockUserAdmin</span><span class="p">(</span><span class="n">LockUser</span><span class="p">,</span> <span class="n">AdminSite</span><span class="p">())</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">lua</span><span class="o">.</span><span class="n">deactivate</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">queryset</span><span class="p">)</span>
+
+        <span class="c"># Issue #x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">is_active</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">is_active</span><span class="p">())</span>
+        <span class="c"># In the fixture, only one LockUser (id 3) is not permitted the same</span>
+        <span class="c"># doors that the staff user is not permitted, so only LockUser 3 would</span>
+        <span class="c"># be deactivated if all are selected.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">is_active</span><span class="p">())</span>
+
+</div></div>
+<div class="viewcode-block" id="AccessTimeAdminTests"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.admin_tests.AccessTimeAdminTests">[docs]</a><span class="k">class</span> <span class="nc">AccessTimeAdminTests</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="n">fixtures</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;initial.json&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="AccessTimeAdminTests.setUp"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="s">&quot;TestCase AccessTimeAdminTests&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_testMethodName</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testMethodDoc</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">&#39;moe&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">&#39;moe&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AccessTimeAdminTests.tearDown"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="AccessTimeAdminTests.test_change_form_redirection"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.test_change_form_redirection">[docs]</a>    <span class="k">def</span> <span class="nf">test_change_form_redirection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that if we try to go to an individual Access Time object&#39;s change</span>
+<span class="sd">        form, we&#39;re redirected back to the change list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># follow=False: prevent from following the redirect and actually</span>
+        <span class="c"># loading the next url</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s">&quot;/lockadmin/rfid_lock_management/accesstime/1/&quot;</span><span class="p">,</span> <span class="n">follow</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span>
+            <span class="s">&#39;/lockadmin/rfid_lock_management/accesstime/&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="AccessTimeAdminTests.test_lockuser_html_heading"><a class="viewcode-back" href="../../../tests.html#rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.test_lockuser_html_heading">[docs]</a>    <span class="k">def</span> <span class="nf">test_lockuser_html_heading</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Does the AccessTime change list page display LockUsers as links to</span>
+<span class="sd">        their change pages?</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ata</span> <span class="o">=</span> <span class="n">AccessTimeAdmin</span><span class="p">(</span><span class="n">AccessTime</span><span class="p">,</span> <span class="n">AdminSite</span><span class="p">())</span>
+        <span class="n">all_at</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">some_at</span> <span class="o">=</span> <span class="n">all_at</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
+
+        <span class="c"># using the actual method</span>
+        <span class="k">for</span> <span class="n">at</span> <span class="ow">in</span> <span class="n">some_at</span><span class="p">:</span>
+            <span class="n">compare_string</span> <span class="o">=</span> <span class="s">&quot;&lt;a href=&#39;../lockuser/</span><span class="si">%d</span><span class="s">/&#39;&gt;</span><span class="si">%s</span><span class="s">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">at</span><span class="o">.</span><span class="n">lockuser</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">at</span><span class="o">.</span><span class="n">lockuser</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">ata</span><span class="o">.</span><span class="n">lockuser_html_heading</span><span class="p">(</span><span class="n">at</span><span class="p">),</span> <span class="n">compare_string</span><span class="p">)</span>
+
+        <span class="c"># looking at the page, i.e. more functional</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s">&quot;/lockadmin/rfid_lock_management/accesstime/&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">lu</span> <span class="ow">in</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">lu</span><span class="o">.</span><span class="n">get_last_access_time</span><span class="p">():</span>
+                <span class="n">link</span> <span class="o">=</span> <span class="s">&quot;&lt;a href=&#39;../lockuser/</span><span class="si">%d</span><span class="s">/&#39;&gt;</span><span class="si">%s</span><span class="s">&lt;/a&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">lu</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">lu</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="n">link</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

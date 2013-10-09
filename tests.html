@@ -1,0 +1,819 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Unit and functional tests &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="index.html" />
+    <link rel="prev" title="Other" href="other.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="other.html" title="Other"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="unit-and-functional-tests">
+<h1>Unit and functional tests<a class="headerlink" href="#unit-and-functional-tests" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-rfid_lock_management.tests.__init__">
+<span id="tests"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">tests</span></tt><a class="headerlink" href="#module-rfid_lock_management.tests.__init__" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-rfid_lock_management.tests.admin_tests">
+<span id="admin-tests"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">admin_tests</span></tt><a class="headerlink" href="#module-rfid_lock_management.tests.admin_tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="rfid_lock_management.tests.admin_tests.AccessTimeAdminTests">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.admin_tests.</tt><tt class="descname">AccessTimeAdminTests</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/admin_tests.html#AccessTimeAdminTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.admin_tests.AccessTimeAdminTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></tt></p>
+<dl class="attribute">
+<dt id="rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.fixtures">
+<tt class="descname">fixtures</tt><em class="property"> = ['initial.json']</em><a class="headerlink" href="#rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.fixtures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/admin_tests.html#AccessTimeAdminTests.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.tearDown">
+<tt class="descname">tearDown</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/admin_tests.html#AccessTimeAdminTests.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.test_change_form_redirection">
+<tt class="descname">test_change_form_redirection</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/admin_tests.html#AccessTimeAdminTests.test_change_form_redirection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.test_change_form_redirection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that if we try to go to an individual Access Time object&#8217;s change
+form, we&#8217;re redirected back to the change list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.test_lockuser_html_heading">
+<tt class="descname">test_lockuser_html_heading</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/admin_tests.html#AccessTimeAdminTests.test_lockuser_html_heading"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.admin_tests.AccessTimeAdminTests.test_lockuser_html_heading" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does the AccessTime change list page display LockUsers as links to
+their change pages?</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.admin_tests.</tt><tt class="descname">LockUserAdminActionsTests</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/admin_tests.html#LockUserAdminActionsTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></tt></p>
+<dl class="attribute">
+<dt id="rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests.fixtures">
+<tt class="descname">fixtures</tt><em class="property"> = ['initial.json']</em><a class="headerlink" href="#rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests.fixtures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/admin_tests.html#LockUserAdminActionsTests.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests.tearDown">
+<tt class="descname">tearDown</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/admin_tests.html#LockUserAdminActionsTests.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests.test_deactivate">
+<tt class="descname">test_deactivate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/admin_tests.html#LockUserAdminActionsTests.test_deactivate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.admin_tests.LockUserAdminActionsTests.test_deactivate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deactivating selected lock users (admin action)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-rfid_lock_management.tests.models_tests">
+<span id="models-tests"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">models_tests</span></tt><a class="headerlink" href="#module-rfid_lock_management.tests.models_tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="rfid_lock_management.tests.models_tests.AccessTimeModelTests">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.models_tests.</tt><tt class="descname">AccessTimeModelTests</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#AccessTimeModelTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.AccessTimeModelTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></tt></p>
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.AccessTimeModelTests.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#AccessTimeModelTests.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.AccessTimeModelTests.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.AccessTimeModelTests.test_get_this_lockuser_html">
+<tt class="descname">test_get_this_lockuser_html</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#AccessTimeModelTests.test_get_this_lockuser_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.AccessTimeModelTests.test_get_this_lockuser_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create AccessTime with specific lockuser; make sure
+get_this_lockuser_html returns the correct html</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.AccessTimeModelTests.test_unicode">
+<tt class="descname">test_unicode</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#AccessTimeModelTests.test_unicode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.AccessTimeModelTests.test_unicode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that custom __unicode__() returns the correctly formatted time</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rfid_lock_management.tests.models_tests.DoorModelTests">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.models_tests.</tt><tt class="descname">DoorModelTests</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#DoorModelTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.DoorModelTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></tt></p>
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.DoorModelTests.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#DoorModelTests.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.DoorModelTests.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.DoorModelTests.test_door_perm_creation">
+<tt class="descname">test_door_perm_creation</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#DoorModelTests.test_door_perm_creation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.DoorModelTests.test_door_perm_creation" title="Permalink to this definition">¶</a></dt>
+<dd><p>When a new Door is added, create a corresponding Permission (i.e.
+checking Door&#8217;s save() method)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.DoorModelTests.test_unicode">
+<tt class="descname">test_unicode</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#DoorModelTests.test_unicode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.DoorModelTests.test_unicode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that custom __unicode__() method returns name of Door</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.models_tests.</tt><tt class="descname">LockUserModelTests</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></tt></p>
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_creating_new_obj_and_saving_it_to_db">
+<tt class="descname">test_creating_new_obj_and_saving_it_to_db</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_creating_new_obj_and_saving_it_to_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_creating_new_obj_and_saving_it_to_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new LockUser, set attributes, save to database</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_custom_save_assign_keycard">
+<tt class="descname">test_custom_save_assign_keycard</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_custom_save_assign_keycard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_custom_save_assign_keycard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that custom save assigns (creates and saves) new RFIDkeycard for
+this LockUser</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_custom_save_deactivate_keycard">
+<tt class="descname">test_custom_save_deactivate_keycard</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_custom_save_deactivate_keycard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_custom_save_deactivate_keycard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that custom save deactivates current keycard</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_all_access_times">
+<tt class="descname">test_get_all_access_times</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_get_all_access_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_all_access_times" title="Permalink to this definition">¶</a></dt>
+<dd><p>Are the access times (access_time field for AccessTime object) for this
+LockUser the same as those returned by get_all_access_times (or None)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_all_rfids">
+<tt class="descname">test_get_all_rfids</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_get_all_rfids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_all_rfids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does get_all_rfids() returns all RFIDkeycards objects associated with
+Lockuser</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_all_rfids_html">
+<tt class="descname">test_get_all_rfids_html</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_get_all_rfids_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_all_rfids_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that method returns the correctly formatted html string of all
+rfids, NOT including the current one</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_allowed_doors">
+<tt class="descname">test_get_allowed_doors</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_get_allowed_doors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_allowed_doors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does get_allowed_doors() return the door(s), if any, that the lockuser
+is allowed to access</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_current_rfid">
+<tt class="descname">test_get_current_rfid</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_get_current_rfid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_current_rfid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_last_access_time">
+<tt class="descname">test_get_last_access_time</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_get_last_access_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_get_last_access_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is the last access time for this LockUser the same as that returned by
+get_last_access_time (or None)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_is_active">
+<tt class="descname">test_is_active</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_is_active"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_is_active" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if is_active() reflects whether the user is assigned a keycard</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_last_access_time_and_link_to_more">
+<tt class="descname">test_last_access_time_and_link_to_more</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_last_access_time_and_link_to_more"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_last_access_time_and_link_to_more" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that method returns the correctly formatted html string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_prettify_get_allowed_doors">
+<tt class="descname">test_prettify_get_allowed_doors</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_prettify_get_allowed_doors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_prettify_get_allowed_doors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_prettify_get_allowed_doors_html_links">
+<tt class="descname">test_prettify_get_allowed_doors_html_links</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_prettify_get_allowed_doors_html_links"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_prettify_get_allowed_doors_html_links" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_prettify_get_current_rfid">
+<tt class="descname">test_prettify_get_current_rfid</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_prettify_get_current_rfid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_prettify_get_current_rfid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_prettify_get_last_access_time">
+<tt class="descname">test_prettify_get_last_access_time</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_prettify_get_last_access_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_prettify_get_last_access_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that this method formats the last access time correctly</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.LockUserModelTests.test_unicode">
+<tt class="descname">test_unicode</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#LockUserModelTests.test_unicode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.LockUserModelTests.test_unicode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that custom __unicode__() &#8211; i.e. just obj_name &#8211; returns first
+and last name of lockuser</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rfid_lock_management.tests.models_tests.RFIDkeycardModelTests">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.models_tests.</tt><tt class="descname">RFIDkeycardModelTests</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#RFIDkeycardModelTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.RFIDkeycardModelTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></tt></p>
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#RFIDkeycardModelTests.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.test_deactivate">
+<tt class="descname">test_deactivate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#RFIDkeycardModelTests.test_deactivate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.test_deactivate" title="Permalink to this definition">¶</a></dt>
+<dd><p>On deactivation, is RFIDkeycard object&#8217;s date revoked and revoker set
+correctly?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.test_get_allowed_doors">
+<tt class="descname">test_get_allowed_doors</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#RFIDkeycardModelTests.test_get_allowed_doors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.test_get_allowed_doors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does get_allowed_doors() return the door(s), if any, that the
+associated lockuser is allowed to access</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.test_is_active">
+<tt class="descname">test_is_active</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#RFIDkeycardModelTests.test_is_active"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.test_is_active" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.test_unicode">
+<tt class="descname">test_unicode</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/models_tests.html#RFIDkeycardModelTests.test_unicode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.models_tests.RFIDkeycardModelTests.test_unicode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that custom __unicode__() method returns the rfid string.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-rfid_lock_management.tests.views_tests">
+<span id="views-tests"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">views_tests</span></tt><a class="headerlink" href="#module-rfid_lock_management.tests.views_tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="rfid_lock_management.tests.views_tests.ChartDataTests">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.views_tests.</tt><tt class="descname">ChartDataTests</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/views_tests.html#ChartDataTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.views_tests.ChartDataTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></tt></p>
+<dl class="attribute">
+<dt id="rfid_lock_management.tests.views_tests.ChartDataTests.fixtures">
+<tt class="descname">fixtures</tt><em class="property"> = ['initial.json']</em><a class="headerlink" href="#rfid_lock_management.tests.views_tests.ChartDataTests.fixtures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.views_tests.ChartDataTests.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/views_tests.html#ChartDataTests.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.views_tests.ChartDataTests.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.views_tests.ChartDataTests.test_chartify">
+<tt class="descname">test_chartify</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/views_tests.html#ChartDataTests.test_chartify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.views_tests.ChartDataTests.test_chartify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does chartify() return response with the correct(ly formatted) data
+for HighChart plot of access times?</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rfid_lock_management.tests.views_tests.NewKeycardScanTests">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.views_tests.</tt><tt class="descname">NewKeycardScanTests</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/views_tests.html#NewKeycardScanTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.views_tests.NewKeycardScanTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></tt></p>
+<dl class="method">
+<dt id="rfid_lock_management.tests.views_tests.NewKeycardScanTests.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/views_tests.html#NewKeycardScanTests.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.views_tests.NewKeycardScanTests.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan">
+<tt class="descname">test_finished_new_keycard_scan</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/views_tests.html#NewKeycardScanTests.test_finished_new_keycard_scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Everything went ok (no active keycard with this RFID num already;
+a NewKeycardScan object with this pk does exist and has an RFID num;
+not timed out), so can assign keycard.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan_keycard_with_same_rfid_exists">
+<tt class="descname">test_finished_new_keycard_scan_keycard_with_same_rfid_exists</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/views_tests.html#NewKeycardScanTests.test_finished_new_keycard_scan_keycard_with_same_rfid_exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan_keycard_with_same_rfid_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>A keycard with the same RFID is already assigned to another
+lockuser</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan_no_keycardscan_obj_with_pk">
+<tt class="descname">test_finished_new_keycard_scan_no_keycardscan_obj_with_pk</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/views_tests.html#NewKeycardScanTests.test_finished_new_keycard_scan_no_keycardscan_obj_with_pk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan_no_keycardscan_obj_with_pk" title="Permalink to this definition">¶</a></dt>
+<dd><p>No NewKeycardScan object with the pk specified in the URL</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan_obj_does_not_have_rfid">
+<tt class="descname">test_finished_new_keycard_scan_obj_does_not_have_rfid</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/views_tests.html#NewKeycardScanTests.test_finished_new_keycard_scan_obj_does_not_have_rfid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan_obj_does_not_have_rfid" title="Permalink to this definition">¶</a></dt>
+<dd><p>NewKeycardScan object did not get an RFID num</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan_timed_out">
+<tt class="descname">test_finished_new_keycard_scan_timed_out</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/views_tests.html#NewKeycardScanTests.test_finished_new_keycard_scan_timed_out"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_finished_new_keycard_scan_timed_out" title="Permalink to this definition">¶</a></dt>
+<dd><p>Longer than x minutes to scan new card &#8211; timed out</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_initiate_new_keycard_scan">
+<tt class="descname">test_initiate_new_keycard_scan</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/views_tests.html#NewKeycardScanTests.test_initiate_new_keycard_scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_initiate_new_keycard_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lockuser with specified id exists, does not have assigned keycard:
+- check for appropriate response
+- and that a new NewKeycardScan object is created,
+- and it has correct attributes (waiting_for_scan = True;</p>
+<blockquote>
+<div>assigner_user = request.user)</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_initiate_new_keycard_scan_but_lockuser_has_keycard">
+<tt class="descname">test_initiate_new_keycard_scan_but_lockuser_has_keycard</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/views_tests.html#NewKeycardScanTests.test_initiate_new_keycard_scan_but_lockuser_has_keycard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_initiate_new_keycard_scan_but_lockuser_has_keycard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lockuser with specified id already has an assigned keycard: check for
+appropriate response and that a new NewKeycardScan object is not
+created</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_initiate_new_keycard_scan_but_no_lockuser">
+<tt class="descname">test_initiate_new_keycard_scan_but_no_lockuser</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/views_tests.html#NewKeycardScanTests.test_initiate_new_keycard_scan_but_no_lockuser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.views_tests.NewKeycardScanTests.test_initiate_new_keycard_scan_but_no_lockuser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lockuser with specified id does not exist:
+- check for appropriate response
+- and that a new NewKeycardScan object is not created</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="templatetags-tests">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">templatetags_tests</span></tt><a class="headerlink" href="#templatetags-tests" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-rfid_lock_management.tests.templatetags_tests"></span><dl class="class">
+<dt id="rfid_lock_management.tests.templatetags_tests.TemplateTagsTests">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.templatetags_tests.</tt><tt class="descname">TemplateTagsTests</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/templatetags_tests.html#TemplateTagsTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.templatetags_tests.TemplateTagsTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></tt></p>
+<dl class="method">
+<dt id="rfid_lock_management.tests.templatetags_tests.TemplateTagsTests.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/templatetags_tests.html#TemplateTagsTests.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.templatetags_tests.TemplateTagsTests.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.templatetags_tests.TemplateTagsTests.test_get_object_type">
+<tt class="descname">test_get_object_type</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/templatetags_tests.html#TemplateTagsTests.test_get_object_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.templatetags_tests.TemplateTagsTests.test_get_object_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that get_object_type custom filter returns the object.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-rfid_lock_management.tests.staff_users_tests">
+<span id="staff-users-tests"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">staff_users_tests</span></tt><a class="headerlink" href="#module-rfid_lock_management.tests.staff_users_tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="rfid_lock_management.tests.staff_users_tests.StaffUserTests">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.staff_users_tests.</tt><tt class="descname">StaffUserTests</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/staff_users_tests.html#StaffUserTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.staff_users_tests.StaffUserTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></tt></p>
+<dl class="method">
+<dt id="rfid_lock_management.tests.staff_users_tests.StaffUserTests.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/staff_users_tests.html#StaffUserTests.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.staff_users_tests.StaffUserTests.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.staff_users_tests.StaffUserTests.tearDown">
+<tt class="descname">tearDown</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/staff_users_tests.html#StaffUserTests.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.staff_users_tests.StaffUserTests.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.staff_users_tests.StaffUserTests.test_staff_only_user_can_only_see_doors_they_have_permission_for">
+<tt class="descname">test_staff_only_user_can_only_see_doors_they_have_permission_for</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/staff_users_tests.html#StaffUserTests.test_staff_only_user_can_only_see_doors_they_have_permission_for"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.staff_users_tests.StaffUserTests.test_staff_only_user_can_only_see_doors_they_have_permission_for" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that staff users can only see the doors they are permitted to
+manage.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-rfid_lock_management.tests.lock_comm_tests">
+<span id="lock-comm-tests"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">lock_comm_tests</span></tt><a class="headerlink" href="#module-rfid_lock_management.tests.lock_comm_tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.lock_comm_tests.</tt><tt class="descname">LockCommunicationTests</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></tt></p>
+<dl class="attribute">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.fixtures">
+<tt class="descname">fixtures</tt><em class="property"> = ['initial.json']</em><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.fixtures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_all_allowed_existing_door">
+<tt class="descname">test_all_allowed_existing_door</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests.test_all_allowed_existing_door"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_all_allowed_existing_door" title="Permalink to this definition">¶</a></dt>
+<dd><p>get all allowed RFIDs for existing door</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_all_allowed_inactive_not_allowed">
+<tt class="descname">test_all_allowed_inactive_not_allowed</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests.test_all_allowed_inactive_not_allowed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_all_allowed_inactive_not_allowed" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of allowed RFIDs does not contain any inactive ones</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_all_allowed_non_existing_door">
+<tt class="descname">test_all_allowed_non_existing_door</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests.test_all_allowed_non_existing_door"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_all_allowed_non_existing_door" title="Permalink to this definition">¶</a></dt>
+<dd><p>get all allowed RFIDs for door that does not exist</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_all_allowed_wrong_format">
+<tt class="descname">test_all_allowed_wrong_format</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests.test_all_allowed_wrong_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_all_allowed_wrong_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>get all allowed RFIDs for door in wrong format (incorrect url)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_but_waiting_for_scan">
+<tt class="descname">test_authent_but_waiting_for_scan</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests.test_authent_but_waiting_for_scan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_but_waiting_for_scan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check: since the latest NewKeycardScan object is waiting_for_scan,
+don&#8217;t attempt to authenticate, just return 0; do not create an AccessTime</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid">
+<tt class="descname">test_authent_rfid</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests.test_authent_rfid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid" title="Permalink to this definition">¶</a></dt>
+<dd><p>RFID associated with door, is active</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid__wrong_door">
+<tt class="descname">test_authent_rfid__wrong_door</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests.test_authent_rfid__wrong_door"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid__wrong_door" title="Permalink to this definition">¶</a></dt>
+<dd><p>RFID not associated with door 2, is active</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid_does_not_exist">
+<tt class="descname">test_authent_rfid_does_not_exist</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests.test_authent_rfid_does_not_exist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid_does_not_exist" title="Permalink to this definition">¶</a></dt>
+<dd><p>RFID does not exist</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid_door_does_not_exist">
+<tt class="descname">test_authent_rfid_door_does_not_exist</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests.test_authent_rfid_door_does_not_exist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid_door_does_not_exist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Door does not exist</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid_door_wrong_format_in_url">
+<tt class="descname">test_authent_rfid_door_wrong_format_in_url</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests.test_authent_rfid_door_wrong_format_in_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid_door_wrong_format_in_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Door id in wrong format (i.e. URL is in the wrong format,
+so not found error)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid_inactive_right_door">
+<tt class="descname">test_authent_rfid_inactive_right_door</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests.test_authent_rfid_inactive_right_door"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid_inactive_right_door" title="Permalink to this definition">¶</a></dt>
+<dd><p>RFID was associated with door, but now inactive</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid_wrong_format_in_url">
+<tt class="descname">test_authent_rfid_wrong_format_in_url</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/lock_comm_tests.html#LockCommunicationTests.test_authent_rfid_wrong_format_in_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.lock_comm_tests.LockCommunicationTests.test_authent_rfid_wrong_format_in_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>RFID is in wrong format (i.e. url wrong format, so not found error)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="lock-comm-tests-helpers">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">lock_comm_tests_helpers</span></tt><a class="headerlink" href="#lock-comm-tests-helpers" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-rfid_lock_management.tests.functional_tests">
+<span id="functional-tests"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">functional_tests</span></tt><a class="headerlink" href="#module-rfid_lock_management.tests.functional_tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="rfid_lock_management.tests.functional_tests.AccessTimeList">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.functional_tests.</tt><tt class="descname">AccessTimeList</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#AccessTimeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.AccessTimeList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.LiveServerTestCase</span></tt></p>
+<dl class="attribute">
+<dt id="rfid_lock_management.tests.functional_tests.AccessTimeList.fixtures">
+<tt class="descname">fixtures</tt><em class="property"> = ['initial.json']</em><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.AccessTimeList.fixtures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_tests.AccessTimeList.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#AccessTimeList.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.AccessTimeList.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start up Selenium WebDriver browser instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_tests.AccessTimeList.tearDown">
+<tt class="descname">tearDown</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#AccessTimeList.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.AccessTimeList.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shut down Selenium WebDriver browser instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_tests.AccessTimeList.test_access_time_change_list">
+<tt class="descname">test_access_time_change_list</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#AccessTimeList.test_access_time_change_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.AccessTimeList.test_access_time_change_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rfid_lock_management.tests.functional_tests.GeneralFunctionalTests">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.functional_tests.</tt><tt class="descname">GeneralFunctionalTests</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#GeneralFunctionalTests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.LiveServerTestCase</span></tt></p>
+<dl class="attribute">
+<dt id="rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.fixtures">
+<tt class="descname">fixtures</tt><em class="property"> = ['initial.json']</em><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.fixtures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#GeneralFunctionalTests.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start up Selenium WebDriver browser instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.tearDown">
+<tt class="descname">tearDown</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#GeneralFunctionalTests.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shut down Selenium WebDriver browser instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.test_keycard_deactivation">
+<tt class="descname">test_keycard_deactivation</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#GeneralFunctionalTests.test_keycard_deactivation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.test_keycard_deactivation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change form for an active (i.e. has assigned keycard) lock user: after
+checking &#8216;Deactivate current keycard&#8217; and saving, does the change list
+show the deactivation/saved message? Does the change list show this
+lockuser as inactive? Back on the change form, there should not be an
+assigned keycard (Current RFID: None) and &#8216;Deactivate current keycard&#8217;
+should be unchecked.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.test_keycard_deactivation_but_some_doors_permitted">
+<tt class="descname">test_keycard_deactivation_but_some_doors_permitted</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#GeneralFunctionalTests.test_keycard_deactivation_but_some_doors_permitted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.test_keycard_deactivation_but_some_doors_permitted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests is the situation where the lock user is permitted access to
+some door(s), but not the one(s) the staff user is allowed access to.
+That is, on the change form, there will be no checked Door(s), so
+checking &#8216;Deactive keycard&#8217; should not deactivate the keycard.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.test_lockuser_change_form">
+<tt class="descname">test_lockuser_change_form</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#GeneralFunctionalTests.test_lockuser_change_form"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.test_lockuser_change_form" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is this the change_form for the right lock user?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.test_no_delete_button_lockuser_change_form">
+<tt class="descname">test_no_delete_button_lockuser_change_form</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#GeneralFunctionalTests.test_no_delete_button_lockuser_change_form"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.GeneralFunctionalTests.test_no_delete_button_lockuser_change_form" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that staff users do not see a &#8216;delete&#8217; button/link on the form
+page for an individual Lock User. (This is for an existing LockUser &#8211;
+when <em>adding</em> a LockUser there would not be a &#8216;delete&#8217; link/button in
+any case.)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rfid_lock_management.tests.functional_tests.LogIn">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.functional_tests.</tt><tt class="descname">LogIn</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#LogIn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.LogIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.LiveServerTestCase</span></tt></p>
+<dl class="attribute">
+<dt id="rfid_lock_management.tests.functional_tests.LogIn.fixtures">
+<tt class="descname">fixtures</tt><em class="property"> = ['initial.json']</em><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.LogIn.fixtures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_tests.LogIn.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#LogIn.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.LogIn.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start up Selenium WebDriver browser instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_tests.LogIn.tearDown">
+<tt class="descname">tearDown</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#LogIn.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.LogIn.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shut down Selenium WebDriver browser instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_tests.LogIn.test_can_do_stuff_in_browser">
+<tt class="descname">test_can_do_stuff_in_browser</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_tests.html#LogIn.test_can_do_stuff_in_browser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_tests.LogIn.test_can_do_stuff_in_browser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logging in; making sure correct user and other info displayed</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="functional-create-assign-walkthrough">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">functional_create_assign_walkthrough</span></tt><a class="headerlink" href="#functional-create-assign-walkthrough" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-rfid_lock_management.tests.functional_create_assign_walkthrough"></span><dl class="class">
+<dt id="rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.tests.functional_create_assign_walkthrough.</tt><tt class="descname">CreateLockUserAssignKeycardWalkthrough</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_create_assign_walkthrough.html#CreateLockUserAssignKeycardWalkthrough"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.LiveServerTestCase</span></tt></p>
+<dl class="attribute">
+<dt id="rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough.fixtures">
+<tt class="descname">fixtures</tt><em class="property"> = ['initial.json']</em><a class="headerlink" href="#rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough.fixtures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_create_assign_walkthrough.html#CreateLockUserAssignKeycardWalkthrough.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough.tearDown">
+<tt class="descname">tearDown</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_create_assign_walkthrough.html#CreateLockUserAssignKeycardWalkthrough.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shut down Selenium WebDriver browser instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough.test_create_new_lockuser_and_assign_keycard_walkthrough">
+<tt class="descname">test_create_new_lockuser_and_assign_keycard_walkthrough</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/functional_create_assign_walkthrough.html#CreateLockUserAssignKeycardWalkthrough.test_create_new_lockuser_and_assign_keycard_walkthrough"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.functional_create_assign_walkthrough.CreateLockUserAssignKeycardWalkthrough.test_create_new_lockuser_and_assign_keycard_walkthrough" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a walkthrough for: adding a lockuser to the system, and
+assigning a keycard.  The sequence of events:</p>
+<p>Staff user...
+- logs in
+- (main page loads (currently /lockadmin/rfid_lock_management/))
+- clicks &#8216;New user&#8217; button
+- (add form loads (/lockadmin/rfid_lock_management/lockuser/add/) )
+- fills out all fields
+- selects a door checkbox
+- clicks &lt;input type=&#8221;submit&#8221; value=&#8221;Save and continue editing&#8221;</p>
+<blockquote>
+<div>name=&#8221;_continue&#8221; class=&#8221;btn&#8221;&gt;</div></blockquote>
+<ul>
+<li><p class="first">clicks &lt;input type=&#8221;button&#8221; class=&#8221;btn&#8221; id=&#8221;add_keycard_button&#8221;
+value=&#8221;Assign keycard&#8221;&gt;</p>
+</li>
+<li><p class="first">&lt;to do at this point &#8211; will find_element_by_* find the element below
+if the enclosing div is not visible, since it itself is not
+explicitly set to not be visible? Depending on answer, might have to
+insert new events/checks in here............. &gt;</p>
+</li>
+<li><p class="first">clicks &lt;input type=&#8221;button&#8221; class=&#8221;btn&#8221; id=&#8221;start_button&#8221; value=&#8221;Scan
+new card&#8221;&gt;</p>
+</li>
+<li><p class="first">opens new browser window and goes to address e.g.
+<a class="reference external" href="http://192.168.x.x:port_num/checkdoor//checkrfid">http://192.168.x.x:port_num/checkdoor//checkrfid</a> (obv use liveserver
+variable)</p>
+</li>
+<li><p class="first">back to previous window</p>
+</li>
+<li><p class="first">clicks &lt;input type=&#8221;button&#8221; class=&#8221;btn&#8221; id=&#8221;done_button&#8221;
+value=&#8221;Done&#8221;&gt;</p>
+</li>
+<li><p class="first">clicks &lt;input type=&#8221;submit&#8221; value=&#8221;Save&#8221; class=&#8221;btn&#8221; name=&#8221;_save&#8221;&gt;</p>
+</li>
+<li><p class="first">(change list loads)</p>
+</li>
+<li><ul class="first simple">
+<li>change list table should have the correct line with the lock user&#8217;s</li>
+</ul>
+<p>information, status, RFID, etc. *</p>
+</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Unit and functional tests</a><ul>
+<li><a class="reference internal" href="#module-rfid_lock_management.tests.__init__"><tt class="docutils literal"><span class="pre">tests</span></tt></a></li>
+<li><a class="reference internal" href="#module-rfid_lock_management.tests.admin_tests"><tt class="docutils literal"><span class="pre">admin_tests</span></tt></a></li>
+<li><a class="reference internal" href="#module-rfid_lock_management.tests.models_tests"><tt class="docutils literal"><span class="pre">models_tests</span></tt></a></li>
+<li><a class="reference internal" href="#module-rfid_lock_management.tests.views_tests"><tt class="docutils literal"><span class="pre">views_tests</span></tt></a></li>
+<li><a class="reference internal" href="#templatetags-tests"><tt class="docutils literal"><span class="pre">templatetags_tests</span></tt></a></li>
+<li><a class="reference internal" href="#module-rfid_lock_management.tests.staff_users_tests"><tt class="docutils literal"><span class="pre">staff_users_tests</span></tt></a></li>
+<li><a class="reference internal" href="#module-rfid_lock_management.tests.lock_comm_tests"><tt class="docutils literal"><span class="pre">lock_comm_tests</span></tt></a></li>
+<li><a class="reference internal" href="#lock-comm-tests-helpers"><tt class="docutils literal"><span class="pre">lock_comm_tests_helpers</span></tt></a></li>
+<li><a class="reference internal" href="#module-rfid_lock_management.tests.functional_tests"><tt class="docutils literal"><span class="pre">functional_tests</span></tt></a></li>
+<li><a class="reference internal" href="#functional-create-assign-walkthrough"><tt class="docutils literal"><span class="pre">functional_create_assign_walkthrough</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="other.html"
+                        title="previous chapter">Other</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/tests.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="other.html" title="Other"
+             >previous</a> |</li>
+        <li><a href="index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

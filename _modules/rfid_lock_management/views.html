@@ -1,0 +1,296 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rfid_lock_management.views &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for rfid_lock_management.views</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">HttpResponseRedirect</span>
+<span class="kn">from</span> <span class="nn">django.template</span> <span class="kn">import</span> <span class="n">RequestContext</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render_to_response</span>
+<span class="kn">import</span> <span class="nn">rfid_lock_management.models</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">simplejson</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">rfid_lock_management.misc_helpers</span> <span class="kn">import</span> <span class="n">get_arg_default</span>
+<span class="kn">from</span> <span class="nn">rfid_lock_management.models</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="do_json_resp"><a class="viewcode-back" href="../../main.html#rfid_lock_management.views.do_json_resp">[docs]</a><span class="k">def</span> <span class="nf">do_json_resp</span><span class="p">(</span><span class="n">success</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="n">response_data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="n">success</span><span class="p">,</span>
+        <span class="s">&#39;error_mess&#39;</span><span class="p">:</span> <span class="n">message</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response_data</span><span class="p">),</span>
+                        <span class="n">content_type</span><span class="o">=</span><span class="s">&quot;application/json&quot;</span><span class="p">)</span>
+
+</div>
+<span class="nd">@login_required</span>
+<div class="viewcode-block" id="chartify"><a class="viewcode-back" href="../../main.html#rfid_lock_management.views.chartify">[docs]</a><span class="k">def</span> <span class="nf">chartify</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return data in appropriate format for the HighCharts (JavaScript)</span>
+<span class="sd">    AccessTime plot.  Creates a series for each door.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tooltip_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">tooltip_dict</span><span class="p">[</span><span class="s">&#39;followPointer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;false&#39;</span>
+    <span class="n">tooltip_dict</span><span class="p">[</span><span class="s">&#39;pointFormat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&quot;{point.user}&quot;&#39;</span>
+    <span class="n">all_series</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">door</span> <span class="ow">in</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="n">one_series</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">one_series</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="n">door</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">one_series</span><span class="p">[</span><span class="s">&#39;tooltip&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tooltip_dict</span>
+        <span class="n">this_door_access_times</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">door</span><span class="o">=</span><span class="n">door</span><span class="p">)</span>
+        <span class="n">one_series</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">at</span> <span class="ow">in</span> <span class="n">this_door_access_times</span><span class="p">:</span>
+            <span class="n">one_series</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">at</span><span class="o">.</span><span class="n">data_point</span><span class="p">))</span>
+        <span class="n">all_series</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">one_series</span><span class="p">)</span>
+    <span class="n">extra_context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;chart_data&#39;</span><span class="p">:</span> <span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">all_series</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;chart.html&#39;</span><span class="p">,</span> <span class="n">dictionary</span><span class="o">=</span><span class="n">extra_context</span><span class="p">,</span>
+                              <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="get_allowed_rfids"><a class="viewcode-back" href="../../main.html#rfid_lock_management.views.get_allowed_rfids">[docs]</a><span class="k">def</span> <span class="nf">get_allowed_rfids</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">doorid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns list of allowed rfid&#39;s for the specified door in JSON format</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">door</span> <span class="o">=</span> <span class="n">Door</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">doorid</span><span class="p">)</span>
+        <span class="n">allowed_rfids</span> <span class="o">=</span> <span class="n">door</span><span class="o">.</span><span class="n">get_allowed_rfids</span><span class="p">()</span>  <span class="c"># list of Keycard objects</span>
+        <span class="n">alloweds</span> <span class="o">=</span> <span class="p">[</span><span class="n">keycard_obj</span><span class="o">.</span><span class="n">the_rfid</span> <span class="k">for</span> <span class="n">keycard_obj</span> <span class="ow">in</span> <span class="n">allowed_rfids</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>  <span class="c"># door may not exist or any other error . . .</span>
+        <span class="n">alloweds</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>   <span class="c"># but still need to respond</span>
+
+    <span class="n">to_json</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;doorid&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">doorid</span><span class="p">),</span> <span class="s">&quot;allowed_rfids&quot;</span><span class="p">:</span> <span class="n">alloweds</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">to_json</span><span class="p">),</span> <span class="n">content_type</span><span class="o">=</span><span class="s">&#39;application/json&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="check"><a class="viewcode-back" href="../../main.html#rfid_lock_management.views.check">[docs]</a><span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">doorid</span><span class="p">,</span> <span class="n">rfid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In addition to checking whether the given rfid is valid for the given door,</span>
+<span class="sd">    this checks whether we&#39;re actually trying to assign a new keycard rather</span>
+<span class="sd">    than authenticating. If not doing a new keycard scan, create and save an</span>
+<span class="sd">    AccessTime.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c"># Is the request actually for new keycard assignment?</span>
+    <span class="n">new_scan_queryset</span> <span class="o">=</span> <span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">new_scan_queryset</span><span class="p">:</span>
+        <span class="c"># Note - getting latest NewKeycardScan object by ordering by the field</span>
+        <span class="c"># time_initiated may not actually return the latest created object if</span>
+        <span class="c"># &#39;start scan&#39; was hit many times in a row -- even microseconds don&#39;t</span>
+        <span class="c"># seem to have sufficient resolution to actually get the latest object.</span>
+
+        <span class="c"># get the latest NewKeycardScan object</span>
+        <span class="n">new_scan</span> <span class="o">=</span> <span class="n">new_scan_queryset</span><span class="o">.</span><span class="n">latest</span><span class="p">(</span><span class="s">&quot;pk&quot;</span><span class="p">)</span>
+
+        <span class="c"># Issue #e</span>
+        <span class="k">if</span> <span class="n">new_scan</span><span class="o">.</span><span class="n">waiting_for_scan</span><span class="p">:</span>
+            <span class="c"># record the door the new scan request came from</span>
+            <span class="n">new_scan</span><span class="o">.</span><span class="n">doorid</span> <span class="o">=</span> <span class="n">doorid</span>
+            <span class="n">new_scan</span><span class="o">.</span><span class="n">rfid</span> <span class="o">=</span> <span class="n">rfid</span>
+            <span class="n">new_scan</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="c"># Or is the request actually for authenticating an existing keycard for</span>
+    <span class="c"># this door?  Note -- RFIDkeycard.objects.get(the_rfid=rfid) fails if there</span>
+    <span class="c"># is more than one item returned. Only one item would be active.</span>
+    <span class="c"># Issue #i</span>
+    <span class="n">rfidkeycards_with_same_rfid</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">the_rfid</span><span class="o">=</span><span class="n">rfid</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rfidkeycards_with_same_rfid</span><span class="p">:</span>
+        <span class="c"># no such keycard, so return response of 0</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">rfidkeycard</span> <span class="ow">in</span> <span class="n">rfidkeycards_with_same_rfid</span><span class="p">:</span>
+            <span class="c"># Keycard exists, so moving on to check if it&#39;s active and get</span>
+            <span class="c"># allowed doors (the latter is called on lockuser, so need to check</span>
+            <span class="c"># if keycard is active first).</span>
+            <span class="k">if</span> <span class="n">rfidkeycard</span><span class="o">.</span><span class="n">is_active</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">door</span> <span class="ow">in</span> <span class="n">rfidkeycard</span><span class="o">.</span><span class="n">get_allowed_doors</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">door</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">doorid</span><span class="p">):</span>
+                        <span class="c"># So response will be 1 -- authenticated.</span>
+                        <span class="n">response</span> <span class="o">=</span> <span class="mi">1</span>
+                        
+                        <span class="c">######################################################</span>
+                        <span class="c"># create the AccessTime for this visit</span>
+                        <span class="c">######################################################</span>
+                        <span class="n">lockuser</span> <span class="o">=</span> <span class="n">rfidkeycard</span><span class="o">.</span><span class="n">lockuser</span>
+                        <span class="n">at</span> <span class="o">=</span> <span class="n">AccessTime</span><span class="p">(</span>
+                            <span class="n">the_rfid</span><span class="o">=</span><span class="n">rfid</span><span class="p">,</span>
+                            <span class="n">door</span><span class="o">=</span><span class="n">door</span><span class="p">,</span>
+                            <span class="n">lockuser</span><span class="o">=</span><span class="n">lockuser</span><span class="p">,</span>
+                            <span class="n">access_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+                        <span class="p">)</span>
+                        <span class="c"># Now create and assign data point dict to JSONify for</span>
+                        <span class="c"># the access times highchart</span>
+                        <span class="n">x_coord</span> <span class="o">=</span> <span class="s">&#39;Date.UTC(</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                            <span class="n">at</span><span class="o">.</span><span class="n">access_time</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">at</span><span class="o">.</span><span class="n">access_time</span><span class="o">.</span><span class="n">month</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                            <span class="n">at</span><span class="o">.</span><span class="n">access_time</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+                        <span class="n">y_coord</span> <span class="o">=</span> <span class="s">&#39;Date.UTC(0,0,0, </span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                            <span class="n">at</span><span class="o">.</span><span class="n">access_time</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span> <span class="n">at</span><span class="o">.</span><span class="n">access_time</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span>
+                            <span class="n">at</span><span class="o">.</span><span class="n">access_time</span><span class="o">.</span><span class="n">second</span><span class="p">)</span>
+                        <span class="n">user_name</span> <span class="o">=</span> <span class="s">&#39;&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                            <span class="n">at</span><span class="o">.</span><span class="n">lockuser</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="n">at</span><span class="o">.</span><span class="n">lockuser</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span>
+                        <span class="n">data_point_dict</span> <span class="o">=</span> <span class="p">{</span>
+                            <span class="s">&#39;x&#39;</span><span class="p">:</span> <span class="n">x_coord</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">:</span> <span class="n">y_coord</span><span class="p">,</span> <span class="s">&#39;user&#39;</span><span class="p">:</span> <span class="n">user_name</span><span class="p">}</span>
+                        <span class="n">at</span><span class="o">.</span><span class="n">data_point</span> <span class="o">=</span> <span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data_point_dict</span><span class="p">)</span>
+                        <span class="n">at</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+</div>
+<span class="nd">@login_required</span>
+<span class="c"># Issue #k</span>
+<div class="viewcode-block" id="initiate_new_keycard_scan"><a class="viewcode-back" href="../../main.html#rfid_lock_management.views.initiate_new_keycard_scan">[docs]</a><span class="k">def</span> <span class="nf">initiate_new_keycard_scan</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">lockuser_object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Try start waiting for new keycard scan; return success/fail message.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># If this lockuser already has a current keycard, don&#39;t proceed</span>
+    <span class="c"># (This should have been prevented at template level also)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">lu</span> <span class="o">=</span> <span class="n">LockUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">lockuser_object_id</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="c"># Probably the error is DoesNotExist: LockUser matching query does not</span>
+        <span class="c"># exist, but send this response on ANY type of exception.</span>
+        <span class="k">return</span> <span class="n">do_json_resp</span><span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="s">&quot;This lock user was probably not found in the system.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">lu</span><span class="o">.</span><span class="n">get_current_rfid</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">do_json_resp</span><span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="s">&quot;This lock user is already assigned a keycard.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">NewKeycardScan</span><span class="p">()</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">waiting_for_scan</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">assigner_user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">response_data</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="s">&#39;new_scan_pk&#39;</span><span class="p">:</span> <span class="n">n</span><span class="o">.</span><span class="n">pk</span><span class="p">}</span>
+        <span class="c"># not do_json_resp, since response_data is different:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response_data</span><span class="p">),</span>
+                            <span class="n">content_type</span><span class="o">=</span><span class="s">&quot;application/json&quot;</span><span class="p">)</span>
+
+
+<span class="c"># TODO:  raise exceptions.</span></div>
+<span class="nd">@login_required</span>
+<div class="viewcode-block" id="finished_new_keycard_scan"><a class="viewcode-back" href="../../main.html#rfid_lock_management.views.finished_new_keycard_scan">[docs]</a><span class="k">def</span> <span class="nf">finished_new_keycard_scan</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">new_scan_pk</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Verify this is the NewKeycardScan object we initiated, that the rfid is not</span>
+<span class="sd">    the same as that of a currently active keycard, and that we haven&#39;t timed</span>
+<span class="sd">    out. Then get the rfid from the newly-scanned card.</span>
+
+<span class="sd">    The new RFIDkeycard object is created upon LockUser save, after change_form</span>
+<span class="sd">    form has been submitted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Verify that the scan object is the one we need - that we have the</span>
+    <span class="c">#   NewKeycardScan object we started with, not one that another staff</span>
+    <span class="c">#   user initiated *after* us, for ex.</span>
+    <span class="n">new_scan_qs</span> <span class="o">=</span> <span class="n">NewKeycardScan</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">new_scan_pk</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">new_scan_qs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">do_json_resp</span><span class="p">(</span><span class="bp">False</span><span class="p">,</span>
+                            <span class="s">&quot;No NewKeycardScan obj with pk {}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">new_scan_pk</span><span class="p">))</span>
+    <span class="n">new_scan</span> <span class="o">=</span> <span class="n">new_scan_qs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">min_till_timeout</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">timed_out</span> <span class="o">=</span> <span class="n">new_scan</span><span class="o">.</span><span class="n">timed_out</span><span class="p">(</span><span class="n">min_till_timeout</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">timed_out</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">do_json_resp</span><span class="p">(</span><span class="bp">False</span><span class="p">,</span>
+            <span class="s">&quot;Sorry, the system timed out. You have {} minutes to scan the card, then hit &#39;Done.&#39; &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">min_till_timeout</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">new_scan</span><span class="o">.</span><span class="n">rfid</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">do_json_resp</span><span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="s">&quot;NewKeycardScan does not have RFID.&quot;</span><span class="p">)</span>
+    <span class="c"># Verify that the rfid is not the same as that of another ACTIVE keycard</span>
+    <span class="n">keycards_with_same_rfid_qs</span> <span class="o">=</span> <span class="n">RFIDkeycard</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">the_rfid</span><span class="o">=</span><span class="n">new_scan</span><span class="o">.</span><span class="n">rfid</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keycards_with_same_rfid_qs</span><span class="o">.</span><span class="n">select_related</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">is_active</span><span class="p">():</span>
+            <span class="c"># todo: include link to this lockuser</span>
+            <span class="k">return</span> <span class="n">do_json_resp</span><span class="p">(</span><span class="bp">False</span><span class="p">,</span>
+                                <span class="s">&quot;A keycard with the same RFID is already assigned to {}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">lockuser</span><span class="p">))</span>
+    <span class="c"># OK, so far so good. Set waiting and ready-to-assign status,</span>
+    <span class="c"># grab the assigner, and save NewKeycardScan object.</span>
+    <span class="n">new_scan</span><span class="o">.</span><span class="n">waiting_for_scan</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">new_scan</span><span class="o">.</span><span class="n">ready_to_assign</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">new_scan</span><span class="o">.</span><span class="n">assigner_user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>  <span class="c"># todo: assigner_user already set in initiate</span>
+    <span class="n">new_scan</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">response_data</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="s">&#39;rfid&#39;</span><span class="p">:</span> <span class="n">new_scan</span><span class="o">.</span><span class="n">rfid</span><span class="p">}</span>
+    <span class="c"># not do_json_resp, since response_data is different:</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response_data</span><span class="p">),</span> <span class="n">content_type</span><span class="o">=</span><span class="s">&quot;application/json&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

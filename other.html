@@ -1,0 +1,183 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Other &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="index.html" />
+    <link rel="next" title="Unit and functional tests" href="tests.html" />
+    <link rel="prev" title="rfid_lock_management Package" href="main.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tests.html" title="Unit and functional tests"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="main.html" title="rfid_lock_management Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="other">
+<h1>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-rfid_lock_management.tests.test_helpers">
+<span id="test-helpers"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">test_helpers</span></tt><a class="headerlink" href="#module-rfid_lock_management.tests.test_helpers" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="rfid_lock_management.tests.test_helpers.t_info">
+<tt class="descclassname">rfid_lock_management.tests.test_helpers.</tt><tt class="descname">t_info</tt><big>(</big><em>mess_str</em>, <em>level=1</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/tests/test_helpers.html#t_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.tests.test_helpers.t_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print message to screen related to what is currently being tested. If
+PRINT_INFO is False, these still serve as documentation for the associated
+lines. Takes a string with the message and level, which refers to the type
+of message, and formats the string with color and indentation accordingly.
+The higher the level number, the more verbose/specific.</p>
+<p>Types of messages:
+- level 1: TestCase name (white on green, prepend new line)
+- level 2: test method name and docstring (green, no indentation)
+- level 3: action description (cyan, no indentation)
+- level 4: assertion description (blue, indent one)
+- level 5: closer assertion description (magenta, indent two)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-rfid_lock_management.misc_helpers">
+<span id="misc-helpers"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">misc_helpers</span></tt><a class="headerlink" href="#module-rfid_lock_management.misc_helpers" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="rfid_lock_management.misc_helpers.get_arg_default">
+<tt class="descclassname">rfid_lock_management.misc_helpers.</tt><tt class="descname">get_arg_default</tt><big>(</big><em>func</em>, <em>arg_name</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/misc_helpers.html#get_arg_default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.misc_helpers.get_arg_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the default value of the specified named argument.
+<a class="reference external" href="http://code.activestate.com/recipes/491272/">http://code.activestate.com/recipes/491272/</a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-rfid_lock_management.templatetags.custom_filters">
+<span id="custom-filters"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">custom_filters</span></tt><a class="headerlink" href="#module-rfid_lock_management.templatetags.custom_filters" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="rfid_lock_management.templatetags.custom_filters.does_lockuser_have_active_keycard">
+<tt class="descclassname">rfid_lock_management.templatetags.custom_filters.</tt><tt class="descname">does_lockuser_have_active_keycard</tt><big>(</big><em>object_id</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/templatetags/custom_filters.html#does_lockuser_have_active_keycard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.templatetags.custom_filters.does_lockuser_have_active_keycard" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="rfid_lock_management.templatetags.custom_filters.fix_json_string">
+<tt class="descclassname">rfid_lock_management.templatetags.custom_filters.</tt><tt class="descname">fix_json_string</tt><big>(</big><em>string</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/templatetags/custom_filters.html#fix_json_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.templatetags.custom_filters.fix_json_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marks a string as not requiring further HTML escaping prior to output.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rfid_lock_management.templatetags.custom_filters.get_doors_you_manage">
+<tt class="descclassname">rfid_lock_management.templatetags.custom_filters.</tt><tt class="descname">get_doors_you_manage</tt><big>(</big><em>request</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/templatetags/custom_filters.html#get_doors_you_manage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.templatetags.custom_filters.get_doors_you_manage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Give template the list of door names that the staff user can manage,
+or &#8216;None&#8217;</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rfid_lock_management.templatetags.custom_filters.get_object_type">
+<tt class="descclassname">rfid_lock_management.templatetags.custom_filters.</tt><tt class="descname">get_object_type</tt><big>(</big><em>content_type_id</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/templatetags/custom_filters.html#get_object_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.templatetags.custom_filters.get_object_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class of object, based on the content type id</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Other</a><ul>
+<li><a class="reference internal" href="#module-rfid_lock_management.tests.test_helpers"><tt class="docutils literal"><span class="pre">test_helpers</span></tt></a></li>
+<li><a class="reference internal" href="#module-rfid_lock_management.misc_helpers"><tt class="docutils literal"><span class="pre">misc_helpers</span></tt></a></li>
+<li><a class="reference internal" href="#module-rfid_lock_management.templatetags.custom_filters"><tt class="docutils literal"><span class="pre">custom_filters</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="main.html"
+                        title="previous chapter">rfid_lock_management Package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tests.html"
+                        title="next chapter">Unit and functional tests</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/other.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tests.html" title="Unit and functional tests"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="main.html" title="rfid_lock_management Package"
+             >previous</a> |</li>
+        <li><a href="index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

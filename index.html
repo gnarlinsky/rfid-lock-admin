@@ -1,1 +1,318 @@
-My GitHub Page
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>RFID Lock Management Interface - Documentation &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="#" />
+    <link rel="next" title="RFID Lock Management Interface - Documentation" href="" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="#" title="RFID Lock Management Interface - Documentation"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">RFID Lock Management 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="rfid-lock-management-interface-documentation">
+<h1>RFID Lock Management Interface - Documentation<a class="headerlink" href="#rfid-lock-management-interface-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">RFID Lock Management Interface - Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#about">About</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#created-with">Created with</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-and-running-the-application">Setting up and running the application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing-and-coverage">Testing and coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#developer-documentation">Developer documentation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="main.html">rfid_lock_management Package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="main.html#module-rfid_lock_management.__init__"><tt class="docutils literal"><span class="pre">rfid_lock_management</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="main.html#module-rfid_lock_management.admin"><tt class="docutils literal"><span class="pre">admin</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="main.html#module-rfid_lock_management.models"><tt class="docutils literal"><span class="pre">models</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="main.html#module-rfid_lock_management.views"><tt class="docutils literal"><span class="pre">views</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="other.html">Other</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="other.html#module-rfid_lock_management.tests.test_helpers"><tt class="docutils literal"><span class="pre">test_helpers</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="other.html#module-rfid_lock_management.misc_helpers"><tt class="docutils literal"><span class="pre">misc_helpers</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="other.html#module-rfid_lock_management.templatetags.custom_filters"><tt class="docutils literal"><span class="pre">custom_filters</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="tests.html">Unit and functional tests</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.__init__"><tt class="docutils literal"><span class="pre">tests</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.admin_tests"><tt class="docutils literal"><span class="pre">admin_tests</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.models_tests"><tt class="docutils literal"><span class="pre">models_tests</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.views_tests"><tt class="docutils literal"><span class="pre">views_tests</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="tests.html#templatetags-tests"><tt class="docutils literal"><span class="pre">templatetags_tests</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.staff_users_tests"><tt class="docutils literal"><span class="pre">staff_users_tests</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.lock_comm_tests"><tt class="docutils literal"><span class="pre">lock_comm_tests</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="tests.html#lock-comm-tests-helpers"><tt class="docutils literal"><span class="pre">lock_comm_tests_helpers</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.functional_tests"><tt class="docutils literal"><span class="pre">functional_tests</span></tt></a></li>
+<li class="toctree-l5"><a class="reference internal" href="tests.html#functional-create-assign-walkthrough"><tt class="docutils literal"><span class="pre">functional_create_assign_walkthrough</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#rfid-keycard-authentication">RFID keycard authentication</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#end-user-documentation-and-walkthroughs">End user documentation and walkthroughs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#meta">Meta</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#this-documentation">This documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="about">
+<h2>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h2>
+<p>This volunteer project is a collaboration with my local Makerspace to set up an
+RFID lock system for doors in the building that houses the Makerspace. My role
+included creating a Django web interface for staff users to manage lock users
+and locked spaces, which involves, for example, assigning/un-assigning RFID
+keycards; managing lock users&#8217; permissions for access to various spaces;
+viewing logs and stats about visitors. Apart from the interface, I worked with
+other volunteers on communication with the RFID lock system hardware to
+authenticate scanned cards.</p>
+</div>
+<div class="section" id="created-with">
+<h2>Created with<a class="headerlink" href="#created-with" title="Permalink to this headline">¶</a></h2>
+<p>Python/Django/SQLite (development version)</p>
+<p>Responsively styled with <a class="reference external" href="http://getbootstrap.com/">Bootstrap</a>.</p>
+<p>The code is at <a class="reference external" href="https://github.com/gnarlinsky/rfid-lock-admin">https://github.com/gnarlinsky/rfid-lock-admin</a>.</p>
+</div>
+<div class="section" id="setting-up-and-running-the-application">
+<h2>Setting up and running the application<a class="headerlink" href="#setting-up-and-running-the-application" title="Permalink to this headline">¶</a></h2>
+<p>Clone the repository.</p>
+<div class="highlight-shell"><pre>$ git clone git@github.com:gnarlinsky/rfid-lock-admin.git</pre>
+</div>
+<p>To avoid dependency issues, create a virtualenv and install the required packages.</p>
+<div class="highlight-shell"><pre>$ cd rfid-lock-admin
+$ virtualenv ve --no-site-packages
+$ source ve/bin/activate      # activate the virtual environment
+$ pip install -r requirements.txt</pre>
+</div>
+<p>Create the database and load the initial data.</p>
+<div class="highlight-shell"><pre>$ python manage.py syncdb
+$ python manage.py loaddata rfid_lock_management/fixtures/initial.json</pre>
+</div>
+<p>Run the Django development server.</p>
+<div class="highlight-shell"><pre>$ python manage.py runserver</pre>
+</div>
+<p>Go to <a class="reference external" href="http://localhost:8000/lockadmin">http://localhost:8000/lockadmin</a> to see the application in action.  (You can log in as user &#8220;moe&#8221; and password &#8220;moe&#8221;)</p>
+</div>
+<div class="section" id="testing-and-coverage">
+<h2>Testing and coverage<a class="headerlink" href="#testing-and-coverage" title="Permalink to this headline">¶</a></h2>
+<p>The script <cite>cover.sh</cite> (in the top-level directory, on the same level as
+<cite>manage.py</cite>) runs both the unit and functional tests (see
+<tt class="xref py py-mod docutils literal"><span class="pre">rfid_lock_management.tests</span></tt>) and determines test coverage, with detailed
+HTML results.</p>
+<div class="highlight-shell"><pre>$ ./cover.sh
+Creating test database for alias 'default'...
+.........................................................
+----------------------------------------------------------------------
+Ran 57 tests in 84.264s
+
+OK
+Destroying test database for alias 'default'...
+Name                                               Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------------
+proj_rfid_lock_management/__init__                     0      0   100%
+proj_rfid_lock_management/settings                    31      0   100%
+proj_rfid_lock_management/urls                        10      0   100%
+rfid_lock_management/__init__                          0      0   100%
+rfid_lock_management/admin                           137      7    95%   79-92
+rfid_lock_management/misc_helpers                      9      7    22%   9-18
+rfid_lock_management/models                          186      0   100%
+rfid_lock_management/templatetags/__init__             0      0   100%
+rfid_lock_management/templatetags/custom_filters      35      0   100%
+rfid_lock_management/views                            98      0   100%
+--------------------------------------------------------------------------------
+TOTAL                                                506     14    97%
+
+----------------------------------------------------------------------
+HTML results are in htmlcov/index.html</pre>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><strong>Cover.sh</strong> - The line <tt class="docutils literal"><span class="pre">open</span> <span class="pre">htmlcov/index.html</span></tt> opens the HTML
+coverage information with your system&#8217;s default browser. Note this may only work
+in OS X, where the <tt class="docutils literal"><span class="pre">open</span></tt> command opens directories and files with the
+default application for the file&#8217;s extension — so you might want to comment out
+that statement.</p>
+</div>
+</div>
+<div class="section" id="developer-documentation">
+<h2>Developer documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="api">
+<h3>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="main.html">rfid_lock_management Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="main.html#module-rfid_lock_management.__init__"><tt class="docutils literal"><span class="pre">rfid_lock_management</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html#module-rfid_lock_management.admin"><tt class="docutils literal"><span class="pre">admin</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html#module-rfid_lock_management.models"><tt class="docutils literal"><span class="pre">models</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html#module-rfid_lock_management.views"><tt class="docutils literal"><span class="pre">views</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="other.html">Other</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="other.html#module-rfid_lock_management.tests.test_helpers"><tt class="docutils literal"><span class="pre">test_helpers</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="other.html#module-rfid_lock_management.misc_helpers"><tt class="docutils literal"><span class="pre">misc_helpers</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="other.html#module-rfid_lock_management.templatetags.custom_filters"><tt class="docutils literal"><span class="pre">custom_filters</span></tt></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">Unit and functional tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.__init__"><tt class="docutils literal"><span class="pre">tests</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.admin_tests"><tt class="docutils literal"><span class="pre">admin_tests</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.models_tests"><tt class="docutils literal"><span class="pre">models_tests</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.views_tests"><tt class="docutils literal"><span class="pre">views_tests</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#templatetags-tests"><tt class="docutils literal"><span class="pre">templatetags_tests</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.staff_users_tests"><tt class="docutils literal"><span class="pre">staff_users_tests</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.lock_comm_tests"><tt class="docutils literal"><span class="pre">lock_comm_tests</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#lock-comm-tests-helpers"><tt class="docutils literal"><span class="pre">lock_comm_tests_helpers</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#module-rfid_lock_management.tests.functional_tests"><tt class="docutils literal"><span class="pre">functional_tests</span></tt></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#functional-create-assign-walkthrough"><tt class="docutils literal"><span class="pre">functional_create_assign_walkthrough</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="rfid-keycard-authentication">
+<h3>RFID keycard authentication<a class="headerlink" href="#rfid-keycard-authentication" title="Permalink to this headline">¶</a></h3>
+<a href="keycard_authentication.html">RFID keycard authentication</a>
+</div>
+</div>
+<div class="section" id="end-user-documentation-and-walkthroughs">
+<h2>End user documentation and walkthroughs<a class="headerlink" href="#end-user-documentation-and-walkthroughs" title="Permalink to this headline">¶</a></h2>
+<a href="the_interface.html">Staff user interface</a>
+</div>
+<div class="section" id="meta">
+<h2>Meta<a class="headerlink" href="#meta" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="this-documentation">
+<h3>This documentation<a class="headerlink" href="#this-documentation" title="Permalink to this headline">¶</a></h3>
+<p>Documentation created with <a class="reference external" href="http://sphinx-doc.org/">Sphinx, a Python document generator</a>.</p>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">RFID Lock Management Interface - Documentation</a><ul>
+<li><a class="reference internal" href="#about">About</a></li>
+<li><a class="reference internal" href="#created-with">Created with</a></li>
+<li><a class="reference internal" href="#setting-up-and-running-the-application">Setting up and running the application</a></li>
+<li><a class="reference internal" href="#testing-and-coverage">Testing and coverage</a></li>
+<li><a class="reference internal" href="#developer-documentation">Developer documentation</a><ul>
+<li><a class="reference internal" href="#api">API</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#rfid-keycard-authentication">RFID keycard authentication</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#end-user-documentation-and-walkthroughs">End user documentation and walkthroughs</a></li>
+<li><a class="reference internal" href="#meta">Meta</a><ul>
+<li><a class="reference internal" href="#this-documentation">This documentation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href=""
+                        title="next chapter">RFID Lock Management Interface - Documentation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="#" title="RFID Lock Management Interface - Documentation"
+             >next</a> |</li>
+        <li><a href="#">RFID Lock Management 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

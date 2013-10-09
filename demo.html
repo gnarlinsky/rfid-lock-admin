@@ -1,0 +1,380 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>app Package &mdash; RFID Lock Management 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="RFID Lock Management 0.1 documentation" href="index.html" />
+    <link rel="next" title="Other" href="demo-other.html" />
+    <link rel="prev" title="Form handling" href="internal_and_design.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="demo-other.html" title="Other"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="internal_and_design.html" title="Form handling"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="app-package">
+<h1>app Package<a class="headerlink" href="#app-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-rfid_lock_management.__init__">
+<span id="app"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">app</span></tt><a class="headerlink" href="#module-rfid_lock_management.__init__" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-rfid_lock_management.admin">
+<span id="admin"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">admin</span></tt><a class="headerlink" href="#module-rfid_lock_management.admin" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="rfid_lock_management.admin.AccessTimeAdmin">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.admin.</tt><tt class="descname">AccessTimeAdmin</tt><big>(</big><em>model</em>, <em>admin_site</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#AccessTimeAdmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.AccessTimeAdmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.contrib.admin.options.ModelAdmin</span></tt></p>
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.AccessTimeAdmin.actions">
+<tt class="descname">actions</tt><em class="property"> = None</em><a class="headerlink" href="#rfid_lock_management.admin.AccessTimeAdmin.actions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.AccessTimeAdmin.change_view">
+<tt class="descname">change_view</tt><big>(</big><em>request</em>, <em>extra_context=None</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#AccessTimeAdmin.change_view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.AccessTimeAdmin.change_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Don&#8217;t allow access to individual AccessTime objects.</p>
+<p>No need to show the link to  page for an individual AccessTime, so no
+field should link to it, as was set in changelist_view. However, the
+page can still be accessed, so redirect to change list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.AccessTimeAdmin.changelist_view">
+<tt class="descname">changelist_view</tt><big>(</big><em>request</em>, <em>extra_context=None</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#AccessTimeAdmin.changelist_view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.AccessTimeAdmin.changelist_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Don&#8217;t show links to individual AccessTime change forms from any field.
+(list_display_links = [] will not works - will default to linking from
+items in AccessTime column.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.AccessTimeAdmin.date_hierarchy">
+<tt class="descname">date_hierarchy</tt><em class="property"> = 'access_time'</em><a class="headerlink" href="#rfid_lock_management.admin.AccessTimeAdmin.date_hierarchy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.AccessTimeAdmin.has_add_permission">
+<tt class="descname">has_add_permission</tt><big>(</big><em>request</em>, <em>obj=None</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#AccessTimeAdmin.has_add_permission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.AccessTimeAdmin.has_add_permission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Don&#8217;t display Save And Add button</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.AccessTimeAdmin.has_delete_permission">
+<tt class="descname">has_delete_permission</tt><big>(</big><em>request</em>, <em>obj=None</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#AccessTimeAdmin.has_delete_permission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.AccessTimeAdmin.has_delete_permission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Don&#8217;t display &#8220;delete&#8221; button</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.AccessTimeAdmin.list_display">
+<tt class="descname">list_display</tt><em class="property"> = ('access_time', 'lockuser_html_heading', 'door')</em><a class="headerlink" href="#rfid_lock_management.admin.AccessTimeAdmin.list_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.AccessTimeAdmin.list_filter">
+<tt class="descname">list_filter</tt><em class="property"> = ('lockuser', 'door')</em><a class="headerlink" href="#rfid_lock_management.admin.AccessTimeAdmin.list_filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.AccessTimeAdmin.lockuser_html_heading">
+<tt class="descname">lockuser_html_heading</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#AccessTimeAdmin.lockuser_html_heading"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.AccessTimeAdmin.lockuser_html_heading" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the HTML with link to lock user&#8217;s change_form to display on the
+Access Times change list page.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.AccessTimeAdmin.media">
+<tt class="descname">media</tt><a class="headerlink" href="#rfid_lock_management.admin.AccessTimeAdmin.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rfid_lock_management.admin.LockUserAdmin">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.admin.</tt><tt class="descname">LockUserAdmin</tt><big>(</big><em>model</em>, <em>admin_site</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#LockUserAdmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.contrib.admin.options.ModelAdmin</span></tt></p>
+<p>Encapsulates all admin options and functionality for a given model.</p>
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.LockUserAdmin.actions">
+<tt class="descname">actions</tt><em class="property"> = (&lt;function deactivate at 0x102c65500&gt;,)</em><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.actions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.LockUserAdmin.change_view">
+<tt class="descname">change_view</tt><big>(</big><em>request</em>, <em>object_id</em>, <em>form_url=''</em>, <em>extra_context=None</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#LockUserAdmin.change_view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.change_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>LockUser may have access to Doors that the staff user cannot admin;
+this must be accounted for when determining (Javascript) whether to
+disable &#8220;Assign keycard&#8221; button or select &#8220;Deactivate keycard&#8221; because
+all Doors have been unchecked.  In change_form template, will get a set
+of these Door objects from context, then check the lockuser_set of each
+to see if the current lockuser has access to it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.LockUserAdmin.deactivate">
+<tt class="descname">deactivate</tt><big>(</big><em>request</em>, <em>queryset</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#LockUserAdmin.deactivate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.deactivate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Staff should not have the ability to delete LockUsers, only to
+DEACTIVATE them.</p>
+<p>Before deactivating, this checks if the LockUser is permitted doors
+that the staff user is not.  This would mean that the staff user is
+not allowed to revoke the keycard, and the lock user would remain active.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.LockUserAdmin.fieldsets">
+<tt class="descname">fieldsets</tt><em class="property"> = ((None, {'fields': (('first_name', 'last_name'), 'email', 'phone_number', 'address', 'prettify_get_current_rfid', 'last_access_time_and_door_and_link_to_more', 'doors', 'deactivate_current_keycard')}),)</em><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.fieldsets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.LockUserAdmin.form">
+<tt class="descname">form</tt><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.form" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#rfid_lock_management.admin.LockUserForm" title="rfid_lock_management.admin.LockUserForm"><tt class="xref py py-class docutils literal"><span class="pre">LockUserForm</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.LockUserAdmin.formfield_for_manytomany">
+<tt class="descname">formfield_for_manytomany</tt><big>(</big><em>db_field</em>, <em>request</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#LockUserAdmin.formfield_for_manytomany"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.formfield_for_manytomany" title="Permalink to this definition">¶</a></dt>
+<dd><p>The queryset() method in DoorAdmin restricts a staff user&#8217;s ability
+to view/change Doors that they do not have permission for (individual
+objects and change list).  But on the listdisplay and changeform for
+LockUsers, staff users can still see Doors  &#8211; and assign them &#8211; that
+they don&#8217;t have permission for.  So here, we need to to limit the
+ManyToMany Door field output for the LockUser.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.LockUserAdmin.formfield_overrides">
+<tt class="descname">formfield_overrides</tt><em class="property"> = {&lt;class 'django.db.models.fields.related.ManyToManyField'&gt;: {'widget': &lt;class 'django.forms.widgets.CheckboxSelectMultiple'&gt;}}</em><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.formfield_overrides" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.LockUserAdmin.get_doors_to_show">
+<tt class="descname">get_doors_to_show</tt><big>(</big><em>request</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#LockUserAdmin.get_doors_to_show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.get_doors_to_show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.LockUserAdmin.get_form">
+<tt class="descname">get_form</tt><big>(</big><em>request</em>, <em>obj=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#LockUserAdmin.get_form"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.get_form" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.LockUserAdmin.get_other_doors">
+<tt class="descname">get_other_doors</tt><big>(</big><em>request</em>, <em>object_id</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#LockUserAdmin.get_other_doors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.get_other_doors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Doors that the staff User is not allowed to administer. In change_form
+template, will get a set of these Door objects from context, then check
+the lockuser_set of each to see if the current lockuser has access to
+it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.LockUserAdmin.has_delete_permission">
+<tt class="descname">has_delete_permission</tt><big>(</big><em>request</em>, <em>obj=None</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#LockUserAdmin.has_delete_permission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.has_delete_permission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Don&#8217;t display &#8220;delete&#8221; button</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.LockUserAdmin.list_display">
+<tt class="descname">list_display</tt><em class="property"> = ('first_name', 'last_name', 'email', 'is_active', '_current_rfid_heading', '_doors_heading', '_last_access_heading')</em><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.list_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.LockUserAdmin.list_display_links">
+<tt class="descname">list_display_links</tt><em class="property"> = ['first_name', 'last_name']</em><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.list_display_links" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.LockUserAdmin.list_filter">
+<tt class="descname">list_filter</tt><em class="property"> = ('doors',)</em><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.list_filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.LockUserAdmin.media">
+<tt class="descname">media</tt><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.LockUserAdmin.readonly_fields">
+<tt class="descname">readonly_fields</tt><em class="property"> = ('prettify_get_current_rfid', 'last_access_time_and_door_and_link_to_more', 'prettify_get_last_access_time')</em><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.readonly_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.LockUserAdmin.save_model">
+<tt class="descname">save_model</tt><big>(</big><em>request</em>, <em>obj</em>, <em>form</em>, <em>change</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#LockUserAdmin.save_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.LockUserAdmin.save_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>If deactivate current keycard was checked (which may have actually
+happened in clean, if  no Doors were selected) need to deactivate
+current keycard.  Doing this here rather than models.py because need to
+attach request.user to the RFIDkeycard object being deactivated, to
+record revoker.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rfid_lock_management.admin.LockUserForm">
+<em class="property">class </em><tt class="descclassname">rfid_lock_management.admin.</tt><tt class="descname">LockUserForm</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#LockUserForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.LockUserForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.forms.models.ModelForm</span></tt></p>
+<dl class="class">
+<dt id="rfid_lock_management.admin.LockUserForm.Meta">
+<em class="property">class </em><tt class="descname">Meta</tt><a class="reference internal" href="_modules/rfid_lock_management/admin.html#LockUserForm.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.LockUserForm.Meta" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="rfid_lock_management.admin.LockUserForm.Meta.model">
+<tt class="descname">model</tt><a class="headerlink" href="#rfid_lock_management.admin.LockUserForm.Meta.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">LockUser</span></tt></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.LockUserForm.base_fields">
+<tt class="descclassname">LockUserForm.</tt><tt class="descname">base_fields</tt><em class="property"> = {'first_name': &lt;django.forms.fields.CharField object at 0x102c66690&gt;, 'last_name': &lt;django.forms.fields.CharField object at 0x102c66890&gt;, 'email': &lt;django.forms.fields.EmailField object at 0x102c66950&gt;, 'address': &lt;django.forms.fields.CharField object at 0x102c66a10&gt;, 'phone_number': &lt;django.forms.fields.CharField object at 0x102c66ad0&gt;, 'birthdate': &lt;django.forms.fields.DateField object at 0x102c66b90&gt;, 'doors': &lt;django.forms.models.ModelMultipleChoiceField object at 0x102c66dd0&gt;, 'deactivate_current_keycard': &lt;django.forms.fields.BooleanField object at 0x102c66d50&gt;, 'current_keycard_revoker': &lt;django.forms.models.ModelChoiceField object at 0x102c66f50&gt;}</em><a class="headerlink" href="#rfid_lock_management.admin.LockUserForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="rfid_lock_management.admin.LockUserForm.clean">
+<tt class="descclassname">LockUserForm.</tt><tt class="descname">clean</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/rfid_lock_management/admin.html#LockUserForm.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rfid_lock_management.admin.LockUserForm.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>If no Doors were selected &#8211; if user is not permitted to access any door
+&#8211; deactivate associated keycard.</p>
+<p>If the user is permitted access to doors that the staff user is not
+permitted access, make sure lockuser still has access to door staff
+user is not permitted to manage, since those wouldn&#8217;t be on the
+form. Also, if &#8216;deactivate current keycard&#8217; was checked in this
+situation, the keycard should NOT actually be revoked, because of
+those other doors.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.LockUserForm.declared_fields">
+<tt class="descclassname">LockUserForm.</tt><tt class="descname">declared_fields</tt><em class="property"> = {}</em><a class="headerlink" href="#rfid_lock_management.admin.LockUserForm.declared_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="rfid_lock_management.admin.LockUserForm.media">
+<tt class="descclassname">LockUserForm.</tt><tt class="descname">media</tt><a class="headerlink" href="#rfid_lock_management.admin.LockUserForm.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><cite>search_fields</cite> adds adds a search box at the top of the change list and specifies which fields (i.e. model attributes or method results) to search on. There is no limit on the number of search fields, but this uses a LIKE SQL query, so keep it reasonable.</p>
+</div>
+</div>
+<div class="section" id="forms">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">forms</span></tt><a class="headerlink" href="#forms" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="models">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">models</span></tt><a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="views">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">views</span></tt><a class="headerlink" href="#views" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">app Package</a><ul>
+<li><a class="reference internal" href="#module-rfid_lock_management.__init__"><tt class="docutils literal"><span class="pre">app</span></tt></a></li>
+<li><a class="reference internal" href="#module-rfid_lock_management.admin"><tt class="docutils literal"><span class="pre">admin</span></tt></a></li>
+<li><a class="reference internal" href="#forms"><tt class="docutils literal"><span class="pre">forms</span></tt></a></li>
+<li><a class="reference internal" href="#models"><tt class="docutils literal"><span class="pre">models</span></tt></a></li>
+<li><a class="reference internal" href="#views"><tt class="docutils literal"><span class="pre">views</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="internal_and_design.html"
+                        title="previous chapter">Form handling</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="demo-other.html"
+                        title="next chapter">Other</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/demo.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="demo-other.html" title="Other"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="internal_and_design.html" title="Form handling"
+             >previous</a> |</li>
+        <li><a href="index.html">RFID Lock Management 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Nadia Karlinsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
