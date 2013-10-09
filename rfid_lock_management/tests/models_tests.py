@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from django.test import TestCase, LiveServerTestCase
 from django.test.client import Client
-from rfid_lock_management.models import * 
+from rfid_lock_management.models import *
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 #from django.utils.timezone import utc
