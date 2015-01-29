@@ -44,6 +44,7 @@ def chartify(request):
 def get_allowed_rfids(request, doorid):
     """
     Returns list of allowed rfid's for the specified door in JSON format
+    (update: no, spaces for now)
     """
     try:
         door = Door.objects.get(pk=doorid)
@@ -52,8 +53,12 @@ def get_allowed_rfids(request, doorid):
     except:  # door may not exist or any other error . . .
         alloweds = ""   # but still need to respond
 
-    to_json = {"doorid": int(doorid), "allowed_rfids": alloweds}
-    return HttpResponse(simplejson.dumps(to_json), content_type='application/json')
+    #to_json = {"doorid": int(doorid), "allowed_rfids": alloweds}
+    #return HttpResponse(simplejson.dumps(to_json), content_type='application/json')
+
+    # we don't feel like making the arduino parse c, so let's just send a list
+    # of numbers separated by spaces
+    return HttpResponse(' '.join(alloweds))
 
 
 def check(request, doorid, rfid):
