@@ -55,8 +55,7 @@ def get_allowed_rfids(request, doorid):
 
     #to_json = {"doorid": int(doorid), "allowed_rfids": alloweds}
     #return HttpResponse(simplejson.dumps(to_json), content_type='application/json')
-
-    # we don't feel like making the arduino parse c, so let's just send a list
+    # We don't feel like making the arduino parse JSON, so let's just send a list
     # of numbers separated by spaces
     return HttpResponse(' '.join(alloweds))
 
