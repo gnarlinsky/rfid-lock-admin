@@ -93,8 +93,8 @@ class LockCommunicationTests(TestCase):
         """ get all allowed RFIDs for door that does not exist """
         response = self.client.get("/door/10/getallowed/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content,
-            '{"doorid": 10, "allowed_rfids": ""}')
+        self.assertEqual(response.content, '\0')
+            #'{"doorid": 10, "allowed_rfids": ""}')
 
     def test_all_allowed_wrong_format(self):
         """ get all allowed RFIDs for door in wrong format (incorrect url) """
@@ -102,17 +102,38 @@ class LockCommunicationTests(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.content, "")
 
+    def test_get_allowed_rfids_has_null_terminator(self):
+        """ Does get_allowed_rfids() return a rfids separated by spaces, with a
+        null terminator?  """
+        # TODO: not the most elegant test...
+        response = self.client.get('/door/1/getallowed/')
+
+        # verify there is a null terminator at the end of the response string
+        actual_rfids = response.content
+        self.assertEqual('\0', actual_rfids[-1:])
+
     def test_all_allowed_existing_door(self):
         """ get all allowed RFIDs for existing door """
-        response = self.client.get("/door/2/getallowed/")
+        response = self.client.get('/door/1/getallowed/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content,
-            '{"doorid": 2, "allowed_rfids": ["1122135199", "9999999992"]}')
+
+        # grab the rfids from actual, removing the null terminator
+        actual_rfids = response.content
+        actual_rfids = actual_rfids[:-1]
+        actual_rfids_sorted_list = sorted(actual_rfids.split())
+        actual_rfids_as_string = ' '.join(actual_rfids_sorted_list)
+
+        # both actual and expected should be sorted so we can compare them
+        self.assertEqual('1122135122 1122135199',
+                         actual_rfids_as_string)
+        #self.assertEqual(response.content,
+        #    '{"doorid": 2, "allowed_rfids": ["1122135199", "9999999992"]}')
 
     def test_all_allowed_inactive_not_allowed(self):
         """ list of allowed RFIDs does not contain any inactive ones """
         response = self.client.get("/door/3/getallowed/")
         self.assertEqual(response.status_code, 200)
-        allowed = simplejson.loads(response.content)['allowed_rfids']
+        #allowed = simplejson.loads(response.content)['allowed_rfids']
         # should not contain the inactive RFID 9999999991
-        self.assertNotIn('9999999991', allowed)
+        # remove null terminator
+        self.assertNotIn('9999999991', response.content[-1:])

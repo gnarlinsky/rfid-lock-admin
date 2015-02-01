@@ -9,41 +9,6 @@ from rfid_lock_management.views import get_allowed_rfids
 from rfid_lock_management.models import *
 from test_helpers import t_info
 
-
-class ResponseToArduinoTests(TestCase):
-    fixtures = ['initial.json']
-
-    def setUp(self):
-        t_info('TestCase ResponseToArudinoTests', 1)
-        t_info(self._testMethodName + ': ' + self._testMethodDoc, 2)
-        self.client = Client()
-
-    def test_get_allowed_rfids_has_null_terminator(self):
-        """ Does get_allowed_rfids() return a rfids separated by spaces, with a
-        null terminator?  """
-        # TODO: not the most elegant test...
-        response = self.client.get('/door/1/getallowed')
-
-        # verify there is a null terminator at the end of the response string
-        actual_rfids = get_allowed_rfids(response.request, 1).content
-        self.assertEqual('\0', actual_rfids[-1:])
-
-    def test_get_allowed_rfids_all_correct(self):
-        """ Does get_allowed_rfids() return a rfids separated by spaces, with a
-        null terminator?  """
-        # TODO: not the most elegant test...
-        response = self.client.get('/door/1/getallowed')
-
-        # grab the rfids from actual, removing the null terminator
-        actual_rfids = get_allowed_rfids(response.request, 1).content
-        actual_rfids = actual_rfids[:-1]
-        actual_rfids_sorted_list = sorted(actual_rfids.split())
-        actual_rfids_as_string = ' '.join(actual_rfids_sorted_list)
-
-        # both actual and expected should be sorted so we can compare them
-        self.assertEqual('1122135122 1122135199',
-                         actual_rfids_as_string)
-
 class ChartDataTests(TestCase):
     fixtures = ['initial.json']
 
