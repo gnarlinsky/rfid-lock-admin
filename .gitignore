@@ -14,6 +14,7 @@ mydjgrep.sh
 test_create_new_lockuser_and_assign_keycard_walkthrough___screenshots
 htmlcov
 .coverage
+old_activate
 
 # Symbolic links #
 ###################
