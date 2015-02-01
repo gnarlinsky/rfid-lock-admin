@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 #from django.utils.timezone import utc
 from django.test import TestCase
 from django.test.client import Client
+from rfid_lock_management.views import get_allowed_rfids
 from rfid_lock_management.models import *
 from test_helpers import t_info
 
@@ -17,29 +18,31 @@ class ResponseToArduinoTests(TestCase):
         t_info(self._testMethodName + ': ' + self._testMethodDoc, 2)
         self.client = Client()
 
-    def test_get_allowed_rfids(self):
+    def test_get_allowed_rfids_has_null_terminator(self):
         """ Does get_allowed_rfids() return a rfids separated by spaces, with a
         null terminator?  """
         # TODO: not the most elegant test...
-        print '\n\nLets just check something . . .; '
-        print RFIDkeycard.objects.all(), '\n\n'
+        response = self.client.get('/door/1/getallowed')
 
-        response = self.client.get('/door/1/getallowed')  # lockuser object id is 1
+        # verify there is a null terminator at the end of the response string
+        actual_rfids = get_allowed_rfids(response.request, 1).content
+        self.assertEqual('\0', actual_rfids[-1:])
 
-        # RFIDkeycard.objects.filter( for a specific door)
-
-        # get all rfids, check what's going on here
-        # then check what's going on with fixture, if after adding that things
-        # will change
+    def test_get_allowed_rfids_all_correct(self):
+        """ Does get_allowed_rfids() return a rfids separated by spaces, with a
+        null terminator?  """
+        # TODO: not the most elegant test...
+        response = self.client.get('/door/1/getallowed')
 
         # grab the rfids from actual, removing the null terminator
-        actual_rfids = blah.get_allowed_rfids()[:-1]
+        actual_rfids = get_allowed_rfids(response.request, 1).content
+        actual_rfids = actual_rfids[:-1]
         actual_rfids_sorted_list = sorted(actual_rfids.split())
         actual_rfids_as_string = ' '.join(actual_rfids_sorted_list)
 
         # both actual and expected should be sorted so we can compare them
-        self.assertEqual('1122135122 1122135199 9999999991 9999999992',
-                         actual_rfids_sorted_as_string)
+        self.assertEqual('1122135122 1122135199',
+                         actual_rfids_as_string)
 
 class ChartDataTests(TestCase):
     fixtures = ['initial.json']
