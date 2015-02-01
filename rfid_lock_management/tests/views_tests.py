@@ -10,9 +10,36 @@ from test_helpers import t_info
 
 
 class ResponseToArduinoTests(TestCase):
+    fixtures = ['initial.json']
+
     def setUp(self):
         t_info('TestCase ResponseToArudinoTests', 1)
         t_info(self._testMethodName + ': ' + self._testMethodDoc, 2)
+        self.client = Client()
+
+    def test_get_allowed_rfids(self):
+        """ Does get_allowed_rfids() return a rfids separated by spaces, with a
+        null terminator?  """
+        # TODO: not the most elegant test...
+        print '\n\nLets just check something . . .; '
+        print RFIDkeycard.objects.all(), '\n\n'
+
+        response = self.client.get('/door/1/getallowed')  # lockuser object id is 1
+
+        # RFIDkeycard.objects.filter( for a specific door)
+
+        # get all rfids, check what's going on here
+        # then check what's going on with fixture, if after adding that things
+        # will change
+
+        # grab the rfids from actual, removing the null terminator
+        actual_rfids = blah.get_allowed_rfids()[:-1]
+        actual_rfids_sorted_list = sorted(actual_rfids.split())
+        actual_rfids_as_string = ' '.join(actual_rfids_sorted_list)
+
+        # both actual and expected should be sorted so we can compare them
+        self.assertEqual('1122135122 1122135199 9999999991 9999999992',
+                         actual_rfids_sorted_as_string)
 
 class ChartDataTests(TestCase):
     fixtures = ['initial.json']
@@ -23,10 +50,8 @@ class ChartDataTests(TestCase):
         self.client = Client()
 
     def test_chartify(self):
-        """
-        Does chartify() return response with the correct(ly formatted) data
-        for HighChart plot of access times?
-        """
+        """ Does chartify() return response with the correct(ly formatted) data
+        for HighChart plot of access times?  """
         # login as staff user in fixture
         self.client.login(username='moe', password='moe')
         response = self.client.get('/chart/')
@@ -39,7 +64,7 @@ class ChartDataTests(TestCase):
         self.assertEqual(response['content-type'], 'text/html; charset=utf-8')
 
         # tooltip hardcoded in view as well
-        tooltip = {'followPointer': 'false', 'pointFormat': ''{point.user}''}
+        tooltip = {'followPointer': 'false', 'pointFormat': '"{point.user}"'}
         all_doors_series = []
         for door in Door.objects.all():
             # get the data points for this door
@@ -73,11 +98,9 @@ class NewKeycardScanTests(TestCase):
         self.client.login(username='johnny_staff', password='my_password')
 
     def test_initiate_new_keycard_scan_but_no_lockuser(self):
-        """
-        Lockuser with specified id does not exist:
-        - check for appropriate response
-        - and that a new NewKeycardScan object is not created
-        """
+        """ Lockuser with specified id does not exist:
+            - check for appropriate response
+            - and that a new NewKeycardScan object is not created """
         t_info('There\'s no LockUser with pk 1, right?', 4)
         self.assertFalse(LockUser.objects.filter(pk=1))
 
@@ -105,11 +128,9 @@ class NewKeycardScanTests(TestCase):
             'This lock user was probably not found in the system.')
 
     def test_initiate_new_keycard_scan_but_lockuser_has_keycard(self):
-        """
-        Lockuser with specified id already has an assigned keycard: check for
+        """ Lockuser with specified id already has an assigned keycard: check for
         appropriate response and that a new NewKeycardScan object is not
-        created
-        """
+        created """
         t_info('No LockUsers at all, right?', 4)
         self.assertEqual(len(LockUser.objects.all()), 0)
 
@@ -159,13 +180,11 @@ class NewKeycardScanTests(TestCase):
             'This lock user is already assigned a keycard.')
 
     def test_initiate_new_keycard_scan(self):
-        """
-        Lockuser with specified id exists, does not have assigned keycard:
-        - check for appropriate response
-        - and that a new NewKeycardScan object is created,
-        - and it has correct attributes (waiting_for_scan = True;
-          assigner_user = request.user)
-        """
+        """ Lockuser with specified id exists, does not have assigned keycard:
+            - check for appropriate response
+            - and that a new NewKeycardScan object is created,
+            - and it has correct attributes (waiting_for_scan = True;
+              assigner_user = request.user) """
         t_info('No LockUsers at all, right?', 4)
         self.assertEqual(len(LockUser.objects.all()), 0)
         t_info('Creating new lockuser..........', 3)
@@ -223,11 +242,9 @@ class NewKeycardScanTests(TestCase):
     #
     # Issue #b (verifying model fields)
     def test_finished_new_keycard_scan(self):
-        """
-        Everything went ok (no active keycard with this RFID num already;
+        """ Everything went ok (no active keycard with this RFID num already;
         a NewKeycardScan object with this pk does exist and has an RFID num;
-        not timed out), so can assign keycard.
-        """
+        not timed out), so can assign keycard.  """
         new_scan_pk = 1
         new_rfid = '9999999999'
 
@@ -309,7 +326,7 @@ class NewKeycardScanTests(TestCase):
         # then hit 'Done.' '  % default_timeout_minutes)
         self.assertEqual(simplejson.loads(response.content)['error_mess'],
             'Sorry, the system timed out. You have {} minutes to scan the card, '
-            'then hit 'Done.' '.format(min_till_timeout))
+            'then hit "Done." '.format(min_till_timeout))
 
     def test_finished_new_keycard_scan_obj_does_not_have_rfid(self):
         """ NewKeycardScan object did not get an RFID num """
@@ -333,10 +350,8 @@ class NewKeycardScanTests(TestCase):
             'NewKeycardScan does not have RFID.')
 
     def test_finished_new_keycard_scan_keycard_with_same_rfid_exists(self):
-        """
-        A keycard with the same RFID is already assigned to another
-        lockuser
-        """
+        """ A keycard with the same RFID is already assigned to another
+        lockuser """
         # create the RFIDkeycard whose rfid is the same as the one trying to
         # assign; create the lockuser with that rfid
         t_info('Creating new lockuser..........', 3)

@@ -10,9 +10,8 @@ from rfid_lock_management.models import *
 
 
 def do_json_resp(success, message):
-    response_data = {
-        'success': success,
-        'error_mess': message}
+    response_data = {'success': success,
+                     'error_mess': message}
     return HttpResponse(simplejson.dumps(response_data),
                         content_type="application/json")
 
@@ -56,8 +55,8 @@ def get_allowed_rfids(request, doorid):
     #to_json = {"doorid": int(doorid), "allowed_rfids": alloweds}
     #return HttpResponse(simplejson.dumps(to_json), content_type='application/json')
     # We don't feel like making the arduino parse JSON, so let's just send a list
-    # of numbers separated by spaces
-    return HttpResponse(' '.join(alloweds))
+    # of numbers separated by spaces.
+    return HttpResponse(' '.join(alloweds) + '\0')
 
 
 def check(request, doorid, rfid):

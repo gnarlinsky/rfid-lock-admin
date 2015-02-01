@@ -1,0 +1,2 @@
+(new_djock_ve)┌──18:17:13──gnadia.code@gmail.com/githubbed/djock───────{master}─────
+$ ./manage.py test rfid_lock_management.ResponseToArduinoTests
