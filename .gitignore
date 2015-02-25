@@ -3,18 +3,9 @@
 # So no trailing white space or comments on the same line.
 #########################################################
 
-ignore_me_for_readme
-NO
-generated_docum_and_coverage
-# PyCharm:
-.idea
-expanded_comments.txt
-pydocs
-mydjgrep.sh
-test_create_new_lockuser_and_assign_keycard_walkthrough___screenshots
-htmlcov
-.coverage
-old_activate
+# virtualenv #
+##############
+ve
 
 # Symbolic links #
 ###################
