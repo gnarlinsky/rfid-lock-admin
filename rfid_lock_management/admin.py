@@ -121,8 +121,7 @@ class DoorCustomFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value():
-            #return queryset.filter(country__id__exact=self.value())
-            return queryset.filter(id=self.value())
+            return queryset.filter(door__id=self.value())
         else:
             return queryset
  
@@ -153,8 +152,7 @@ class LockUserCustomFilter(SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value():
-            #return queryset.filter(country__id__exact=self.value())
-            return queryset.filter(id=self.value())
+            return queryset.filter(lockuser__id=self.value())
         else:
             return queryset
 
@@ -370,8 +368,6 @@ class AccessTimeAdmin(admin.ModelAdmin):
     # include date-based drilldown navigation
     date_hierarchy = 'access_time'
     # show filters by RFID and active/inactive on the right
-    # TODO: the custom filters work in that they don't show the 'None' but they don't actually filter!  
-    # That's because the queryset() method cannot return just queryset, it has to return the FILTERED queryset
     #list_filter = ('lockuser', 'door')
     list_filter = (DoorCustomFilter, LockUserCustomFilter)
 
