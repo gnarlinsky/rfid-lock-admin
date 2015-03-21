@@ -56,3 +56,14 @@ def get_object_type(content_type_id):
         return ct.model
     except:
         return None
+
+
+# @register.filter
+# def isnull_true_thing(query_string_thing):
+#     """
+#     Checks that object's query_string is not '?door__isnull=True' nor
+#     '?lockuser__isnull=True'.  TODO: this is a really gross, interim way to fix
+#     not showing '(None') in change_list sidebar.
+#     """
+#     return query_string not in ['?lockuser__isnull=True', '?door__isnull=True']
+

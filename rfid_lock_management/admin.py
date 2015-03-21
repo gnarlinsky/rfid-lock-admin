@@ -7,6 +7,9 @@ from django import forms
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.contrib.admin import SimpleListFilter
+from django.utils.translation import ugettext_lazy as _
+
 
 
 class LockUserForm(ModelForm):
@@ -91,6 +94,69 @@ class LockUserForm(ModelForm):
                     else:
                         self.cleaned_data['doors'] = Door.objects.filter(pk=item.pk)
         return self.cleaned_data
+
+class DoorCustomFilter(SimpleListFilter):
+    """ TODO: interim and probably gross way to fix not showing '(None') 
+        in change_list sidebar. And note how similar LockUserFilterWithCustomTemplate is.
+    """
+    #template = 'custom_list_filter.html'
+
+    # Human-readable title which will be displayed in the
+    # right admin sidebar just above the filter options.
+    title = _('Door')
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'door__id__exact'
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples where the first element 
+        is the coded value for the option that will
+        appear in the URL query and the second is the 
+        human-readable name for the option that will appear
+        in the right sidebar.
+        """
+        doors = Door.objects.all()
+        return [ (door.id, door.name) for door in doors]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            #return queryset.filter(country__id__exact=self.value())
+            return queryset.filter(id=self.value())
+        else:
+            return queryset
+ 
+
+class LockUserCustomFilter(SimpleListFilter):
+    """ TODO: interim and probably gross way to fix not showing '(None') 
+        in change_list sidebar. And note how similar LockUserFilterWithCustomTemplate is.
+    """
+    #template = 'custom_list_filter.html'
+
+    # Human-readable title which will be displayed in the
+    # right admin sidebar just above the filter options.
+    title = _('Lock User')
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'lockuser__id__exact'
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples where the first element 
+        is the coded value for the option that will
+        appear in the URL query and the second is the 
+        human-readable name for the option that will appear
+        in the right sidebar.
+        """
+        lock_users = LockUser.objects.all()
+        return [ (lock_user.id, lock_user.first_name + ' ' + lock_user.last_name) for lock_user in lock_users]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            #return queryset.filter(country__id__exact=self.value())
+            return queryset.filter(id=self.value())
+        else:
+            return queryset
 
 
 class LockUserAdmin(admin.ModelAdmin):
@@ -304,7 +370,10 @@ class AccessTimeAdmin(admin.ModelAdmin):
     # include date-based drilldown navigation
     date_hierarchy = 'access_time'
     # show filters by RFID and active/inactive on the right
-    list_filter = ('lockuser', 'door')
+    # TODO: the custom filters work in that they don't show the 'None' but they don't actually filter!  
+    # That's because the queryset() method cannot return just queryset, it has to return the FILTERED queryset
+    #list_filter = ('lockuser', 'door')
+    list_filter = (DoorCustomFilter, LockUserCustomFilter)
 
     def changelist_view(self, request, extra_context=None):
         """
