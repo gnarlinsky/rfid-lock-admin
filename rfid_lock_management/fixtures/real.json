@@ -384,11 +384,11 @@
       "last_login": "2013-04-11T00:44:38",
       "groups": [],
       "user_permissions": [
-        27,   # change access time
-        29,  # change lock user
-        37,  # door 1  (json no have comments, delete us)
-        38, # no exist
-        39  # no exist
+        27,
+        29,
+        37,
+        38,
+        39
       ],
       "password": "pbkdf2_sha256$10000$CXyQ714GlGYt$PltE5WBfMggLFs90R9A2/YH1uX7tTDjFVj+h4lxfSp8=",
       "email": "",
