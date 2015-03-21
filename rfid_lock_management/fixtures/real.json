@@ -6,7 +6,7 @@
       "door": 1,
       "access_time": "2013-04-10T00:56:21.644",
       "the_rfid": "1122135199",
-      "lockuser": 2,
+      "lockuser": 1,
       "data_point": "{\"y\": \"Date.UTC(0,0,0, 0,56,21)\", \"x\": \"Date.UTC(2013,3,10)\", \"user\": \"\\\"homer simpson\\\"\"}"
     }
   },
@@ -191,8 +191,8 @@
       "content_type": 8
     }
   },
-  {
-    "pk": 37,
+ {
+    "pk": 40,
     "model": "auth.permission",
     "fields": {
       "codename": "can_manage_door_1",
@@ -200,6 +200,7 @@
       "content_type": 8
     }
   },
+
   {
     "pk": 28,
     "model": "auth.permission",
@@ -386,7 +387,7 @@
       "user_permissions": [
         27,
         29,
-        37,
+        40,
         38,
         39
       ],
