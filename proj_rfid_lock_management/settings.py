@@ -134,8 +134,8 @@ INSTALLED_APPS = (
     'django_extensions',
     #'chartit',
     'django.contrib.messages',
-    'south',
-    'gunicorn'
+    #'south',
+    #'gunicorn'
 )
 
 
